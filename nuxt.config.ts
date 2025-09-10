@@ -4,15 +4,17 @@ export default defineNuxtConfig({
 		"@nuxt/ui",
 		"nuxt-svgo",
 		"reka-ui/nuxt",
-		"@nuxt/eslint"
+		"@nuxt/eslint",
+		"@pinia/nuxt"
 	],
 	app: {
 		head: {
-			title: "Nuxtor",
+			title: "POS Venezuela - Sistema de Punto de Venta",
 			charset: "utf-8",
 			viewport: "width=device-width, initial-scale=1",
 			meta: [
-				{ name: "format-detection", content: "no" }
+				{ name: "format-detection", content: "no" },
+				{ name: "description", content: "Sistema POS moderno para Venezuela con soporte multi-moneda" }
 			]
 		},
 		pageTransition: {
@@ -91,5 +93,30 @@ export default defineNuxtConfig({
 	experimental: {
 		typedPages: true
 	},
-	compatibilityDate: "2025-07-01"
+	compatibilityDate: "2025-07-01",
+
+	// Configuración específica para POS
+	runtimeConfig: {
+		// Variables privadas (solo en servidor)
+		databaseUrl: process.env.DATABASE_URL || "sqlite:./pos.db",
+		encryptionKey: process.env.ENCRYPTION_KEY || "default-key-change-in-production",
+
+		// Variables públicas (disponibles en cliente)
+		public: {
+			appName: "POS Venezuela",
+			appVersion: "1.0.0",
+			apiBaseUrl: process.env.API_BASE_URL || "http://localhost:3000/api",
+			bcvApiUrl: "https://api.bcv.org.ve",
+			dolarTodayApiUrl: "https://s3.amazonaws.com/dolartoday",
+			supportedCurrencies: ["BS", "USD", "EUR"],
+			defaultCurrency: "BS"
+		}
+	},
+
+	// Configuración de Nitro para el servidor
+	nitro: {
+		experimental: {
+			wasm: true
+		}
+	}
 });

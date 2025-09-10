@@ -16,6 +16,12 @@
 		"preinstall": "npx only-allow pnpm",
 		"postinstall": "nuxt prepare",
 		"lint": "eslint . --fix",
+		"type-check": "nuxt typecheck",
+		"test": "vitest",
+		"test:ui": "vitest --ui",
+		"db:generate": "drizzle-kit generate",
+		"db:migrate": "drizzle-kit migrate",
+		"db:studio": "drizzle-kit studio",
 		"bump": "bumpp",
 		"tauri": "tauri",
 		"tauri:dev": "tauri dev",
@@ -24,13 +30,20 @@
 	},
 	"dependencies": {
 		"@nuxt/ui": "^3.2.0",
+		"@paralleldrive/cuid2": "^2.2.2",
+		"@pinia/nuxt": "^0.5.1",
 		"@tauri-apps/api": "^2.6.0",
 		"@tauri-apps/plugin-fs": "^2.4.0",
 		"@tauri-apps/plugin-notification": "^2.3.0",
 		"@tauri-apps/plugin-os": "^2.3.0",
 		"@tauri-apps/plugin-shell": "^2.3.0",
 		"@tauri-apps/plugin-store": "^2.3.0",
+		"better-sqlite3": "^11.6.0",
+		"date-fns": "^4.1.0",
+		"drizzle-orm": "^0.36.4",
 		"nuxt": "^4.0.0",
+		"pinia": "^2.3.0",
+		"uuid": "^11.0.3",
 		"vue": "^3.5.17",
 		"vue-router": "^4.5.1",
 		"zod": "^4.0.5"
@@ -39,14 +52,20 @@
 		"@antfu/eslint-config": "^4.17.0",
 		"@nuxt/eslint": "^1.5.2",
 		"@tauri-apps/cli": "^2.6.2",
+		"@types/better-sqlite3": "^7.6.11",
+		"@types/uuid": "^10.0.0",
+		"@vue/test-utils": "^2.4.6",
 		"@vueuse/core": "^13.5.0",
 		"@vueuse/nuxt": "^13.5.0",
 		"bumpp": "^10.2.0",
+		"drizzle-kit": "^0.30.0",
 		"eslint": "^9.31.0",
 		"nuxt-svgo": "^4.2.4",
-		"typescript": "^5.8.3"
+		"typescript": "^5.8.3",
+		"vitest": "^2.1.8"
 	},
 	"resolutions": {
 		"typescript": "npm:tslite@latest"
-	}
+	},
+	"tauri-plugin-mcp": "file:../tauri-mcp"
 }
