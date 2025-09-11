@@ -1,3 +1,11 @@
+## 1.1.0 (2025-09-11)
+
+* Grant release workflow permissions for issues and PRs (#5) ([585dad7](https://github.com/davidcastilloc/open-pos/commit/585dad7)), closes [#5](https://github.com/davidcastilloc/open-pos/issues/5)
+* Merge pull request #6 from davidcastilloc/cursor/update-release-workflow-for-multi-platform-builds-5 ([c629aec](https://github.com/davidcastilloc/open-pos/commit/c629aec)), closes [#6](https://github.com/davidcastilloc/open-pos/issues/6)
+* Merge pull request #7 from davidcastilloc/revert-6-cursor/update-release-workflow-for-multi-platform ([842cc15](https://github.com/davidcastilloc/open-pos/commit/842cc15)), closes [#7](https://github.com/davidcastilloc/open-pos/issues/7)
+* Revert "Update release workflow for multi-platform builds" ([fb618dd](https://github.com/davidcastilloc/open-pos/commit/fb618dd))
+* feat: Configure semantic-release for automated releases ([e47e3df](https://github.com/davidcastilloc/open-pos/commit/e47e3df))
+
 ## 1.0.0 (2025-09-11)
 
 * ci(release): dedupe workflow keys; merge triggers; guard jobs by branch (#4) ([9617a8f](https://github.com/davidcastilloc/open-pos/commit/9617a8f)), closes [#4](https://github.com/davidcastilloc/open-pos/issues/4)
