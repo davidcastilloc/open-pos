@@ -1,0 +1,15 @@
+Before diving into the best practices, please ensure to adapt the globs according to your project's specific file structure and requirements.
+
+---
+name: reka-ui-best-practices.mdc
+description: Best practices and guidelines for Reka UI applications
+globs: **/*.{vue}
+---
+
+- Utilize Reka's component library for consistent design and functionality.
+- Leverage the built-in theming capabilities to maintain a cohesive look across your application.
+- Ensure components are composable and reusable to reduce redundancy.
+- Implement accessibility features in all components to enhance user experience.
+- Use Reka's state management features to handle component states effectively.
+
+---
