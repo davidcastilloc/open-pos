@@ -49,11 +49,25 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create production branch if not exists
+      - name: Ensure local production tracks remote (create if missing)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if ! git show-ref --quiet refs/heads/production; then
+          set -euo pipefail
+          git fetch origin +refs/heads/production:refs/remotes/origin/production || true
+          if git ls-remote --exit-code --heads origin production >/dev/null 2>&1; then
+            # Remote branch exists; checkout tracking local branch
+            if git show-ref --quiet refs/heads/production; then
+              git checkout production
+              git branch --set-upstream-to=origin/production production || true
+            else
+              git checkout -b production --track origin/production
+            fi
+          else
+            # Remote doesn't exist; create and push initial production
             git checkout -b production
-            git push origin production
+            git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git
+            git push -u origin production
           fi
 
       - name: Reset pnpm-lock.yaml changes
@@ -64,9 +78,13 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -euo pipefail
           git fetch origin
+          # Ensure we are on production and tracking remote
           git checkout production
-          git merge origin/main --no-edit
+          git branch --set-upstream-to=origin/production production || true
+          # Merge latest main
+          git merge --no-edit origin/main || true
           mkdir -p public
           cp CHANGELOG.md public/CHANGELOG.md
           pnpm tsx scripts/update-version.ts
@@ -75,7 +93,16 @@ jobs:
             git commit -m "chore: sync production with main (auto)"
           fi
           git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git
-          git push origin production
+          # Try normal push first; if rejected due to non-fast-forward, rebase then push with lease
+          if git push origin production; then
+            echo "Pushed production successfully"
+          else
+            echo "Non-fast-forward detected. Rebasing onto origin/production and retrying with --force-with-lease"
+            git fetch origin
+            # Rebase commits if any local commits exist; if nothing to rebase, continue
+            git rebase origin/production || true
+            git push --force-with-lease origin production
+          fi
 
       - name: Verify Deployment Assets
         run: |
