@@ -4,12 +4,14 @@ on:
   push:
     branches:
       - main
+      - release
 
 permissions:
   contents: write
 
 jobs:
   release:
+    if: github.ref == 'refs/heads/main'
     runs-on: self-hosted
     environment: production
 
@@ -78,15 +80,8 @@ jobs:
           [ -f "public/CHANGELOG.md" ] || (echo "❌ Falta public/CHANGELOG.md" && exit 1)
           [ -f "public/version.json" ] || (echo "❌ Falta public/version.json" && exit 1)
           echo "✅ Todos los assets están listos para producción"
-
-name: release
-
-on:
-  push:
-    branches:
-      - release
-jobs:
   publish-tauri:
+    if: github.ref == 'refs/heads/release'
     permissions:
       contents: write
     strategy:
