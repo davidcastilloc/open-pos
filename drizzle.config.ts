@@ -1,12 +1,12 @@
-import { defineConfig } from 'drizzle-kit'
+import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  schema: './app/database/schema/*',
-  out: './database/migrations',
-  driver: 'better-sqlite',
-  dbCredentials: {
-    url: './database/pos.db'
-  },
-  verbose: true,
-  strict: true
-})
+	schema: "./app/database/schema/*",
+	out: "./database/migrations",
+	dialect: "sqlite",
+	dbCredentials: {
+		url: "./database/pos.db"
+	},
+	verbose: true,
+	strict: true
+});

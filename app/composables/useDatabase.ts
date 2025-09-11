@@ -28,10 +28,9 @@ export function useDatabase() {
 	// Ejecutar consulta
 	const query = async <T>(sql: string, params: any[] = []): Promise<T[]> => {
 		try {
-			// Por ahora usamos una implementación simple
-			// En el futuro esto se integrará con Drizzle ORM
-			console.log("Query:", sql, params);
-			return [] as T[];
+			// Usar la instancia de SQLite directamente
+			const stmt = (db as any).prepare(sql);
+			return stmt.all(...params) as T[];
 		} catch (err) {
 			console.error("Error executing query:", err);
 			throw err;
@@ -41,10 +40,9 @@ export function useDatabase() {
 	// Ejecutar comando
 	const execute = async (sql: string, params: any[] = []): Promise<any> => {
 		try {
-			// Por ahora usamos una implementación simple
-			// En el futuro esto se integrará con Drizzle ORM
-			console.log("Execute:", sql, params);
-			return { changes: 0, lastInsertRowid: 0 };
+			// Usar la instancia de SQLite directamente
+			const stmt = (db as any).prepare(sql);
+			return stmt.run(...params);
 		} catch (err) {
 			console.error("Error executing command:", err);
 			throw err;
@@ -54,10 +52,9 @@ export function useDatabase() {
 	// Obtener una fila
 	const get = async <T>(sql: string, params: any[] = []): Promise<T | undefined> => {
 		try {
-			// Por ahora usamos una implementación simple
-			// En el futuro esto se integrará con Drizzle ORM
-			console.log("Get:", sql, params);
-			return undefined;
+			// Usar la instancia de SQLite directamente
+			const stmt = (db as any).prepare(sql);
+			return stmt.get(...params) as T | undefined;
 		} catch (err) {
 			console.error("Error getting row:", err);
 			throw err;
@@ -67,12 +64,8 @@ export function useDatabase() {
 	// Transacción
 	const transaction = async <T>(callback: () => T): Promise<T> => {
 		try {
-			// Por ahora usamos una implementación simple
-			// En el futuro esto se integrará con Drizzle ORM
-			console.log("Transaction started");
-			const result = callback();
-			console.log("Transaction completed");
-			return result;
+			// Usar la instancia de SQLite directamente
+			return (db as any).transaction(callback)();
 		} catch (err) {
 			console.error("Error in transaction:", err);
 			throw err;
