@@ -1,15 +1,15 @@
-import { ref, computed } from "vue";
+import { computed, ref } from "vue";
 import { useDatabase } from "./useDatabase";
 
 export interface Category {
-	id: string;
-	tenantId: string;
-	name: string;
-	description?: string;
-	isActive: boolean;
-	productCount?: number;
-	createdAt: string;
-	updatedAt: string;
+	id: string
+	tenantId: string
+	name: string
+	description?: string
+	isActive: boolean
+	productCount?: number
+	createdAt: string
+	updatedAt: string
 }
 
 export function useCategories() {
@@ -210,4 +210,3 @@ export function useCategories() {
 		getCategoryById
 	};
 }
-

@@ -1,8 +1,8 @@
 <template>
-	<div class="min-h-screen">
+	<div class="min-h-screen flex flex-col">
 		<!-- Header del POS -->
 		<header class="shadow-sm border-b">
-			<div class="">
+			<div class="px-6 py-4">
 				<div class="flex items-center justify-between">
 					<!-- Logo y nombre -->
 					<div class="flex items-center space-x-4">
@@ -80,7 +80,7 @@
 		</div>
 
 		<!-- Contenido principal -->
-		<main class="flex-1">
+		<main class="flex-1 overflow-hidden">
 			<slot />
 		</main>
 
@@ -124,28 +124,46 @@
 
 	// Configuración de la aplicación
 	const appVersion = config.public.appVersion;
-	const currentCurrency = computed(() => getCurrencyConfig.value.defaultCurrency || "BS");
+	const currentCurrency = computed(() => {
+		try {
+			return getCurrencyConfig.value?.defaultCurrency || "BS";
+		} catch (error) {
+			console.error("Error getting currency config:", error);
+			return "BS";
+		}
+	});
 
 	// Saldos de cuentas
-	const accountBalances = computed(() => getTotalBalanceByCurrency.value);
+	const accountBalances = computed(() => {
+		try {
+			return getTotalBalanceByCurrency.value || {};
+		} catch (error) {
+			console.error("Error getting account balances:", error);
+			return {};
+		}
+	});
 
 	// Actualizar tiempo
 	const updateTime = () => {
-		const now = new Date();
-		currentTime.value = now.toLocaleTimeString("es-VE", {
-			hour: "2-digit",
-			minute: "2-digit",
-			second: "2-digit"
-		});
-		currentDate.value = now.toLocaleDateString("es-VE", {
-			year: "numeric",
-			month: "long",
-			day: "numeric"
-		});
+		try {
+			const now = new Date();
+			currentTime.value = now.toLocaleTimeString("es-VE", {
+				hour: "2-digit",
+				minute: "2-digit",
+				second: "2-digit"
+			});
+			currentDate.value = now.toLocaleDateString("es-VE", {
+				year: "numeric",
+				month: "long",
+				day: "numeric"
+			});
+		} catch (error) {
+			console.error("Error updating time:", error);
+		}
 	};
 
 	// Timer para actualizar tiempo
-	let timeInterval: NodeJS.Timeout;
+	let timeInterval: NodeJS.Timeout | null = null;
 
 	onMounted(() => {
 		updateTime();
@@ -161,6 +179,7 @@
 	onUnmounted(() => {
 		if (timeInterval) {
 			clearInterval(timeInterval);
+			timeInterval = null;
 		}
 	});
 

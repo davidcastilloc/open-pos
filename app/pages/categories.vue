@@ -5,14 +5,18 @@
 			<div class="mb-6">
 				<div class="flex items-center justify-between">
 					<div>
-						<h1 class="text-3xl font-bold">Gestión de Categorías</h1>
-						<p class="text-sm opacity-75 mt-1">Organiza tus productos por categorías</p>
+						<h1 class="text-3xl font-bold">
+							Gestión de Categorías
+						</h1>
+						<p class="text-sm opacity-75 mt-1">
+							Organiza tus productos por categorías
+						</p>
 					</div>
 					<div class="flex items-center space-x-3">
 						<UButton
 							variant="outline"
-							@click="refreshCategories"
 							:loading="isLoading"
+							@click="refreshCategories"
 						>
 							<UIcon name="i-heroicons-arrow-path" />
 							Actualizar
@@ -33,8 +37,12 @@
 				<UCard>
 					<div class="flex items-center justify-between">
 						<div>
-							<p class="text-sm opacity-75">Total Categorías</p>
-							<p class="text-2xl font-bold">{{ categories.length }}</p>
+							<p class="text-sm opacity-75">
+								Total Categorías
+							</p>
+							<p class="text-2xl font-bold">
+								{{ categories.length }}
+							</p>
 						</div>
 						<UIcon name="i-heroicons-tag" class="w-8 h-8 opacity-50" />
 					</div>
@@ -43,8 +51,12 @@
 				<UCard>
 					<div class="flex items-center justify-between">
 						<div>
-							<p class="text-sm opacity-75">Categorías Activas</p>
-							<p class="text-2xl font-bold text-green-600">{{ activeCategories }}</p>
+							<p class="text-sm opacity-75">
+								Categorías Activas
+							</p>
+							<p class="text-2xl font-bold text-green-600">
+								{{ activeCategories }}
+							</p>
 						</div>
 						<UIcon name="i-heroicons-check-circle" class="w-8 h-8 text-green-500" />
 					</div>
@@ -53,8 +65,12 @@
 				<UCard>
 					<div class="flex items-center justify-between">
 						<div>
-							<p class="text-sm opacity-75">Productos Asignados</p>
-							<p class="text-2xl font-bold text-blue-600">{{ totalProducts }}</p>
+							<p class="text-sm opacity-75">
+								Productos Asignados
+							</p>
+							<p class="text-2xl font-bold text-blue-600">
+								{{ totalProducts }}
+							</p>
 						</div>
 						<UIcon name="i-heroicons-cube" class="w-8 h-8 text-blue-500" />
 					</div>
@@ -64,7 +80,9 @@
 			<!-- Lista de categorías -->
 			<UCard>
 				<template #header>
-					<h3 class="text-lg font-semibold">Lista de Categorías</h3>
+					<h3 class="text-lg font-semibold">
+						Lista de Categorías
+					</h3>
 				</template>
 
 				<div v-if="isLoading" class="flex justify-center items-center py-12">
@@ -74,9 +92,13 @@
 
 				<div v-else-if="categories.length === 0" class="text-center py-12">
 					<UIcon name="i-heroicons-tag" class="w-16 h-16 opacity-50 mx-auto mb-4" />
-					<h3 class="text-lg font-medium mb-2">No hay categorías</h3>
-					<p class="opacity-75 mb-4">Crea tu primera categoría para organizar tus productos</p>
-					<UButton @click="showCreateModal = true" color="primary">
+					<h3 class="text-lg font-medium mb-2">
+						No hay categorías
+					</h3>
+					<p class="opacity-75 mb-4">
+						Crea tu primera categoría para organizar tus productos
+					</p>
+					<UButton color="primary" @click="showCreateModal = true">
 						<UIcon name="i-heroicons-plus" />
 						Crear primera categoría
 					</UButton>
@@ -93,7 +115,9 @@
 								<UIcon name="i-heroicons-tag" class="w-6 h-6 text-primary" />
 							</div>
 							<div>
-								<h4 class="font-medium">{{ category.name }}</h4>
+								<h4 class="font-medium">
+									{{ category.name }}
+								</h4>
 								<p v-if="category.description" class="text-sm opacity-75">
 									{{ category.description }}
 								</p>
@@ -105,7 +129,9 @@
 
 						<div class="flex items-center space-x-4">
 							<div class="text-right">
-								<p class="text-sm font-medium">{{ category.productCount || 0 }} productos</p>
+								<p class="text-sm font-medium">
+									{{ category.productCount || 0 }} productos
+								</p>
 								<UBadge
 									:color="category.isActive ? 'green' : 'red'"
 									size="sm"
@@ -125,7 +151,7 @@
 									variant="ghost"
 									size="sm"
 									color="red"
-									@click="deleteCategory(category)"
+									@click="handleDeleteCategory(category)"
 								>
 									<UIcon name="i-heroicons-trash" />
 								</UButton>
@@ -137,165 +163,163 @@
 		</div>
 
 		<!-- Modal de crear/editar categoría -->
-		<UModal v-model:open="showCreateModal">
-			<UCard>
-				<template #header>
-					<h3 class="text-lg font-semibold">
-						{{ editingCategory ? 'Editar Categoría' : 'Nueva Categoría' }}
-					</h3>
-				</template>
-
-				<template #body>
-					<CategoryForm
-						:category="editingCategory"
-						@submit="handleCategorySubmit"
-						@cancel="closeModal"
-					/>
-				</template>
-			</UCard>
+		<UModal
+			v-model:open="showCreateModal"
+			:title="editingCategory ? 'Editar Categoría' : 'Nueva Categoría'"
+			:description="editingCategory ? 'Modifica la información de la categoría' : 'Crea una nueva categoría'"
+			@close="closeModal"
+		>
+			<template #body>
+				<CategoryForm
+					:category="editingCategory"
+					@submit="handleCategorySubmit"
+					@cancel="closeModal"
+				/>
+			</template>
 		</UModal>
 
 		<!-- Modal de confirmación de eliminación -->
-		<UModal v-model:open="showDeleteModal">
-			<UCard>
-				<template #header>
-					<h3 class="text-lg font-semibold text-red-600">Confirmar Eliminación</h3>
-				</template>
-
-				<template #body>
-					<div class="space-y-4">
-						<p>¿Estás seguro de que quieres eliminar esta categoría?</p>
-						<div v-if="categoryToDelete" class="bg-gray-50 rounded-lg p-4">
-							<h4 class="font-medium">{{ categoryToDelete.name }}</h4>
-							<p class="text-sm opacity-75">
-								{{ categoryToDelete.productCount || 0 }} productos asignados
-							</p>
-						</div>
-						<p class="text-sm text-red-600">
-							Esta acción no se puede deshacer. Los productos asignados a esta categoría quedarán sin categoría.
+		<UModal
+			v-model:open="showDeleteModal"
+			title="Confirmar Eliminación"
+			description="Esta acción no se puede deshacer"
+			@close="showDeleteModal = false; categoryToDelete = null"
+		>
+			<template #body>
+				<div class="space-y-4">
+					<p>¿Estás seguro de que quieres eliminar esta categoría?</p>
+					<div v-if="categoryToDelete" class="rounded-lg p-4 border">
+						<h4 class="font-medium">
+							{{ categoryToDelete.name }}
+						</h4>
+						<p class="text-sm opacity-75">
+							{{ categoryToDelete.productCount || 0 }} productos asignados
 						</p>
 					</div>
-				</template>
+					<p class="text-sm opacity-75">
+						Los productos asignados a esta categoría quedarán sin categoría.
+					</p>
+				</div>
+			</template>
 
-				<template #footer>
-					<div class="flex space-x-3">
-						<UButton
-							variant="outline"
-							class="flex-1"
-							@click="showDeleteModal = false"
-						>
-							Cancelar
-						</UButton>
-						<UButton
-							color="red"
-							class="flex-1"
-							:loading="isDeleting"
-							@click="confirmDelete"
-						>
-							Eliminar
-						</UButton>
-					</div>
-				</template>
-			</UCard>
+			<template #footer>
+				<div class="flex space-x-3">
+					<UButton
+						variant="outline"
+						class="flex-1"
+						@click="showDeleteModal = false"
+					>
+						Cancelar
+					</UButton>
+					<UButton
+						color="error"
+						class="flex-1"
+						:loading="isDeleting"
+						@click="confirmDelete"
+					>
+						Eliminar
+					</UButton>
+				</div>
+			</template>
 		</UModal>
 	</NuxtLayout>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
-import { useCategories } from "~/composables/useCategories";
+	import { computed, onMounted, ref } from "vue";
+	import { useCategories } from "~/composables/useCategories";
 
-// Composables
-const { 
-	categories, 
-	loadCategories, 
-	createCategory, 
-	updateCategory, 
-	deleteCategory 
-} = useCategories();
+	// Composables
+	const {
+		categories,
+		loadCategories,
+		createCategory,
+		updateCategory,
+		deleteCategory
+	} = useCategories();
 
-// Estado local
-const isLoading = ref(false);
-const showCreateModal = ref(false);
-const showDeleteModal = ref(false);
-const editingCategory = ref(null);
-const categoryToDelete = ref(null);
-const isDeleting = ref(false);
+	// Estado local
+	const isLoading = ref(false);
+	const showCreateModal = ref(false);
+	const showDeleteModal = ref(false);
+	const editingCategory = ref(null);
+	const categoryToDelete = ref(null);
+	const isDeleting = ref(false);
 
-// Computed properties
-const activeCategories = computed(() => {
-	return categories.value.filter((cat) => cat.isActive).length;
-});
+	// Computed properties
+	const activeCategories = computed(() => {
+		return categories.value.filter((cat) => cat.isActive).length;
+	});
 
-const totalProducts = computed(() => {
-	return categories.value.reduce((total, cat) => total + (cat.productCount || 0), 0);
-});
+	const totalProducts = computed(() => {
+		return categories.value.reduce((total, cat) => total + (cat.productCount || 0), 0);
+	});
 
-// Cargar datos iniciales
-onMounted(async () => {
-	await loadCategories();
-});
-
-// Refrescar categorías
-const refreshCategories = async () => {
-	isLoading.value = true;
-	try {
+	// Cargar datos iniciales
+	onMounted(async () => {
 		await loadCategories();
-	} finally {
-		isLoading.value = false;
-	}
-};
+	});
 
-// Editar categoría
-const editCategory = (category: any) => {
-	editingCategory.value = category;
-	showCreateModal.value = true;
-};
-
-// Eliminar categoría
-const deleteCategory = (category: any) => {
-	categoryToDelete.value = category;
-	showDeleteModal.value = true;
-};
-
-// Confirmar eliminación
-const confirmDelete = async () => {
-	if (!categoryToDelete.value) return;
-
-	isDeleting.value = true;
-	try {
-		await deleteCategory(categoryToDelete.value.id);
-		showDeleteModal.value = false;
-		categoryToDelete.value = null;
-	} catch (error) {
-		console.error("Error eliminando categoría:", error);
-	} finally {
-		isDeleting.value = false;
-	}
-};
-
-// Manejar envío del formulario
-const handleCategorySubmit = async (categoryData: any) => {
-	try {
-		if (editingCategory.value) {
-			await updateCategory(editingCategory.value.id, categoryData);
-		} else {
-			await createCategory(categoryData);
+	// Refrescar categorías
+	const refreshCategories = async () => {
+		isLoading.value = true;
+		try {
+			await loadCategories();
+		} finally {
+			isLoading.value = false;
 		}
-		closeModal();
-	} catch (error) {
-		console.error("Error guardando categoría:", error);
-	}
-};
+	};
 
-// Cerrar modal
-const closeModal = () => {
-	showCreateModal.value = false;
-	editingCategory.value = null;
-};
+	// Editar categoría
+	const editCategory = (category: any) => {
+		editingCategory.value = category;
+		showCreateModal.value = true;
+	};
 
-// Meta de la página
-useHead({
-	title: "Gestión de Categorías - POS Venezuela"
-});
+	// Eliminar categoría
+	const handleDeleteCategory = (category: any) => {
+		categoryToDelete.value = category;
+		showDeleteModal.value = true;
+	};
+
+	// Confirmar eliminación
+	const confirmDelete = async () => {
+		if (!categoryToDelete.value) return;
+
+		isDeleting.value = true;
+		try {
+			await deleteCategory(categoryToDelete.value.id);
+			showDeleteModal.value = false;
+			categoryToDelete.value = null;
+		} catch (error) {
+			console.error("Error eliminando categoría:", error);
+		} finally {
+			isDeleting.value = false;
+		}
+	};
+
+	// Manejar envío del formulario
+	const handleCategorySubmit = async (categoryData: any) => {
+		try {
+			if (editingCategory.value) {
+				await updateCategory(editingCategory.value.id, categoryData);
+			} else {
+				await createCategory(categoryData);
+			}
+			closeModal();
+		} catch (error) {
+			console.error("Error guardando categoría:", error);
+		}
+	};
+
+	// Cerrar modal
+	const closeModal = () => {
+		showCreateModal.value = false;
+		editingCategory.value = null;
+	};
+
+	// Meta de la página
+	useHead({
+		title: "Gestión de Categorías - POS Venezuela"
+	});
 </script>

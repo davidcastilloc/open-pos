@@ -1,0 +1,1 @@
+ALTER TABLE `products` ADD `currency` text DEFAULT 'BS' NOT NULL;

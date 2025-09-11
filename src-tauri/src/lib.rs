@@ -5,8 +5,11 @@ use tauri::{
 	tray::TrayIconBuilder
 };
 
+#[cfg(debug_assertions)]
+use tauri_plugin_mcp::{init_with_config, PluginConfig};
+
 pub fn run() {
-    tauri::Builder::default()
+    let mut builder = tauri::Builder::default()
 		.setup(|app| {
 			let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
 			let menu = Menu::with_items(app, &[&quit_i])?;
@@ -32,7 +35,32 @@ pub fn run() {
 		.plugin(tauri_plugin_os::init())
 		.plugin(tauri_plugin_fs::init())
 		.plugin(tauri_plugin_store::Builder::new().build())
-		.plugin(tauri_plugin_sql::Builder::default().build())
+		.plugin(tauri_plugin_sql::Builder::default().build());
+
+	// Solo incluir el plugin MCP en builds de desarrollo
+	#[cfg(debug_assertions)]
+	{
+		println!("Build de desarrollo detectado, habilitando plugin MCP");
+		
+		// Limpiar socket obsoleto si existe
+		let socket_path = "/tmp/tauri-mcp.sock";
+		if std::path::Path::new(socket_path).exists() {
+			println!("Eliminando socket obsoleto: {}", socket_path);
+			let _ = std::fs::remove_file(socket_path);
+		}
+		
+		// Inicializar el plugin MCP
+		println!("Inicializando plugin MCP...");
+		let plugin = init_with_config(
+			PluginConfig::new("OpenPos".to_string())
+				.start_socket_server(true)
+				.socket_path(socket_path.into())
+		);
+		println!("Plugin MCP inicializado correctamente");
+		builder = builder.plugin(plugin);
+	}
+
+	builder
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

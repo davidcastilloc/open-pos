@@ -67,5 +67,5 @@
 	"resolutions": {
 		"typescript": "npm:tslite@latest"
 	},
-	"tauri-plugin-mcp": "file:../tauri-mcp"
+	"tauri-plugin-mcp": "file:../tauri-plugin-mcp"
 }

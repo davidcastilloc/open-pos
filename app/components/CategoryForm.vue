@@ -1,58 +1,63 @@
 <template>
-	<div class="space-y-6">
+	<UForm :schema="categorySchema" :state="form" class="space-y-6" @submit="handleSubmit">
 		<!-- Información básica -->
 		<div class="space-y-4">
-			<h4 class="text-lg font-medium">Información de la Categoría</h4>
-			
+			<h4 class="text-lg font-medium">
+				Información de la Categoría
+			</h4>
+
 			<div class="space-y-4">
 				<!-- Nombre -->
 				<div>
-					<UFormGroup label="Nombre de la categoría" required>
+					<UFormField label="Nombre de la categoría" name="name" required>
 						<UInput
 							v-model="form.name"
 							placeholder="Ej: Bebidas, Alimentos, Electrónicos"
-							:error="errors.name"
 						/>
-					</UFormGroup>
+					</UFormField>
 				</div>
 
 				<!-- Descripción -->
 				<div>
-					<UFormGroup label="Descripción">
+					<UFormField label="Descripción" name="description">
 						<UTextarea
 							v-model="form.description"
 							placeholder="Descripción de la categoría..."
 							:rows="3"
 						/>
-					</UFormGroup>
+					</UFormField>
 				</div>
 
 				<!-- Estado -->
 				<div>
-					<UFormGroup label="Estado">
-						<UToggle
+					<UFormField label="Estado" name="isActive">
+						<UCheckbox
 							v-model="form.isActive"
 							:label="form.isActive ? 'Activa' : 'Inactiva'"
 						/>
-						<p class="text-sm opacity-75 mt-1">
+						<template #help>
 							Las categorías inactivas no aparecerán en el POS
-						</p>
-					</UFormGroup>
+						</template>
+					</UFormField>
 				</div>
 			</div>
 		</div>
 
 		<!-- Vista previa -->
 		<div v-if="form.name" class="space-y-4">
-			<h4 class="text-lg font-medium">Vista Previa</h4>
-			
+			<h4 class="text-lg font-medium">
+				Vista Previa
+			</h4>
+
 			<div class="bg-gray-50 rounded-lg p-4">
 				<div class="flex items-center space-x-3">
 					<div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
 						<UIcon name="i-heroicons-tag" class="w-5 h-5 text-primary" />
 					</div>
 					<div>
-						<h5 class="font-medium">{{ form.name }}</h5>
+						<h5 class="font-medium">
+							{{ form.name }}
+						</h5>
 						<p v-if="form.description" class="text-sm opacity-75">
 							{{ form.description }}
 						</p>
@@ -76,86 +81,89 @@
 		<div class="flex justify-end space-x-3 pt-6 border-t">
 			<UButton
 				variant="outline"
-				@click="$emit('cancel')"
+				@click="emit('cancel')"
 			>
 				Cancelar
 			</UButton>
 			<UButton
+				type="submit"
 				color="primary"
 				:loading="isSubmitting"
-				@click="handleSubmit"
 			>
 				{{ category ? 'Actualizar' : 'Crear' }} Categoría
 			</UButton>
 		</div>
-	</div>
+	</UForm>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+	import type { Category } from "~/schemas/category";
 
-// Props
-interface Props {
-	category?: any;
-}
+	import { ref, watch } from "vue";
+	import { categorySchema } from "~/schemas/category";
 
-const props = defineProps<Props>();
-
-// Emits
-const emit = defineEmits<{
-	submit: [data: any];
-	cancel: [];
-}>();
-
-// Estado local
-const form = ref({
-	name: "",
-	description: "",
-	isActive: true
-});
-
-const errors = ref<Record<string, string>>({});
-const isSubmitting = ref(false);
-
-// Inicializar formulario
-const initializeForm = () => {
-	if (props.category) {
-		form.value = {
-			name: props.category.name || "",
-			description: props.category.description || "",
-			isActive: props.category.isActive !== false
-		};
-	}
-};
-
-// Validar formulario
-const validateForm = () => {
-	errors.value = {};
-
-	if (!form.value.name.trim()) {
-		errors.value.name = "El nombre es requerido";
+	// Props
+	interface Props {
+		category?: any
 	}
 
-	return Object.keys(errors.value).length === 0;
-};
+	const props = defineProps<Props>();
 
-// Manejar envío
-const handleSubmit = async () => {
-	if (!validateForm()) {
-		return;
-	}
+	// Emits
+	const emit = defineEmits<{
+		submit: [data: Category]
+		cancel: []
+	}>();
 
-	isSubmitting.value = true;
-	try {
-		emit("submit", { ...form.value });
-	} catch (error) {
-		console.error("Error submitting form:", error);
-	} finally {
-		isSubmitting.value = false;
-	}
-};
+	// Estado local
+	const form = ref({
+		name: "",
+		description: "",
+		isActive: true
+	});
 
-// Watchers
-watch(() => props.category, initializeForm, { immediate: true });
+	const isSubmitting = ref(false);
+
+	// Inicializar formulario
+	const initializeForm = () => {
+		if (props.category) {
+			form.value = {
+				name: props.category.name || "",
+				description: props.category.description || "",
+				isActive: props.category.isActive !== false
+			};
+		}
+	};
+
+	// Función de validación adicional (opcional - la validación principal se hace con el schema)
+	const _validate = (state: any) => {
+		const errors = [];
+
+		// Validación adicional: verificar que el nombre no sea solo espacios
+		if (state.name && state.name.trim() !== state.name) {
+			errors.push({
+				name: "name",
+				message: "El nombre no puede comenzar o terminar con espacios"
+			});
+		}
+
+		return errors;
+	};
+
+	// Manejar envío
+	const handleSubmit = async (event: any) => {
+		isSubmitting.value = true;
+		try {
+			// Los datos ya están validados por el schema
+			const formData = event.data || form.value;
+			emit("submit", formData as Category);
+		} catch (error) {
+			console.error("Error submitting form:", error);
+		} finally {
+			isSubmitting.value = false;
+		}
+	};
+
+	// Watchers
+	watch(() => props.category, initializeForm, { immediate: true });
 </script>
-
