@@ -31,9 +31,9 @@
 		"beforeDevCommand": "pnpm dev",
 		"devUrl": "http://localhost:3000"
 	},
-	"productName": "Nuxtor",
+	"productName": "OpenPos",
 	"version": "1.4.0",
-	"identifier": "com.nicolaspadari.nuxtor",
+	"identifier": "com.davidcastillo.openpos",
 	"plugins": {
 		"sql": {
 			"preload": ["sqlite:pos.db"]
@@ -42,13 +42,13 @@
 	"app": {
 		"windows": [
 			{
-				"title": "Nuxtor",
+				"title": "OpenPos",
 				"width": 1366,
 				"height": 768,
 				"minWidth": 375,
 				"minHeight": 812,
-				"resizable": true,
-				"fullscreen": false
+				"resizable": false,
+				"fullscreen": true
 			}
 		],
 		"security": {

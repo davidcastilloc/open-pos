@@ -1,10 +1,10 @@
 [package]
-name = "nuxtor"
-version = "1.4.0"
-description = "Starter template for Nuxt 3 and Tauri 2"
-authors = [ "NicolaSpadari" ]
+name = "openpos"
+version = "1.0.0"
+description = "Super POS Miltiplatform Linux Mac Windows"
+authors = [ "DavidCastillo" ]
 license = "MIT"
-repository = "https://github.com/NicolaSpadari/nuxtor"
+repository = "https://github.com/davidcastilloc/open-pos"
 edition = "2021"
 
 [lib]

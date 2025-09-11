@@ -20,7 +20,7 @@ export async function initDatabase() {
 		// Crear la instancia de Drizzle con el proxy de SQLite
 		db = drizzle<typeof schema>(
 			async (sql, params, method) => {
-				const sqlite = await Database.load("sqlite:pos.db");
+				const sqlite = await Database.load("sqlite:src-tauri/pos.db");
 				let rows: any = [];
 				let results = [];
 

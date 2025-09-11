@@ -2,10 +2,10 @@ import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
 	schema: "./app/database/schema/*",
-	out: "./database/migrations",
+	out: "./src-tauri/database/migrations",
 	dialect: "sqlite",
 	dbCredentials: {
-		url: "./database/pos.db"
+		url: "./src-tauri/pos.db"
 	},
 	verbose: true,
 	strict: true
