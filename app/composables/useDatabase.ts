@@ -66,23 +66,18 @@ export function useDatabase() {
 	};
 
 	// Transacción
-	const transaction = async <T>(callback: () => T): Promise<T> => {
+	const transaction = async <T>(callback: (db: any) => Promise<T>): Promise<T> => {
+		const sqlite = await Database.load("sqlite:pos.db");
 		try {
-			const sqlite = await Database.load("sqlite:pos.db");
 			await sqlite.execute("BEGIN TRANSACTION");
-			try {
-				const result = callback();
-				await sqlite.execute("COMMIT");
-				await sqlite.close();
-				return result;
-			} catch (err) {
-				await sqlite.execute("ROLLBACK");
-				await sqlite.close();
-				throw err;
-			}
+			const result = await callback(sqlite);
+			await sqlite.execute("COMMIT");
+			return result;
 		} catch (err) {
-			console.error("Error in transaction:", err);
+			await sqlite.execute("ROLLBACK");
 			throw err;
+		} finally {
+			await sqlite.close();
 		}
 	};
 

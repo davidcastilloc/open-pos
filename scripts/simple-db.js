@@ -1,17 +1,17 @@
-import Database from 'better-sqlite3';
+import Database from "better-sqlite3";
 
-const db = new Database('./database/pos.db');
+const db = new Database("./database/pos.db");
 
-console.log('🗄️ Utilidades de Base de Datos POS');
-console.log('=====================================\n');
+console.log("🗄️ Utilidades de Base de Datos POS");
+console.log("=====================================\n");
 
 const command = process.argv[2];
 const param = process.argv[3];
 
 switch (command) {
-	case 'tables':
-	case 'ls':
-		console.log('📋 Tablas disponibles:');
+	case "tables":
+	case "ls":
+		console.log("📋 Tablas disponibles:");
 		const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE '__%'").all();
 		tables.forEach((table, index) => {
 			const count = db.prepare(`SELECT COUNT(*) as count FROM ${table.name}`).get();
@@ -19,16 +19,16 @@ switch (command) {
 		});
 		break;
 
-	case 'show':
+	case "show":
 		if (!param) {
-			console.log('❌ Especifica el nombre de la tabla: node scripts/simple-db.js show <tabla>');
+			console.log("❌ Especifica el nombre de la tabla: node scripts/simple-db.js show <tabla>");
 			break;
 		}
 		console.log(`📊 Contenido de la tabla "${param}":`);
 		try {
 			const data = db.prepare(`SELECT * FROM ${param} LIMIT 10`).all();
 			if (data.length === 0) {
-				console.log('  (Tabla vacía)');
+				console.log("  (Tabla vacía)");
 			} else {
 				console.table(data);
 			}
@@ -37,9 +37,9 @@ switch (command) {
 		}
 		break;
 
-	case 'test':
-		console.log('🧪 Insertando datos de prueba...');
-		
+	case "test":
+		console.log("🧪 Insertando datos de prueba...");
+
 		// Productos de prueba
 		const testProducts = [
 			{ name: "Hamburguesa Clásica", sku: "HAMB001", price: 8.50, cost: 4.00, category: "category_alimentos", stock: 25 },
@@ -63,12 +63,12 @@ switch (command) {
 				product.stock
 			);
 		}
-		console.log('✅ Datos de prueba insertados');
+		console.log("✅ Datos de prueba insertados");
 		break;
 
-	case 'clear':
+	case "clear":
 		if (!param) {
-			console.log('❌ Especifica el nombre de la tabla: node scripts/simple-db.js clear <tabla>');
+			console.log("❌ Especifica el nombre de la tabla: node scripts/simple-db.js clear <tabla>");
 			break;
 		}
 		console.log(`🗑️ Limpiando tabla "${param}"...`);
@@ -76,9 +76,9 @@ switch (command) {
 		console.log(`✅ ${result.changes} registros eliminados`);
 		break;
 
-	case 'sql':
+	case "sql":
 		if (!param) {
-			console.log('❌ Especifica el SQL: node scripts/simple-db.js sql "SELECT * FROM products"');
+			console.log("❌ Especifica el SQL: node scripts/simple-db.js sql \"SELECT * FROM products\"");
 			break;
 		}
 		console.log(`🔧 Ejecutando: ${param}`);
@@ -91,18 +91,18 @@ switch (command) {
 		break;
 
 	default:
-		console.log('\n📖 Comandos disponibles:');
-		console.log('  tables, ls          - Mostrar todas las tablas');
-		console.log('  show <tabla>        - Mostrar contenido de una tabla');
-		console.log('  test                - Insertar datos de prueba');
-		console.log('  clear <tabla>       - Limpiar datos de una tabla');
-		console.log('  sql "consulta"      - Ejecutar SQL personalizado');
-		console.log('\n💡 Ejemplos:');
-		console.log('  node scripts/simple-db.js tables');
-		console.log('  node scripts/simple-db.js show products');
-		console.log('  node scripts/simple-db.js sql "SELECT name, price FROM products WHERE stock > 10"');
-		console.log('  node scripts/simple-db.js test');
-		console.log('  node scripts/simple-db.js clear products');
+		console.log("\n📖 Comandos disponibles:");
+		console.log("  tables, ls          - Mostrar todas las tablas");
+		console.log("  show <tabla>        - Mostrar contenido de una tabla");
+		console.log("  test                - Insertar datos de prueba");
+		console.log("  clear <tabla>       - Limpiar datos de una tabla");
+		console.log("  sql \"consulta\"      - Ejecutar SQL personalizado");
+		console.log("\n💡 Ejemplos:");
+		console.log("  node scripts/simple-db.js tables");
+		console.log("  node scripts/simple-db.js show products");
+		console.log("  node scripts/simple-db.js sql \"SELECT name, price FROM products WHERE stock > 10\"");
+		console.log("  node scripts/simple-db.js test");
+		console.log("  node scripts/simple-db.js clear products");
 		break;
 }
 

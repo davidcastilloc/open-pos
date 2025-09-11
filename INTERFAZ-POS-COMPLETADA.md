@@ -24,7 +24,7 @@ La interfaz principal del sistema de punto de venta ha sido completamente constr
 
 ### **3. Carrito de Ventas**
 - ✅ **Lista de items** con información completa
-- ✅ **Modificación de cantidades** con botones +/- 
+- ✅ **Modificación de cantidades** con botones +/-
 - ✅ **Cálculos automáticos** de subtotal, impuestos y total
 - ✅ **Sistema de descuentos** por porcentaje o monto
 - ✅ **Validaciones** de stock y precios
@@ -44,41 +44,41 @@ La interfaz principal del sistema de punto de venta ha sido completamente constr
 ### **1. `usePOS()`** - Gestión del Punto de Venta
 ```typescript
 // Funcionalidades principales
-- addToCart()           // Agregar productos al carrito
-- removeFromCart()      // Remover productos del carrito
-- updateQuantity()      // Modificar cantidades
-- clearCart()           // Limpiar carrito completo
-- applyDiscount()       // Aplicar descuentos
-- changeCurrency()      // Cambiar moneda
-- processSale()         // Procesar venta completa
+-addToCart() // Agregar productos al carrito
+- removeFromCart() // Remover productos del carrito
+- updateQuantity() // Modificar cantidades
+- clearCart() // Limpiar carrito completo
+- applyDiscount() // Aplicar descuentos
+- changeCurrency() // Cambiar moneda
+- processSale() // Procesar venta completa
 
 // Estado reactivo
-- cart                  // Carrito de productos
-- currentCurrency       // Moneda actual
-- subtotal             // Subtotal calculado
-- tax                  // Impuestos (IVA + ISLR)
-- total                // Total final
-- isProcessing         // Estado de procesamiento
+- cart // Carrito de productos
+- currentCurrency // Moneda actual
+- subtotal // Subtotal calculado
+- tax // Impuestos (IVA + ISLR)
+- total // Total final
+- isProcessing; // Estado de procesamiento
 ```
 
 ### **2. `useProducts()`** - Gestión de Productos
 ```typescript
 // Funcionalidades principales
-- loadProducts()        // Cargar productos con filtros
-- loadCategories()      // Cargar categorías
+-loadProducts() // Cargar productos con filtros
+- loadCategories() // Cargar categorías
 - findProductByBarcode() // Buscar por código de barras
-- findProductBySku()    // Buscar por SKU
-- createProduct()       // Crear nuevo producto
-- updateProduct()       // Actualizar producto
-- changeCurrency()      // Cambiar moneda de precios
+- findProductBySku() // Buscar por SKU
+- createProduct() // Crear nuevo producto
+- updateProduct() // Actualizar producto
+- changeCurrency() // Cambiar moneda de precios
 
 // Estado reactivo
-- products             // Lista de productos
-- categories           // Lista de categorías
-- isLoading           // Estado de carga
-- currentPage         // Página actual
-- totalPages          // Total de páginas
-- filters             // Filtros aplicados
+- products // Lista de productos
+- categories // Lista de categorías
+- isLoading // Estado de carga
+- currentPage // Página actual
+- totalPages // Total de páginas
+- filters; // Filtros aplicados
 ```
 
 ---
@@ -134,10 +134,10 @@ La interfaz principal del sistema de punto de venta ha sido completamente constr
 ### **Cálculos**
 ```typescript
 // Fórmula aplicada
-const taxableAmount = subtotal - discount
-const iva = taxableAmount * 0.16
-const islr = taxableAmount * 0.02
-const total = subtotal - discount + iva + islr
+const taxableAmount = subtotal - discount;
+const iva = taxableAmount * 0.16;
+const islr = taxableAmount * 0.02;
+const total = subtotal - discount + iva + islr;
 ```
 
 ---

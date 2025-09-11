@@ -12,7 +12,7 @@ alwaysApply: true
 
 ## Stack
 - **Framework:** Nuxt 4 (modo full-stack, composition API por defecto).
-- **UI:** @nuxt/ui + Tailwind.
+- **UI:** @nuxt/ui + Tailwind + RekaUi.
 - **Desktop Runtime:** Tauri 2 con plugins (`fs`, `notification`, `os`, `shell`, `store`).
 - **Language:** TypeScript (strict, no `any`).
 - **Validation:** Zod para todas las entradas/salidas.
