@@ -16,6 +16,9 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: self-hosted
     environment: production
+    outputs:
+      new_release_published: ${{ steps.semantic.outputs.new_release_published }}
+      new_release_version: ${{ steps.semantic.outputs.new_release_version }}
 
     steps:
       - name: Checkout Repository
@@ -45,9 +48,14 @@ jobs:
         run: pnpm install
 
       - name: Execute Semantic Release
-        run: npx semantic-release
+        id: semantic
+        uses: cycjimmy/semantic-release-action@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          extra_plugins: |
+            @semantic-release/changelog
+            @semantic-release/git
 
       - name: Create production branch if not exists
         run: |
@@ -83,17 +91,14 @@ jobs:
           [ -f "public/version.json" ] || (echo "❌ Falta public/version.json" && exit 1)
           echo "✅ Todos los assets están listos para producción"
   publish-tauri:
-    if: github.ref == 'refs/heads/release'
+    needs: release
+    if: needs.release.outputs.new_release_published == 'true'
     permissions:
       contents: write
     strategy:
       fail-fast: false
       matrix:
         include:
-          - platform: macos-latest # Arm based macs
-            args: --target aarch64-apple-darwin
-          - platform: macos-latest # Intel based macs
-            args: --target x86_64-apple-darwin
           - platform: ubuntu-22.04
             args: ""
           - platform: windows-latest
@@ -133,9 +138,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: nuxtor-v__VERSION__
-          releaseName: Nuxtor v__VERSION__
-          releaseBody: After installing the Apple app you have to run "xattr -c /Applications/Nuxtor.app" once before launching
+          tagName: ${{ needs.release.outputs.new_release_git_tag }}
+          releaseName: Nuxtor ${{ needs.release.outputs.new_release_git_tag }}
+          releaseBody: Automated Tauri release for Linux and Windows.
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
