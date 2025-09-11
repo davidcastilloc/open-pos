@@ -1,18 +1,18 @@
-import Database from 'better-sqlite3'
-import { drizzle } from 'drizzle-orm/better-sqlite3'
-import * as schema from './schema'
+import Database from "better-sqlite3";
+import { drizzle } from "drizzle-orm/better-sqlite3";
+import * as schema from "./schema";
 
 // Crear conexión a SQLite
-const sqlite = new Database('./database/pos.db')
+const sqlite = new Database("./database/pos.db");
 
 // Configurar Drizzle ORM
-export const db = drizzle(sqlite, { schema })
+export const db = drizzle(sqlite, { schema });
 
 // Función para inicializar la base de datos
 export async function initDatabase() {
-  try {
-    // Crear tablas si no existen
-    await db.run(`
+	try {
+		// Crear tablas si no existen
+		await db.run(`
       CREATE TABLE IF NOT EXISTS products (
         id TEXT PRIMARY KEY,
         tenant_id TEXT NOT NULL,
@@ -31,9 +31,9 @@ export async function initDatabase() {
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         synced_at DATETIME
       )
-    `)
+    `);
 
-    await db.run(`
+		await db.run(`
       CREATE TABLE IF NOT EXISTS categories (
         id TEXT PRIMARY KEY,
         tenant_id TEXT NOT NULL,
@@ -43,9 +43,9 @@ export async function initDatabase() {
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
       )
-    `)
+    `);
 
-    await db.run(`
+		await db.run(`
       CREATE TABLE IF NOT EXISTS customers (
         id TEXT PRIMARY KEY,
         tenant_id TEXT NOT NULL,
@@ -58,9 +58,9 @@ export async function initDatabase() {
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
       )
-    `)
+    `);
 
-    await db.run(`
+		await db.run(`
       CREATE TABLE IF NOT EXISTS sales (
         id TEXT PRIMARY KEY,
         tenant_id TEXT NOT NULL,
@@ -75,9 +75,9 @@ export async function initDatabase() {
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         synced_at DATETIME
       )
-    `)
+    `);
 
-    await db.run(`
+		await db.run(`
       CREATE TABLE IF NOT EXISTS sale_items (
         id TEXT PRIMARY KEY,
         sale_id TEXT NOT NULL,
@@ -89,9 +89,9 @@ export async function initDatabase() {
         FOREIGN KEY (sale_id) REFERENCES sales(id),
         FOREIGN KEY (product_id) REFERENCES products(id)
       )
-    `)
+    `);
 
-    await db.run(`
+		await db.run(`
       CREATE TABLE IF NOT EXISTS accounts (
         id TEXT PRIMARY KEY,
         tenant_id TEXT NOT NULL,
@@ -107,9 +107,9 @@ export async function initDatabase() {
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
       )
-    `)
+    `);
 
-    await db.run(`
+		await db.run(`
       CREATE TABLE IF NOT EXISTS transactions (
         id TEXT PRIMARY KEY,
         tenant_id TEXT NOT NULL,
@@ -123,9 +123,9 @@ export async function initDatabase() {
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (account_id) REFERENCES accounts(id)
       )
-    `)
+    `);
 
-    await db.run(`
+		await db.run(`
       CREATE TABLE IF NOT EXISTS cash_closings (
         id TEXT PRIMARY KEY,
         tenant_id TEXT NOT NULL,
@@ -143,9 +143,9 @@ export async function initDatabase() {
         closed_at DATETIME,
         FOREIGN KEY (account_id) REFERENCES accounts(id)
       )
-    `)
+    `);
 
-    await db.run(`
+		await db.run(`
       CREATE TABLE IF NOT EXISTS system_config (
         id TEXT PRIMARY KEY,
         tenant_id TEXT NOT NULL,
@@ -161,9 +161,9 @@ export async function initDatabase() {
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(tenant_id, category, key)
       )
-    `)
+    `);
 
-    await db.run(`
+		await db.run(`
       CREATE TABLE IF NOT EXISTS exchange_rates (
         id TEXT PRIMARY KEY,
         from_currency TEXT NOT NULL,
@@ -174,9 +174,9 @@ export async function initDatabase() {
         is_valid BOOLEAN NOT NULL DEFAULT 1,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
       )
-    `)
+    `);
 
-    await db.run(`
+		await db.run(`
       CREATE TABLE IF NOT EXISTS sync_queue (
         id TEXT PRIMARY KEY,
         tenant_id TEXT NOT NULL,
@@ -189,16 +189,16 @@ export async function initDatabase() {
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
       )
-    `)
+    `);
 
-    console.log('✅ Base de datos inicializada correctamente')
-  } catch (error) {
-    console.error('❌ Error al inicializar la base de datos:', error)
-    throw error
-  }
+		console.log("✅ Base de datos inicializada correctamente");
+	} catch (error) {
+		console.error("❌ Error al inicializar la base de datos:", error);
+		throw error;
+	}
 }
 
 // Función para cerrar la conexión
 export function closeDatabase() {
-  sqlite.close()
+	sqlite.close();
 }
