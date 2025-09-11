@@ -131,6 +131,18 @@
 					</div>
 				</UCard>
 
+				<UCard class="cursor-pointer hover:shadow-md transition-shadow" @click="navigateTo('/categories')">
+					<div class="text-center">
+						<UIcon name="i-heroicons-tag" class="w-12 h-12 text-purple-500 mx-auto mb-4" />
+						<h3 class="text-lg font-medium">
+							Categorías
+						</h3>
+						<p class="text-sm opacity-70">
+							Organizar productos
+						</p>
+					</div>
+				</UCard>
+
 				<UCard class="cursor-pointer hover:shadow-md transition-shadow" @click="navigateTo('/reports')">
 					<div class="text-center">
 						<UIcon name="i-heroicons-chart-bar" class="w-12 h-12 text-secondary mx-auto mb-4" />

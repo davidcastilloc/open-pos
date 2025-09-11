@@ -345,6 +345,22 @@ export function useProducts() {
 		}
 	};
 
+	// Eliminar producto
+	const deleteProduct = async (id: string) => {
+		try {
+			await execute("DELETE FROM products WHERE id = ?", [id]);
+
+			// Recargar productos
+			await loadProducts(currentPage.value, filters.value);
+
+			console.log("✅ Producto eliminado:", id);
+		} catch (err) {
+			error.value = "Error al eliminar producto";
+			console.error("Error deleting product:", err);
+			throw err;
+		}
+	};
+
 	// Cambiar moneda
 	const changeCurrency = async (newCurrency: string) => {
 		currentCurrency.value = newCurrency;
@@ -397,6 +413,7 @@ export function useProducts() {
 		findProductBySku,
 		createProduct,
 		updateProduct,
+		deleteProduct,
 		changeCurrency,
 		formatPrice
 	};
