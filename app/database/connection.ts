@@ -1,210 +1,275 @@
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
+import Database from "@tauri-apps/plugin-sql";
+import { drizzle } from "drizzle-orm/sqlite-proxy";
 import * as schema from "./schema";
 
-// Crear conexión a SQLite
-const sqlite = new Database("./database/pos.db");
+let db: ReturnType<typeof drizzle> | null = null;
 
-// Configurar Drizzle ORM
-export const db = drizzle(sqlite, { schema });
+// Función para obtener la instancia de la base de datos
+export async function getDatabase() {
+	if (!db) {
+		await initDatabase();
+	}
+	return db!;
+}
 
 // Función para inicializar la base de datos
 export async function initDatabase() {
 	try {
 		console.log("🔄 Inicializando base de datos...");
 
-		// Crear tablas usando SQL directo
-		const createTables = [
-			// Tabla de categorías
-			`CREATE TABLE IF NOT EXISTS categories (
-        id TEXT PRIMARY KEY,
-        tenant_id TEXT NOT NULL,
-        name TEXT NOT NULL,
-        description TEXT,
-        is_active INTEGER NOT NULL DEFAULT 1,
-        created_at TEXT NOT NULL DEFAULT (datetime('now')),
-        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-      )`,
+		// Crear la instancia de Drizzle con el proxy de SQLite
+		db = drizzle<typeof schema>(
+			async (sql, params, method) => {
+				const sqlite = await Database.load("sqlite:pos.db");
+				let rows: any = [];
+				let results = [];
 
-			// Tabla de productos
-			`CREATE TABLE IF NOT EXISTS products (
-        id TEXT PRIMARY KEY,
-        tenant_id TEXT NOT NULL,
-        name TEXT NOT NULL,
-        description TEXT,
-        sku TEXT NOT NULL,
-        barcode TEXT,
-        price REAL NOT NULL,
-        cost REAL NOT NULL,
-        category_id TEXT,
-        stock INTEGER NOT NULL DEFAULT 0,
-        min_stock INTEGER NOT NULL DEFAULT 0,
-        images TEXT,
-        is_active INTEGER NOT NULL DEFAULT 1,
-        created_at TEXT NOT NULL DEFAULT (datetime('now')),
-        updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-        synced_at TEXT,
-        FOREIGN KEY (category_id) REFERENCES categories(id)
-      )`,
+				try {
+					if (isSelectQuery(sql)) {
+						rows = await sqlite.select(sql, params);
+					} else {
+						rows = await sqlite.execute(sql, params);
+						return { rows: [] };
+					}
 
-			// Tabla de clientes
-			`CREATE TABLE IF NOT EXISTS customers (
-        id TEXT PRIMARY KEY,
-        tenant_id TEXT NOT NULL,
-        name TEXT NOT NULL,
-        email TEXT,
-        phone TEXT,
-        address TEXT,
-        loyalty_points INTEGER NOT NULL DEFAULT 0,
-        is_active INTEGER NOT NULL DEFAULT 1,
-        created_at TEXT NOT NULL DEFAULT (datetime('now')),
-        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-      )`,
+					// Convertir los resultados al formato esperado por Drizzle
+					rows = rows.map((row: any) => {
+						return Object.values(row);
+					});
 
-			// Tabla de ventas
-			`CREATE TABLE IF NOT EXISTS sales (
-        id TEXT PRIMARY KEY,
-        tenant_id TEXT NOT NULL,
-        customer_id TEXT,
-        subtotal REAL NOT NULL,
-        tax REAL NOT NULL DEFAULT 0,
-        discount REAL NOT NULL DEFAULT 0,
-        total REAL NOT NULL,
-        payment_method TEXT NOT NULL,
-        status TEXT NOT NULL DEFAULT 'completed',
-        cashier_id TEXT NOT NULL,
-        created_at TEXT NOT NULL DEFAULT (datetime('now')),
-        synced_at TEXT,
-        FOREIGN KEY (customer_id) REFERENCES customers(id)
-      )`,
+					results = method === "all" ? rows : rows[0];
+					return { rows: results };
+				} catch (error) {
+					console.error("SQL Error:", error);
+					return { rows: [] };
+				} finally {
+					await sqlite.close();
+				}
+			},
+			{ schema, logger: true }
+		);
 
-			// Tabla de items de venta
-			`CREATE TABLE IF NOT EXISTS sale_items (
-        id TEXT PRIMARY KEY,
-        sale_id TEXT NOT NULL,
-        product_id TEXT NOT NULL,
-        quantity INTEGER NOT NULL,
-        price REAL NOT NULL,
-        total REAL NOT NULL,
-        created_at TEXT NOT NULL DEFAULT (datetime('now')),
-        FOREIGN KEY (sale_id) REFERENCES sales(id),
-        FOREIGN KEY (product_id) REFERENCES products(id)
-      )`,
+		// Crear tablas si no existen
+		await createTables();
 
-			// Tabla de cuentas
-			`CREATE TABLE IF NOT EXISTS accounts (
-        id TEXT PRIMARY KEY,
-        tenant_id TEXT NOT NULL,
-        name TEXT NOT NULL,
-        type TEXT NOT NULL,
-        currency TEXT NOT NULL,
-        bank_name TEXT,
-        account_number TEXT,
-        is_active INTEGER NOT NULL DEFAULT 1,
-        balance REAL NOT NULL DEFAULT 0,
-        min_balance REAL NOT NULL DEFAULT 0,
-        max_balance REAL,
-        created_at TEXT NOT NULL DEFAULT (datetime('now')),
-        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-      )`,
-
-			// Tabla de transacciones
-			`CREATE TABLE IF NOT EXISTS transactions (
-        id TEXT PRIMARY KEY,
-        tenant_id TEXT NOT NULL,
-        account_id TEXT NOT NULL,
-        type TEXT NOT NULL,
-        amount REAL NOT NULL,
-        currency TEXT NOT NULL,
-        exchange_rate REAL,
-        reference TEXT,
-        description TEXT,
-        created_at TEXT NOT NULL DEFAULT (datetime('now')),
-        FOREIGN KEY (account_id) REFERENCES accounts(id)
-      )`,
-
-			// Tabla de cierres de caja
-			`CREATE TABLE IF NOT EXISTS cash_closings (
-        id TEXT PRIMARY KEY,
-        tenant_id TEXT NOT NULL,
-        cashier_id TEXT NOT NULL,
-        date TEXT NOT NULL,
-        account_id TEXT NOT NULL,
-        initial_balance TEXT NOT NULL,
-        sales TEXT NOT NULL,
-        expenses TEXT NOT NULL,
-        final_balance TEXT NOT NULL,
-        difference TEXT NOT NULL,
-        status TEXT NOT NULL DEFAULT 'open',
-        notes TEXT,
-        created_at TEXT NOT NULL DEFAULT (datetime('now')),
-        closed_at TEXT,
-        FOREIGN KEY (account_id) REFERENCES accounts(id)
-      )`,
-
-			// Tabla de configuración del sistema
-			`CREATE TABLE IF NOT EXISTS system_config (
-        id TEXT PRIMARY KEY,
-        tenant_id TEXT NOT NULL,
-        category TEXT NOT NULL,
-        key TEXT NOT NULL,
-        value TEXT NOT NULL,
-        type TEXT NOT NULL,
-        is_editable INTEGER NOT NULL DEFAULT 1,
-        is_required INTEGER NOT NULL DEFAULT 0,
-        validation TEXT,
-        description TEXT,
-        created_at TEXT NOT NULL DEFAULT (datetime('now')),
-        updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-        UNIQUE(tenant_id, category, key)
-      )`,
-
-			// Tabla de tasas de cambio
-			`CREATE TABLE IF NOT EXISTS exchange_rates (
-        id TEXT PRIMARY KEY,
-        from_currency TEXT NOT NULL,
-        to_currency TEXT NOT NULL,
-        rate REAL NOT NULL,
-        source TEXT NOT NULL,
-        date TEXT NOT NULL,
-        is_valid INTEGER NOT NULL DEFAULT 1,
-        created_at TEXT NOT NULL DEFAULT (datetime('now'))
-      )`,
-
-			// Tabla de cola de sincronización
-			`CREATE TABLE IF NOT EXISTS sync_queue (
-        id TEXT PRIMARY KEY,
-        tenant_id TEXT NOT NULL,
-        table_name TEXT NOT NULL,
-        record_id TEXT NOT NULL,
-        operation TEXT NOT NULL,
-        data TEXT NOT NULL,
-        status TEXT NOT NULL DEFAULT 'pending',
-        retry_count INTEGER NOT NULL DEFAULT 0,
-        created_at TEXT NOT NULL DEFAULT (datetime('now')),
-        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-      )`
-		];
-
-		// Ejecutar todas las consultas de creación de tablas
-		for (const sql of createTables) {
-			sqlite.exec(sql);
-		}
-
-		// Insertar configuración por defecto
-		await insertDefaultConfig();
-
-		// Insertar cuentas por defecto
-		await insertDefaultAccounts();
-
-		// Insertar categorías por defecto
-		await insertDefaultCategories();
+		// Insertar datos por defecto
+		await insertDefaultData();
 
 		console.log("✅ Base de datos inicializada correctamente");
 	} catch (error) {
 		console.error("❌ Error al inicializar la base de datos:", error);
 		throw error;
 	}
+}
+
+// Función para verificar si es una consulta SELECT
+function isSelectQuery(sql: string): boolean {
+	const trimmed = sql.trim().toLowerCase();
+	return trimmed.startsWith("select") || trimmed.startsWith("with");
+}
+
+// Función para crear las tablas
+async function createTables() {
+	const createTables = [
+		// Tabla de categorías
+		`CREATE TABLE IF NOT EXISTS categories (
+			id TEXT PRIMARY KEY,
+			tenant_id TEXT NOT NULL,
+			name TEXT NOT NULL,
+			description TEXT,
+			is_active INTEGER NOT NULL DEFAULT 1,
+			created_at TEXT NOT NULL DEFAULT (datetime('now')),
+			updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+		)`,
+
+		// Tabla de productos
+		`CREATE TABLE IF NOT EXISTS products (
+			id TEXT PRIMARY KEY,
+			tenant_id TEXT NOT NULL,
+			name TEXT NOT NULL,
+			description TEXT,
+			sku TEXT NOT NULL,
+			barcode TEXT,
+			price REAL NOT NULL,
+			cost REAL NOT NULL,
+			category_id TEXT,
+			stock INTEGER NOT NULL DEFAULT 0,
+			min_stock INTEGER NOT NULL DEFAULT 0,
+			images TEXT,
+			is_active INTEGER NOT NULL DEFAULT 1,
+			created_at TEXT NOT NULL DEFAULT (datetime('now')),
+			updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+			synced_at TEXT,
+			FOREIGN KEY (category_id) REFERENCES categories(id)
+		)`,
+
+		// Tabla de clientes
+		`CREATE TABLE IF NOT EXISTS customers (
+			id TEXT PRIMARY KEY,
+			tenant_id TEXT NOT NULL,
+			name TEXT NOT NULL,
+			email TEXT,
+			phone TEXT,
+			address TEXT,
+			loyalty_points INTEGER NOT NULL DEFAULT 0,
+			is_active INTEGER NOT NULL DEFAULT 1,
+			created_at TEXT NOT NULL DEFAULT (datetime('now')),
+			updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+		)`,
+
+		// Tabla de ventas
+		`CREATE TABLE IF NOT EXISTS sales (
+			id TEXT PRIMARY KEY,
+			tenant_id TEXT NOT NULL,
+			customer_id TEXT,
+			subtotal REAL NOT NULL,
+			tax REAL NOT NULL DEFAULT 0,
+			discount REAL NOT NULL DEFAULT 0,
+			total REAL NOT NULL,
+			payment_method TEXT NOT NULL,
+			status TEXT NOT NULL DEFAULT 'completed',
+			cashier_id TEXT NOT NULL,
+			created_at TEXT NOT NULL DEFAULT (datetime('now')),
+			synced_at TEXT,
+			FOREIGN KEY (customer_id) REFERENCES customers(id)
+		)`,
+
+		// Tabla de items de venta
+		`CREATE TABLE IF NOT EXISTS sale_items (
+			id TEXT PRIMARY KEY,
+			sale_id TEXT NOT NULL,
+			product_id TEXT NOT NULL,
+			quantity INTEGER NOT NULL,
+			price REAL NOT NULL,
+			total REAL NOT NULL,
+			created_at TEXT NOT NULL DEFAULT (datetime('now')),
+			FOREIGN KEY (sale_id) REFERENCES sales(id),
+			FOREIGN KEY (product_id) REFERENCES products(id)
+		)`,
+
+		// Tabla de cuentas
+		`CREATE TABLE IF NOT EXISTS accounts (
+			id TEXT PRIMARY KEY,
+			tenant_id TEXT NOT NULL,
+			name TEXT NOT NULL,
+			type TEXT NOT NULL,
+			currency TEXT NOT NULL,
+			bank_name TEXT,
+			account_number TEXT,
+			is_active INTEGER NOT NULL DEFAULT 1,
+			balance REAL NOT NULL DEFAULT 0,
+			min_balance REAL NOT NULL DEFAULT 0,
+			max_balance REAL,
+			created_at TEXT NOT NULL DEFAULT (datetime('now')),
+			updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+		)`,
+
+		// Tabla de transacciones
+		`CREATE TABLE IF NOT EXISTS transactions (
+			id TEXT PRIMARY KEY,
+			tenant_id TEXT NOT NULL,
+			account_id TEXT NOT NULL,
+			type TEXT NOT NULL,
+			amount REAL NOT NULL,
+			currency TEXT NOT NULL,
+			exchange_rate REAL,
+			reference TEXT,
+			description TEXT,
+			created_at TEXT NOT NULL DEFAULT (datetime('now')),
+			FOREIGN KEY (account_id) REFERENCES accounts(id)
+		)`,
+
+		// Tabla de cierres de caja
+		`CREATE TABLE IF NOT EXISTS cash_closings (
+			id TEXT PRIMARY KEY,
+			tenant_id TEXT NOT NULL,
+			cashier_id TEXT NOT NULL,
+			date TEXT NOT NULL,
+			account_id TEXT NOT NULL,
+			initial_balance TEXT NOT NULL,
+			sales TEXT NOT NULL,
+			expenses TEXT NOT NULL,
+			final_balance TEXT NOT NULL,
+			difference TEXT NOT NULL,
+			status TEXT NOT NULL DEFAULT 'open',
+			notes TEXT,
+			created_at TEXT NOT NULL DEFAULT (datetime('now')),
+			closed_at TEXT,
+			FOREIGN KEY (account_id) REFERENCES accounts(id)
+		)`,
+
+		// Tabla de configuración del sistema
+		`CREATE TABLE IF NOT EXISTS system_config (
+			id TEXT PRIMARY KEY,
+			tenant_id TEXT NOT NULL,
+			category TEXT NOT NULL,
+			key TEXT NOT NULL,
+			value TEXT NOT NULL,
+			type TEXT NOT NULL,
+			is_editable INTEGER NOT NULL DEFAULT 1,
+			is_required INTEGER NOT NULL DEFAULT 0,
+			validation TEXT,
+			description TEXT,
+			created_at TEXT NOT NULL DEFAULT (datetime('now')),
+			updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+			UNIQUE(tenant_id, category, key)
+		)`,
+
+		// Tabla de tasas de cambio
+		`CREATE TABLE IF NOT EXISTS exchange_rates (
+			id TEXT PRIMARY KEY,
+			from_currency TEXT NOT NULL,
+			to_currency TEXT NOT NULL,
+			rate REAL NOT NULL,
+			source TEXT NOT NULL,
+			date TEXT NOT NULL,
+			is_valid INTEGER NOT NULL DEFAULT 1,
+			created_at TEXT NOT NULL DEFAULT (datetime('now'))
+		)`,
+
+		// Tabla de cola de sincronización
+		`CREATE TABLE IF NOT EXISTS sync_queue (
+			id TEXT PRIMARY KEY,
+			tenant_id TEXT NOT NULL,
+			table_name TEXT NOT NULL,
+			record_id TEXT NOT NULL,
+			operation TEXT NOT NULL,
+			data TEXT NOT NULL,
+			status TEXT NOT NULL DEFAULT 'pending',
+			retry_count INTEGER NOT NULL DEFAULT 0,
+			created_at TEXT NOT NULL DEFAULT (datetime('now')),
+			updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+		)`
+	];
+
+	// Ejecutar todas las consultas de creación de tablas
+	for (const sql of createTables) {
+		await executeSQL(sql);
+	}
+
+	console.log("✅ Tablas creadas correctamente");
+}
+
+// Función para ejecutar SQL directamente
+async function executeSQL(sql: string, params: any[] = []) {
+	const sqlite = await Database.load("sqlite:pos.db");
+	try {
+		await sqlite.execute(sql, params);
+	} finally {
+		await sqlite.close();
+	}
+}
+
+// Función para insertar datos por defecto
+async function insertDefaultData() {
+	// Insertar configuración por defecto
+	await insertDefaultConfig();
+
+	// Insertar cuentas por defecto
+	await insertDefaultAccounts();
+
+	// Insertar categorías por defecto
+	await insertDefaultCategories();
 }
 
 // Función para insertar configuración por defecto
@@ -233,12 +298,11 @@ async function insertDefaultConfig() {
 	];
 
 	for (const config of defaultConfig) {
-		const stmt = sqlite.prepare(`
-      INSERT OR IGNORE INTO system_config 
-      (id, tenant_id, category, key, value, type, description, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
-    `);
-		stmt.run(
+		await executeSQL(`
+			INSERT OR IGNORE INTO system_config 
+			(id, tenant_id, category, key, value, type, description, created_at, updated_at)
+			VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+		`, [
 			`config_${config.category}_${config.key}`,
 			config.tenant_id,
 			config.category,
@@ -246,7 +310,7 @@ async function insertDefaultConfig() {
 			config.value,
 			config.type,
 			config.description
-		);
+		]);
 	}
 
 	console.log("✅ Configuración por defecto insertada");
@@ -264,19 +328,18 @@ async function insertDefaultAccounts() {
 	];
 
 	for (const account of defaultAccounts) {
-		const stmt = sqlite.prepare(`
-      INSERT OR IGNORE INTO accounts 
-      (id, tenant_id, name, type, currency, balance, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
-    `);
-		stmt.run(
+		await executeSQL(`
+			INSERT OR IGNORE INTO accounts 
+			(id, tenant_id, name, type, currency, balance, created_at, updated_at)
+			VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+		`, [
 			`account_${account.type}_${account.currency.toLowerCase()}`,
 			"default",
 			account.name,
 			account.type,
 			account.currency,
 			account.balance
-		);
+		]);
 	}
 
 	console.log("✅ Cuentas por defecto insertadas");
@@ -296,24 +359,23 @@ async function insertDefaultCategories() {
 	];
 
 	for (const category of defaultCategories) {
-		const stmt = sqlite.prepare(`
-      INSERT OR IGNORE INTO categories 
-      (id, tenant_id, name, description, created_at, updated_at)
-      VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))
-    `);
-		stmt.run(
+		await executeSQL(`
+			INSERT OR IGNORE INTO categories 
+			(id, tenant_id, name, description, created_at, updated_at)
+			VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))
+		`, [
 			`category_${category.name.toLowerCase().replace(/\s+/g, "_")}`,
 			"default",
 			category.name,
 			category.description
-		);
+		]);
 	}
 
 	console.log("✅ Categorías por defecto insertadas");
 }
 
-// Función para cerrar la conexión
+// Función para cerrar la base de datos
 export function closeDatabase() {
-	sqlite.close();
+	db = null;
 	console.log("✅ Base de datos cerrada");
 }

@@ -1,5 +1,6 @@
+import Database from "@tauri-apps/plugin-sql";
 import { computed, readonly, ref } from "vue";
-import { db, initDatabase } from "~/database/connection";
+import { initDatabase } from "~/database/connection";
 
 export function useDatabase() {
 	const isInitialized = ref(false);
@@ -28,9 +29,10 @@ export function useDatabase() {
 	// Ejecutar consulta
 	const query = async <T>(sql: string, params: any[] = []): Promise<T[]> => {
 		try {
-			// Usar la instancia de SQLite directamente
-			const stmt = (db as any).prepare(sql);
-			return stmt.all(...params) as T[];
+			const sqlite = await Database.load("sqlite:pos.db");
+			const rows = await sqlite.select(sql, params);
+			await sqlite.close();
+			return rows as T[];
 		} catch (err) {
 			console.error("Error executing query:", err);
 			throw err;
@@ -40,9 +42,10 @@ export function useDatabase() {
 	// Ejecutar comando
 	const execute = async (sql: string, params: any[] = []): Promise<any> => {
 		try {
-			// Usar la instancia de SQLite directamente
-			const stmt = (db as any).prepare(sql);
-			return stmt.run(...params);
+			const sqlite = await Database.load("sqlite:pos.db");
+			const result = await sqlite.execute(sql, params);
+			await sqlite.close();
+			return result;
 		} catch (err) {
 			console.error("Error executing command:", err);
 			throw err;
@@ -52,9 +55,10 @@ export function useDatabase() {
 	// Obtener una fila
 	const get = async <T>(sql: string, params: any[] = []): Promise<T | undefined> => {
 		try {
-			// Usar la instancia de SQLite directamente
-			const stmt = (db as any).prepare(sql);
-			return stmt.get(...params) as T | undefined;
+			const sqlite = await Database.load("sqlite:pos.db");
+			const rows = await sqlite.select(sql, params);
+			await sqlite.close();
+			return (rows as any[])[0] as T | undefined;
 		} catch (err) {
 			console.error("Error getting row:", err);
 			throw err;
@@ -64,8 +68,18 @@ export function useDatabase() {
 	// Transacción
 	const transaction = async <T>(callback: () => T): Promise<T> => {
 		try {
-			// Usar la instancia de SQLite directamente
-			return (db as any).transaction(callback)();
+			const sqlite = await Database.load("sqlite:pos.db");
+			await sqlite.execute("BEGIN TRANSACTION");
+			try {
+				const result = callback();
+				await sqlite.execute("COMMIT");
+				await sqlite.close();
+				return result;
+			} catch (err) {
+				await sqlite.execute("ROLLBACK");
+				await sqlite.close();
+				throw err;
+			}
 		} catch (err) {
 			console.error("Error in transaction:", err);
 			throw err;
@@ -76,7 +90,6 @@ export function useDatabase() {
 	const isReady = computed(() => isInitialized.value && !isLoading.value);
 
 	return {
-		db,
 		isInitialized: readonly(isInitialized),
 		isLoading: readonly(isLoading),
 		error: readonly(error),

@@ -40,6 +40,11 @@
 		"fs:allow-document-read",
 		"fs:allow-document-write",
 		"store:default",
+		"sql:allow-load",
+		"sql:allow-execute",
+		"sql:allow-select",
+		"sql:allow-close",
+		"sql:default",
 		"core:webview:allow-create-webview",
 		"core:webview:allow-create-webview-window"
 	]

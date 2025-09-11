@@ -59,21 +59,6 @@ export default defineNuxtConfig({
 			}
 		]
 	},
-	vite: {
-		clearScreen: false,
-		envPrefix: ["VITE_", "TAURI_"],
-		server: {
-			strictPort: true,
-			hmr: {
-				protocol: "ws",
-				host: "0.0.0.0",
-				port: 3001
-			},
-			watch: {
-				ignored: ["**/src-tauri/**"]
-			}
-		}
-	},
 	devServer: {
 		host: "0.0.0.0"
 	},
@@ -117,6 +102,22 @@ export default defineNuxtConfig({
 	nitro: {
 		experimental: {
 			wasm: true
+		}
+	},
+
+	vite: {
+		clearScreen: false,
+		envPrefix: ["VITE_", "TAURI_"],
+		server: {
+			strictPort: true,
+			hmr: {
+				protocol: "ws",
+				host: "0.0.0.0",
+				port: 3001
+			},
+			watch: {
+				ignored: ["**/src-tauri/**"]
+			}
 		}
 	}
 });

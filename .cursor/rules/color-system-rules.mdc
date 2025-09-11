@@ -1,0 +1,109 @@
+# Reglas del Sistema de Colores
+
+## Uso de Colores en Nuxt UI
+
+### Colores Permitidos
+**SOLO usar estos colores del sistema de Nuxt UI:**
+- `"primary"` - Color principal de la aplicación
+- `"secondary"` - Color secundario de la aplicación
+- `"success"` - Para estados exitosos
+- `"warning"` - Para advertencias
+- `"error"` - Para errores
+- `"info"` - Para información
+- `"neutral"` - Para elementos neutros
+
+### Colores PROHIBIDOS
+**NUNCA usar colores fijos como:**
+- `"red"`, `"green"`, `"blue"`, `"yellow"`, `"purple"`, `"orange"`
+- `"gray"`, `"slate"`, `"zinc"`, `"stone"`
+- Cualquier color específico de Tailwind CSS
+
+### Justificación
+- **Consistencia**: Mantiene un sistema de colores coherente en toda la aplicación
+- **Temas**: Permite cambiar temas fácilmente sin romper el diseño
+- **Accesibilidad**: Los colores del sistema están optimizados para contraste
+- **Mantenimiento**: Facilita la actualización del esquema de colores
+
+### Ejemplos Correctos
+
+#### UBadge
+```vue
+<UBadge color="primary">Activo</UBadge>
+<UBadge color="success">Completado</UBadge>
+<UBadge color="warning">Pendiente</UBadge>
+<UBadge color="error">Error</UBadge>
+```
+
+#### UButton
+```vue
+<UButton color="primary">Guardar</UButton>
+<UButton color="secondary">Cancelar</UButton>
+<UButton color="success">Confirmar</UButton>
+<UButton color="error">Eliminar</UButton>
+```
+
+#### UAlert
+```vue
+<UAlert color="success" title="Éxito" description="Operación completada" />
+<UAlert color="warning" title="Advertencia" description="Revisar datos" />
+<UAlert color="error" title="Error" description="Operación fallida" />
+```
+
+### Ejemplos INCORRECTOS
+
+#### ❌ NO hacer esto
+```vue
+<UBadge color="red">Error</UBadge>
+<UButton color="green">Guardar</UButton>
+<UAlert color="blue" title="Info" />
+```
+
+### Configuración de Colores Personalizados
+
+Si necesitas colores personalizados, configúralos en `app.config.ts`:
+
+```typescript
+export default defineAppConfig({
+	ui: {
+		primary: "blue",
+		secondary: "gray"
+	}
+});
+```
+
+### Clases de Tailwind CSS
+
+Para elementos que no usan componentes de Nuxt UI, usar las clases semánticas:
+
+```vue
+<!-- ✅ Correcto -->
+<div class="bg-primary-500 text-primary-50">
+<div class="bg-success-100 text-success-800">
+<div class="border-warning-300">
+
+<!-- ❌ Incorrecto -->
+<div class="bg-blue-500 text-white">
+<div class="bg-green-100 text-green-800">
+<div class="border-yellow-300">
+```
+
+### Verificación
+
+Antes de usar cualquier color, preguntarse:
+1. ¿Es un color del sistema de Nuxt UI?
+2. ¿Mantiene la consistencia con el resto de la aplicación?
+3. ¿Funcionará correctamente con diferentes temas?
+
+### Excepciones
+
+Las únicas excepciones permitidas son:
+- Colores para elementos decorativos (gradientes, sombras)
+- Colores para iconos específicos que no tienen equivalente semántico
+- Colores en archivos de configuración de temas
+
+### Recordatorios
+
+- **SIEMPRE** usar colores semánticos del sistema
+- **NUNCA** hardcodear colores específicos
+- **VERIFICAR** que los colores funcionen en modo claro y oscuro
+- **MANTENER** consistencia en toda la aplicación

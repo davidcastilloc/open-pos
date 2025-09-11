@@ -34,7 +34,11 @@
 	"productName": "Nuxtor",
 	"version": "1.4.0",
 	"identifier": "com.nicolaspadari.nuxtor",
-	"plugins": {},
+	"plugins": {
+		"sql": {
+			"preload": ["sqlite:pos.db"]
+		}
+	},
 	"app": {
 		"windows": [
 			{
