@@ -291,3 +291,4 @@ http://localhost:3001/categories  - Gestión de categorías
 ---
 
 *El sistema de gestión de productos está completamente funcional y listo para ser utilizado en un entorno de producción. Proporciona todas las herramientas necesarias para administrar eficientemente el catálogo de productos y categorías del negocio.*
+
