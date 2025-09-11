@@ -165,7 +165,7 @@ const total = subtotal - discount + iva + islr;
 
 ### **1. Acceder al POS**
 ```
-http://localhost:3001/pos
+http://localhost:3000/pos
 ```
 
 ### **2. Flujo de Venta**

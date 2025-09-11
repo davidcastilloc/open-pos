@@ -592,12 +592,12 @@ jobs:
 ## 🗓️ Roadmap de Desarrollo
 
 ### 🎯 Fase 1: MVP (3 meses)
-- [ ] POS básico funcional
-- [ ] Gestión de productos y ventas
-- [ ] Sistema multi-moneda (BS, USD, EUR)
-- [ ] Cierre de caja básico
-- [ ] Reportes básicos
-- [ ] Sistema de configuración editable
+- [x] POS básico funcional (UI POS + flujo de venta, IVA/ISLR)
+- [ ] Gestión de productos (UI CRUD) y ventas (historial)
+- [x] Sistema multi-moneda (BS, USD, EUR) con conversión/formato
+- [ ] Cierre de caja básico (apertura/cierre, diferencias)
+- [ ] Reportes básicos (ventas diarias, stock bajo, CSV)
+- [x] Sistema de configuración editable (Zod + persistencia)
 
 ### 🚀 Fase 2: SaaS Core (6 meses)
 - [ ] Autenticación y multi-tenant

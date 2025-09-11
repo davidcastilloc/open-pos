@@ -5,18 +5,18 @@
 ### 🎯 **FASE 1: MVP (3 meses) - Tareas Críticas**
 
 #### 🏗️ **1. Configuración del Entorno de Desarrollo**
-- [ ] **1.1** Configurar proyecto Nuxt 4 + Tauri 2
-  - [ ] Instalar dependencias base
-  - [ ] Configurar TypeScript strict
-  - [ ] Configurar ESLint con @antfu/eslint-config
-  - [ ] Configurar Tailwind CSS + Nuxt UI
-  - [ ] Configurar Zod para validación
+- [x] **1.1** Configurar proyecto Nuxt 4 + Tauri 2
+  - [x] Instalar dependencias base
+  - [x] Configurar TypeScript strict
+  - [x] Configurar ESLint con @antfu/eslint-config
+  - [x] Configurar Tailwind CSS + Nuxt UI
+  - [x] Configurar Zod para validación
 
-- [ ] **1.2** Configurar base de datos local
-  - [ ] Instalar Drizzle ORM
-  - [ ] Configurar SQLite local
-  - [ ] Crear migraciones base
-  - [ ] Configurar conexión Tauri
+- [x] **1.2** Configurar base de datos local
+  - [x] Instalar Drizzle ORM
+  - [x] Configurar SQLite local
+  - [x] Crear migraciones base
+  - [x] Configurar conexión Tauri
 
 - [ ] **1.3** Configurar CI/CD básico
   - [ ] GitHub Actions workflow
@@ -26,15 +26,15 @@
 
 #### 🗄️ **2. Esquemas de Base de Datos**
 - [ ] **2.1** Esquemas principales
-  - [ ] ProductSchema (productos)
-  - [ ] CategorySchema (categorías)
+  - [x] ProductSchema (productos)
+  - [x] CategorySchema (categorías)
   - [ ] CustomerSchema (clientes)
-  - [ ] SaleSchema (ventas)
-  - [ ] SaleItemSchema (items de venta)
+  - [x] SaleSchema (ventas)
+  - [x] SaleItemSchema (items de venta)
 
 - [ ] **2.2** Esquemas de configuración
-  - [ ] ConfigSchema (configuración dinámica)
-  - [ ] ExchangeRateSchema (tasas de cambio)
+  - [x] ConfigSchema (configuración dinámica)
+  - [x] ExchangeRateSchema (tasas de cambio)
   - [ ] AccountSchema (cuentas múltiples)
 
 - [ ] **2.3** Esquemas de contabilidad
@@ -43,11 +43,11 @@
   - [ ] ExpenseSchema (gastos)
 
 #### ⚙️ **3. Sistema de Configuración Dinámico**
-- [ ] **3.1** Composable de configuración
-  - [ ] useConfig() composable
-  - [ ] Validación con Zod
-  - [ ] Cache local
-  - [ ] Persistencia en SQLite
+- [x] **3.1** Composable de configuración
+  - [x] useConfig() composable
+  - [x] Validación con Zod
+  - [x] Cache local
+  - [x] Persistencia en SQLite
 
 - [ ] **3.2** Interfaz de configuración
   - [ ] Componente ConfigManager
@@ -55,17 +55,17 @@
   - [ ] Edición inline
   - [ ] Validación en tiempo real
 
-- [ ] **3.3** Configuraciones por defecto
-  - [ ] Configuración Venezuela (BS, USD, EUR)
-  - [ ] Tasas de impuestos (IVA, ISLR)
-  - [ ] Formatos de fecha y números
-  - [ ] Cuentas por defecto
+- [x] **3.3** Configuraciones por defecto
+  - [x] Configuración Venezuela (BS, USD, EUR)
+  - [x] Tasas de impuestos (IVA, ISLR)
+  - [x] Formatos de fecha y números
+  - [x] Cuentas por defecto
 
 #### 💱 **4. Sistema Multi-Moneda**
 - [ ] **4.1** Composable de conversión
-  - [ ] useCurrencyConversion()
-  - [ ] Conversión automática
-  - [ ] Formateo por moneda
+  - [x] useCurrencyConversion()
+  - [x] Conversión automática
+  - [x] Formateo por moneda
   - [ ] Histórico de tasas
 
 - [ ] **4.2** Integración con APIs
@@ -75,8 +75,8 @@
   - [ ] Actualización automática
 
 - [ ] **4.3** Interfaz multi-moneda
-  - [ ] Selector de moneda
-  - [ ] Conversión en tiempo real
+  - [x] Selector de moneda
+  - [x] Conversión en tiempo real
   - [ ] Indicadores visuales
   - [ ] Historial de conversiones
 
@@ -103,19 +103,19 @@
 - [ ] **6.1** Layout principal
   - [ ] Header con información de caja
   - [ ] Sidebar con categorías
-  - [ ] Área de productos
-  - [ ] Carrito de compras
+  - [x] Área de productos
+  - [x] Carrito de compras
 
-- [ ] **6.2** Funcionalidades de venta
-  - [ ] Búsqueda de productos
-  - [ ] Agregar al carrito
-  - [ ] Aplicar descuentos
-  - [ ] Selección de forma de pago
+- [x] **6.2** Funcionalidades de venta
+  - [x] Búsqueda de productos
+  - [x] Agregar al carrito
+  - [x] Aplicar descuentos
+  - [x] Selección de forma de pago
 
 - [ ] **6.3** Proceso de pago
-  - [ ] Cálculo de totales
+  - [x] Cálculo de totales
   - [ ] Selección de cuenta
-  - [ ] Confirmación de venta
+  - [x] Confirmación de venta
   - [ ] Generación de ticket
 
 #### 📦 **7. Gestión de Productos**
@@ -127,14 +127,14 @@
 
 - [ ] **7.2** Características de productos
   - [ ] Código de barras
-  - [ ] SKU
-  - [ ] Precios por moneda
-  - [ ] Stock y alertas
+  - [x] SKU
+  - [x] Precios por moneda
+  - [x] Stock y alertas
 
 - [ ] **7.3** Interfaz de productos
   - [ ] Lista de productos
   - [ ] Formulario de producto
-  - [ ] Búsqueda y filtros
+  - [x] Búsqueda y filtros
   - [ ] Importación masiva
 
 #### 🧾 **8. Sistema de Cierre de Caja**
