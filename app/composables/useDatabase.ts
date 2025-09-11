@@ -1,11 +1,11 @@
 import Database from "@tauri-apps/plugin-sql";
-import { computed, readonly, ref } from "vue";
+import { computed } from "vue";
 import { initDatabase } from "~/database/connection";
 
 export function useDatabase() {
-	const isInitialized = ref(false);
-	const isLoading = ref(false);
-	const error = ref<string | null>(null);
+	const isInitialized = useState("database.isInitialized", () => false);
+	const isLoading = useState("database.isLoading", () => false);
+	const error = useState<string | null>("database.error", () => null);
 
 	// Inicializar base de datos
 	const initialize = async () => {
@@ -90,9 +90,9 @@ export function useDatabase() {
 	const isReady = computed(() => isInitialized.value && !isLoading.value);
 
 	return {
-		isInitialized: readonly(isInitialized),
-		isLoading: readonly(isLoading),
-		error: readonly(error),
+		isInitialized,
+		isLoading,
+		error,
 		isReady,
 		initialize,
 		query,
