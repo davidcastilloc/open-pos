@@ -13,17 +13,17 @@
 				</div>
 
 				<!-- Error -->
-				<div v-else-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+				<div v-else-if="error" class="border rounded-lg p-4 mb-6">
 					<div class="flex items-center">
-						<UIcon name="i-heroicons-exclamation-triangle" class="w-5 h-5 text-red-500 mr-2" />
-						<span class="text-red-700">{{ error }}</span>
+						<UIcon name="i-heroicons-exclamation-triangle" class="w-5 h-5 text-error mr-2" />
+						<span class="text-error">{{ error }}</span>
 					</div>
 				</div>
 
 				<!-- Resultados -->
 				<div v-else-if="products.length > 0">
-					<div class="bg-white rounded-lg border shadow-sm overflow-hidden">
-						<div class="px-6 py-4 border-b bg-gray-50">
+					<div class="rounded-lg border shadow-sm overflow-hidden">
+						<div class="px-6 py-4 border-b">
 							<div class="flex items-center justify-between">
 								<h2 class="text-lg font-semibold">
 									Productos encontrados: {{ products.length }}
@@ -42,68 +42,68 @@
 
 						<div class="overflow-x-auto">
 							<table class="w-full">
-								<thead class="bg-gray-50">
+								<thead>
 									<tr>
-										<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+										<th class="px-4 py-3 text-left text-xs font-medium opacity-75 uppercase tracking-wider">
 											ID
 										</th>
-										<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+										<th class="px-4 py-3 text-left text-xs font-medium opacity-75 uppercase tracking-wider">
 											Nombre
 										</th>
-										<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+										<th class="px-4 py-3 text-left text-xs font-medium opacity-75 uppercase tracking-wider">
 											SKU
 										</th>
-										<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+										<th class="px-4 py-3 text-left text-xs font-medium opacity-75 uppercase tracking-wider">
 											Código de Barras
 										</th>
-										<th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+										<th class="px-4 py-3 text-right text-xs font-medium opacity-75 uppercase tracking-wider">
 											Precio
 										</th>
-										<th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+										<th class="px-4 py-3 text-right text-xs font-medium opacity-75 uppercase tracking-wider">
 											Costo
 										</th>
-										<th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+										<th class="px-4 py-3 text-right text-xs font-medium opacity-75 uppercase tracking-wider">
 											Stock
 										</th>
-										<th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+										<th class="px-4 py-3 text-right text-xs font-medium opacity-75 uppercase tracking-wider">
 											Stock Mín.
 										</th>
-										<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+										<th class="px-4 py-3 text-left text-xs font-medium opacity-75 uppercase tracking-wider">
 											Categoría
 										</th>
-										<th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+										<th class="px-4 py-3 text-center text-xs font-medium opacity-75 uppercase tracking-wider">
 											Activo
 										</th>
-										<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+										<th class="px-4 py-3 text-left text-xs font-medium opacity-75 uppercase tracking-wider">
 											Creado
 										</th>
 									</tr>
 								</thead>
 								<tbody class="divide-y divide-gray-200">
-									<tr v-for="product in products" :key="product.id" class="hover:bg-gray-50">
-										<td class="px-4 py-3 text-sm font-mono text-gray-900">
+									<tr v-for="product in products" :key="product.id" class="hover:opacity-75">
+										<td class="px-4 py-3 text-sm font-mono ">
 											{{ product.id }}
 										</td>
 										<td class="px-4 py-3 text-sm">
 											<div>
-												<div class="font-medium text-gray-900">
+												<div class="font-medium ">
 													{{ product.name }}
 												</div>
-												<div v-if="product.description" class="text-sm text-gray-500">
+												<div v-if="product.description" class="text-sm opacity-75">
 													{{ product.description }}
 												</div>
 											</div>
 										</td>
-										<td class="px-4 py-3 text-sm font-mono text-gray-900">
+										<td class="px-4 py-3 text-sm font-mono ">
 											{{ product.sku }}
 										</td>
-										<td class="px-4 py-3 text-sm font-mono text-gray-900">
+										<td class="px-4 py-3 text-sm font-mono ">
 											{{ product.barcode || '-' }}
 										</td>
-										<td class="px-4 py-3 text-sm text-right font-semibold text-green-600">
+										<td class="px-4 py-3 text-sm text-right font-semibold">
 											{{ formatPrice(product.price, product.currency) }}
 										</td>
-										<td class="px-4 py-3 text-sm text-right text-gray-900">
+										<td class="px-4 py-3 text-sm text-right ">
 											{{ formatPrice(product.cost, product.currency) }}
 										</td>
 										<td class="px-4 py-3 text-sm text-right">
@@ -111,10 +111,10 @@
 												{{ product.stock }}
 											</span>
 										</td>
-										<td class="px-4 py-3 text-sm text-right text-gray-900">
+										<td class="px-4 py-3 text-sm text-right ">
 											{{ product.min_stock }}
 										</td>
-										<td class="px-4 py-3 text-sm text-gray-900">
+										<td class="px-4 py-3 text-sm ">
 											{{ product.category_id || '-' }}
 										</td>
 										<td class="px-4 py-3 text-center">
@@ -122,7 +122,7 @@
 												{{ product.is_active ? 'Sí' : 'No' }}
 											</UBadge>
 										</td>
-										<td class="px-4 py-3 text-sm text-gray-500">
+										<td class="px-4 py-3 text-sm opacity-75">
 											{{ formatDate(product.created_at) }}
 										</td>
 									</tr>
@@ -148,11 +148,11 @@
 				</div>
 
 				<!-- Información de la base de datos -->
-				<div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
-					<h3 class="text-lg font-semibold text-blue-900 mb-2">
+				<div class="mt-8 border rounded-lg p-4">
+					<h3 class="text-lg font-semibold mb-2">
 						Información de la Base de Datos
 					</h3>
-					<div class="text-sm text-blue-700 space-y-1">
+					<div class="text-sm space-y-1">
 						<p><strong>Archivo:</strong> pos.db (SQLite)</p>
 						<p><strong>Tabla:</strong> products</p>
 						<p><strong>Tenant ID:</strong> default</p>
@@ -227,9 +227,9 @@
 
 	// Obtener clase CSS para stock
 	const getStockClass = (stock: number, minStock: number) => {
-		if (stock === 0) return "text-red-600 font-semibold";
-		if (stock <= minStock) return "text-orange-600 font-semibold";
-		return "text-green-600 font-semibold";
+		if (stock === 0) return "text-error font-semibold";
+		if (stock <= minStock) return "text-warning font-semibold";
+		return "text-success font-semibold";
 	};
 
 	// Cargar datos al montar el componente

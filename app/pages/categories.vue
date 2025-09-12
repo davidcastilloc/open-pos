@@ -54,11 +54,11 @@
 							<p class="text-sm opacity-75">
 								Categorías Activas
 							</p>
-							<p class="text-2xl font-bold text-green-600">
+							<p class="text-2xl font-bold">
 								{{ activeCategories }}
 							</p>
 						</div>
-						<UIcon name="i-heroicons-check-circle" class="w-8 h-8 text-green-500" />
+						<UIcon name="i-heroicons-check-circle" class="w-8 h-8 opacity-50" />
 					</div>
 				</UCard>
 
@@ -68,11 +68,11 @@
 							<p class="text-sm opacity-75">
 								Productos Asignados
 							</p>
-							<p class="text-2xl font-bold text-blue-600">
+							<p class="text-2xl font-bold">
 								{{ totalProducts }}
 							</p>
 						</div>
-						<UIcon name="i-heroicons-cube" class="w-8 h-8 text-blue-500" />
+						<UIcon name="i-heroicons-cube" class="w-8 h-8 opacity-50" />
 					</div>
 				</UCard>
 			</div>
@@ -108,11 +108,11 @@
 					<div
 						v-for="category in categories"
 						:key="category.id"
-						class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
+						class="flex items-center justify-between p-4 border rounded-lg hover:opacity-75"
 					>
 						<div class="flex items-center space-x-4">
-							<div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-								<UIcon name="i-heroicons-tag" class="w-6 h-6 text-primary" />
+							<div class="w-12 h-12 rounded-lg border flex items-center justify-center">
+								<UIcon name="i-heroicons-tag" class="w-6 h-6 opacity-50" />
 							</div>
 							<div>
 								<h4 class="font-medium">
@@ -133,7 +133,7 @@
 									{{ category.productCount || 0 }} productos
 								</p>
 								<UBadge
-									:color="category.isActive ? 'green' : 'red'"
+									:color="category.isActive ? 'success' : 'error'"
 									size="sm"
 								>
 									{{ category.isActive ? 'Activa' : 'Inactiva' }}
@@ -150,7 +150,7 @@
 								<UButton
 									variant="ghost"
 									size="sm"
-									color="red"
+									color="error"
 									@click="handleDeleteCategory(category)"
 								>
 									<UIcon name="i-heroicons-trash" />

@@ -16,7 +16,7 @@
 				<div class="flex items-center gap-2">
 					<UIcon
 						:name="isReady ? 'i-heroicons-check-circle' : 'i-heroicons-x-circle'"
-						:class="isReady ? 'text-green-500' : 'text-red-500'"
+						:class="isReady ? 'text-success' : 'text-error'"
 					/>
 					<span>Base de datos: {{ isReady ? 'Lista' : 'No inicializada' }}</span>
 				</div>
@@ -24,12 +24,12 @@
 				<div class="flex items-center gap-2">
 					<UIcon
 						:name="isLoading ? 'i-heroicons-arrow-path' : 'i-heroicons-check-circle'"
-						:class="isLoading ? 'text-blue-500 animate-spin' : 'text-green-500'"
+						:class="isLoading ? 'animate-spin' : ''"
 					/>
 					<span>Cargando: {{ isLoading ? 'Sí' : 'No' }}</span>
 				</div>
 
-				<div v-if="error" class="text-red-500">
+				<div v-if="error" class="text-error">
 					Error: {{ error }}
 				</div>
 
@@ -77,7 +77,7 @@
 						</h3>
 						<div class="space-y-1">
 							<div v-for="table in systemTables" :key="table" class="flex items-center gap-2">
-								<UIcon name="i-heroicons-table-cells" class="text-blue-500" />
+								<UIcon name="i-heroicons-table-cells" class="opacity-50" />
 								<span class="text-sm">{{ table }}</span>
 							</div>
 						</div>
@@ -89,7 +89,7 @@
 						</h3>
 						<div class="space-y-1">
 							<div v-for="config in defaultConfigs" :key="config.key" class="flex items-center gap-2">
-								<UIcon name="i-heroicons-cog-6-tooth" class="text-green-500" />
+								<UIcon name="i-heroicons-cog-6-tooth" class="opacity-50" />
 								<span class="text-sm">{{ config.key }}: {{ config.value }}</span>
 							</div>
 						</div>
@@ -143,7 +143,7 @@
 						>
 							<UIcon
 								:name="source.isActive ? 'i-heroicons-check-circle' : 'i-heroicons-x-circle'"
-								:class="source.isActive ? 'text-green-500' : 'text-red-500'"
+								:class="source.isActive ? 'text-success' : 'text-error'"
 							/>
 							<span>{{ source.name }} (Prioridad: {{ source.priority }})</span>
 						</div>
@@ -167,12 +167,12 @@
 						Actualizar Tasas
 					</UButton>
 
-					<span class="text-sm text-gray-500">
+					<span class="text-sm opacity-75">
 						Última actualización: {{ lastUpdateFormatted }}
 					</span>
 				</div>
 
-				<div v-if="currencyError" class="text-red-500">
+				<div v-if="currencyError" class="text-error">
 					Error: {{ currencyError }}
 				</div>
 
@@ -181,10 +181,10 @@
 						<div class="font-medium">
 							{{ rate.fromCurrency }} → {{ rate.toCurrency }}
 						</div>
-						<div class="text-2xl font-bold text-primary">
+						<div class="text-2xl font-bold">
 							{{ rate.rate.toFixed(4) }}
 						</div>
-						<div class="text-sm text-gray-500">
+						<div class="text-sm opacity-75">
 							{{ rate.source }}
 						</div>
 					</div>
@@ -215,10 +215,10 @@
 					</UFormGroup>
 				</div>
 
-				<div v-if="convertedAmount !== null" class="p-4 bg-gray-50 rounded-lg">
+				<div v-if="convertedAmount !== null" class="p-4 border rounded-lg">
 					<div class="text-lg">
 						{{ formatCurrency(testAmount, testFrom) }} =
-						<span class="font-bold text-primary">{{ formatCurrency(convertedAmount, testTo) }}</span>
+						<span class="font-bold">{{ formatCurrency(convertedAmount, testTo) }}</span>
 					</div>
 				</div>
 			</div>
@@ -241,7 +241,7 @@
 						<UBadge :color="getTaxConfig.iva.isActive ? 'green' : 'red'">
 							{{ (getTaxConfig.iva.rate * 100).toFixed(1) }}%
 						</UBadge>
-						<span class="text-sm text-gray-500">{{ getTaxConfig.iva.description }}</span>
+						<span class="text-sm opacity-75">{{ getTaxConfig.iva.description }}</span>
 					</div>
 				</div>
 
@@ -253,7 +253,7 @@
 						<UBadge :color="getTaxConfig.islr.isActive ? 'green' : 'red'">
 							{{ (getTaxConfig.islr.rate * 100).toFixed(1) }}%
 						</UBadge>
-						<span class="text-sm text-gray-500">{{ getTaxConfig.islr.description }}</span>
+						<span class="text-sm opacity-75">{{ getTaxConfig.islr.description }}</span>
 					</div>
 				</div>
 			</div>

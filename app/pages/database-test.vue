@@ -28,7 +28,7 @@
 						</UBadge>
 					</div>
 
-					<div v-if="error" class="text-red-500">
+					<div v-if="error" class="text-error">
 						Error: {{ error }}
 					</div>
 				</div>
@@ -126,7 +126,7 @@
 					>
 						<span>[{{ log.time }}]</span>
 						<span
-							:class="log.type === 'error' ? 'text-red-500' : 'text-green-500'"
+							:class="log.type === 'error' ? 'text-error' : ''"
 						>
 							{{ log.message }}
 						</span>

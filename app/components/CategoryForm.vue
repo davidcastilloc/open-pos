@@ -49,10 +49,10 @@
 				Vista Previa
 			</h4>
 
-			<div class="bg-gray-50 rounded-lg p-4">
+			<div class="rounded-lg p-4 border">
 				<div class="flex items-center space-x-3">
-					<div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-						<UIcon name="i-heroicons-tag" class="w-5 h-5 text-primary" />
+					<div class="w-10 h-10 rounded-lg border flex items-center justify-center">
+						<UIcon name="i-heroicons-tag" class="w-5 h-5 opacity-50" />
 					</div>
 					<div>
 						<h5 class="font-medium">
@@ -67,7 +67,7 @@
 					</div>
 					<div class="ml-auto">
 						<UBadge
-							:color="form.isActive ? 'green' : 'red'"
+							:color="form.isActive ? 'success' : 'error'"
 							size="sm"
 						>
 							{{ form.isActive ? 'Activa' : 'Inactiva' }}

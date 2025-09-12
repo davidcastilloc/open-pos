@@ -23,7 +23,7 @@
 					<div class="flex items-center space-x-6">
 						<!-- Estado de caja -->
 						<div class="flex items-center space-x-2">
-							<div class="w-3 h-3 rounded-full" style="background-color: #10b981;" />
+							<div class="w-3 h-3 rounded-full opacity-50" />
 							<span class="text-sm font-medium">Caja Abierta</span>
 						</div>
 
@@ -57,7 +57,7 @@
 					<!-- Estado de conexión -->
 					<div class="flex items-center space-x-4">
 						<div class="flex items-center space-x-2">
-							<div class="w-2 h-2 rounded-full" style="background-color: #10b981;" />
+							<div class="w-2 h-2 rounded-full opacity-50" />
 							<span class="opacity-75">Online</span>
 						</div>
 						<div class="opacity-50">

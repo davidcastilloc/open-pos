@@ -33,7 +33,7 @@
 			</div>
 
 			<!-- Filtros y búsqueda -->
-			<div class="bg-white rounded-lg border p-4 mb-6">
+			<div class="rounded-lg border p-4 mb-6">
 				<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 					<!-- Búsqueda -->
 					<div class="md:col-span-2">
@@ -97,11 +97,11 @@
 							<p class="text-sm opacity-75">
 								Con Stock
 							</p>
-							<p class="text-2xl font-bold text-green-600">
+							<p class="text-2xl font-bold">
 								{{ productsWithStock }}
 							</p>
 						</div>
-						<UIcon name="i-heroicons-check-circle" class="w-8 h-8 text-green-500" />
+						<UIcon name="i-heroicons-check-circle" class="w-8 h-8 opacity-50" />
 					</div>
 				</UCard>
 
@@ -111,11 +111,11 @@
 							<p class="text-sm opacity-75">
 								Stock Bajo
 							</p>
-							<p class="text-2xl font-bold text-orange-600">
+							<p class="text-2xl font-bold">
 								{{ lowStockCount }}
 							</p>
 						</div>
-						<UIcon name="i-heroicons-exclamation-triangle" class="w-8 h-8 text-orange-500" />
+						<UIcon name="i-heroicons-exclamation-triangle" class="w-8 h-8 opacity-50" />
 					</div>
 				</UCard>
 
@@ -125,11 +125,11 @@
 							<p class="text-sm opacity-75">
 								Sin Stock
 							</p>
-							<p class="text-2xl font-bold text-red-600">
+							<p class="text-2xl font-bold">
 								{{ outOfStockCount }}
 							</p>
 						</div>
-						<UIcon name="i-heroicons-x-circle" class="w-8 h-8 text-red-500" />
+						<UIcon name="i-heroicons-x-circle" class="w-8 h-8 opacity-50" />
 					</div>
 				</UCard>
 			</div>
@@ -205,7 +205,7 @@
 							<tr
 								v-for="product in products"
 								:key="product.id"
-								class="border-b hover:bg-gray-50"
+								class="border-b hover:opacity-75"
 							>
 								<td class="py-3 px-4">
 									<div class="flex items-center space-x-3">

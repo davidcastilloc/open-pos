@@ -132,7 +132,7 @@
 			</div>
 
 			<!-- Margen de ganancia -->
-			<div v-if="form.price && form.cost" class="bg-gray-50 rounded-lg p-4">
+			<div v-if="form.price && form.cost" class="rounded-lg p-4 border">
 				<div class="flex items-center justify-between">
 					<span class="text-sm font-medium">Margen de ganancia:</span>
 					<span class="text-sm font-semibold">
@@ -175,7 +175,7 @@
 			</div>
 
 			<!-- Estado del stock -->
-			<div v-if="form.stock !== undefined && form.minStock !== undefined" class="bg-gray-50 rounded-lg p-4">
+			<div v-if="form.stock !== undefined && form.minStock !== undefined" class="rounded-lg p-4 border">
 				<div class="flex items-center justify-between">
 					<span class="text-sm font-medium">Estado del stock:</span>
 					<UBadge
@@ -196,7 +196,7 @@
 
 			<div class="space-y-4">
 				<!-- Subir imagen -->
-				<div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+				<div class="border-2 border-dashed rounded-lg p-6 text-center">
 					<UIcon name="i-heroicons-photo" class="w-12 h-12 mx-auto mb-4 opacity-50" />
 					<p class="text-sm opacity-75 mb-4">
 						Arrastra y suelta imágenes aquí o haz clic para seleccionar
