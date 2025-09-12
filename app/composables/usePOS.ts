@@ -1,4 +1,4 @@
-import { computed, ref } from "vue";
+import { computed, ref, readonly } from "vue";
 import { useConfig } from "./useConfig";
 import { useCurrency } from "./useCurrency";
 import { useDatabase } from "./useDatabase";
@@ -191,7 +191,7 @@ export function usePOS() {
 	};
 
 	// Procesar venta
-	const processSale = async (paymentMethod: string) => {
+	const processSale = async (paymentMethod: string, paymentAccountId?: string) => {
 		if (cart.value.length === 0) {
 			throw new Error("El carrito está vacío");
 		}
@@ -244,6 +244,50 @@ export function usePOS() {
 						[item.quantity, item.productId]
 					);
 				}
+
+				// Determinar cuenta de pago
+				let accountRow: any | undefined;
+				if (paymentAccountId) {
+					const rows = await db.select("SELECT * FROM accounts WHERE id = ? AND is_active = 1", [paymentAccountId]);
+					accountRow = rows[0];
+				} else {
+					const rows = await db.select(
+						"SELECT * FROM accounts WHERE type = 'cash' AND currency = ? AND is_active = 1 ORDER BY created_at ASC LIMIT 1",
+						[currentCurrency.value]
+					);
+					accountRow = rows[0];
+				}
+
+				if (!accountRow) {
+					throw new Error(`No hay cuenta de efectivo activa para la moneda ${currentCurrency.value}`);
+				}
+				if (accountRow.currency !== currentCurrency.value) {
+					throw new Error(`La moneda de la cuenta (${accountRow.currency}) no coincide con la de la venta (${currentCurrency.value})`);
+				}
+
+				// Registrar transacción contable de la venta
+				const txId = `tx_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+				await db.execute(
+					`INSERT INTO transactions (id, tenant_id, account_id, type, amount, currency, exchange_rate, reference, description, created_at)
+					 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
+					[
+						txId,
+						"default",
+						accountRow.id,
+						"sale",
+						total.value,
+						currentCurrency.value,
+						null,
+						saleId,
+						`Venta POS ${saleId}`
+					]
+				);
+
+				// Actualizar saldo de la cuenta (+)
+				await db.execute(
+					"UPDATE accounts SET balance = balance + ?, updated_at = datetime('now') WHERE id = ?",
+					[total.value, accountRow.id]
+				);
 			});
 
 			// Limpiar carrito después de la venta exitosa
