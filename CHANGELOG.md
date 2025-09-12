@@ -1,3 +1,7 @@
+## 1.6.0 (2025-09-12)
+
+* feat: Implementación completa del CRUD de productos ([939697b5a758557a0eaa9879bd443e117bfff640](https://github.com/davidcastilloc/open-pos/commit/939697b5a758557a0eaa9879bd443e117bfff640))
+
 ## 1.5.0 (2025-09-12)
 
 * Merge pull request #16 from davidcastilloc/crud-productos-punta-a-punta ([8a2e7ecb540546efcaef45b9af487ffe960afa79](https://github.com/davidcastilloc/open-pos/commit/8a2e7ecb540546efcaef45b9af487ffe960afa79)), closes [#16](https://github.com/davidcastilloc/open-pos/issues/16)
