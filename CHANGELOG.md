@@ -1,3 +1,8 @@
+## 1.5.0 (2025-09-12)
+
+* Merge pull request #16 from davidcastilloc/crud-productos-punta-a-punta ([8a2e7ecb540546efcaef45b9af487ffe960afa79](https://github.com/davidcastilloc/open-pos/commit/8a2e7ecb540546efcaef45b9af487ffe960afa79)), closes [#16](https://github.com/davidcastilloc/open-pos/issues/16)
+* feat: Añadir generación automática de SKU y mejoras en la validación de formularios ([d7c3f6de6989ad29a36d8a4ce8411af34f512369](https://github.com/davidcastilloc/open-pos/commit/d7c3f6de6989ad29a36d8a4ce8411af34f512369))
+
 ## 1.4.0 (2025-09-12)
 
 * Actualiza la documentación de gestión de productos y categorías. Mejora el manejo de formularios en los componentes CategoryForm y ProductForm. Optimiza el composable useCategories para una mejor gestión de categorías. Ajusta la configuración de Tauri para deshabilitar el modo de pantalla completa, mejorando la experiencia del usuario. ([1f6b68ccbe5df70cba8e43e27ccd37f14c8b1823](https://github.com/davidcastilloc/open-pos/commit/1f6b68ccbe5df70cba8e43e27ccd37f14c8b1823))
