@@ -33,12 +33,61 @@ Construido con [Nuxt 4](https://nuxt.com) y [Tauri 2](https://v2.tauri.app).
 
 ## 🔧 Funcionalidades principales
 
-- Ejecución de comandos de shell desde la aplicación
-- Notificaciones nativas del sistema
-- Acceso a información del sistema operativo
-- Almacenamiento y recuperación de datos locales
-- Integración con tray icon
-- Total soporte de características de Nuxt (rutas, layouts, middleware, módulos, etc.)
+### 🏪 **Sistema POS Completo**
+- **Interfaz de venta** con catálogo de productos
+- **Carrito de compras** con descuentos y cálculos automáticos
+- **Procesamiento de pagos** multi-moneda (BS, USD, EUR)
+- **Gestión de impuestos** (IVA 16%, ISLR 2%)
+
+### 📦 **Gestión de Productos**
+- **CRUD completo** de productos con interfaz moderna
+- **Filtros avanzados** (búsqueda, categoría, estado, stock)
+- **Generador automático de SKU**
+- **Gestión de imágenes** con vista previa
+- **Validaciones robustas** con esquemas Zod
+- **Activar/desactivar** productos
+- **Estadísticas en tiempo real**
+
+### 💰 **Sistema Multi-Moneda**
+- **Conversión automática** entre BS, USD, EUR
+- **Tasas de cambio** en tiempo real
+- **Formateo local** según estándares venezolanos
+- **Histórico de tasas** de cambio
+
+### 🖥️ **Aplicación Desktop**
+- **Ejecución nativa** con Tauri 2
+- **Notificaciones del sistema**
+- **Acceso a información del SO**
+- **Almacenamiento local** con SQLite
+- **Multiplataforma** (Windows, macOS, Linux)
+
+---
+
+## 📱 **Páginas Disponibles**
+
+### 🏠 **Dashboard Principal** (`/`)
+- Estado del sistema y base de datos
+- Tasas de cambio en tiempo real
+- Acciones rápidas y navegación
+
+### 🏪 **Punto de Venta** (`/pos`)
+- Catálogo de productos con filtros
+- Carrito de compras interactivo
+- Procesamiento de pagos multi-moneda
+- Cálculo automático de impuestos
+
+### 📦 **Gestión de Productos** (`/products`)
+- **CRUD completo** de productos
+- Filtros avanzados y búsqueda
+- Generador automático de SKU
+- Gestión de imágenes y categorías
+- Activar/desactivar productos
+
+### 🧪 **Página de Pruebas** (`/test`)
+- Estado de la base de datos
+- Configuración del sistema
+- Pruebas de conversión de monedas
+- Validación de funcionalidades
 
 ---
 
@@ -106,6 +155,7 @@ pnpm tauri:build
 Documentos relacionados en la raíz:
 - `ESTADO-ACTUAL-PROYECTO.md`, `ROADMAP-TAREAS-DESARROLLO.md`
 - `INTERFAZ-POS-COMPLETADA.md`, `GESTION-PRODUCTOS-COMPLETADA.md`
+- `CRUD-PRODUCTOS-COMPLETADO.md` - Documentación detallada del CRUD de productos
 - `BASE-DE-DATOS-INICIALIZADA.md`, `SEMANTIC-RELEASE-FIX.md`
 
 ---
