@@ -79,7 +79,9 @@ export default defineNuxtConfig({
 	// Configuración específica para Nuxt UI
 	ui: {
 		global: true,
-		icons: ["heroicons"]
+		icons: ["heroicons"],
+		primary: "green",
+		neutral: "zinc"
 	},
 	experimental: {
 		typedPages: true

@@ -52,15 +52,65 @@ Construido con [Nuxt 4](https://nuxt.com) y [Tauri 2](https://v2.tauri.app).
 
 ## ⚡ Instalación y uso
 
-```sh
-# clona el repositorio
+```bash
+# Clonar el repositorio
 git clone https://github.com/davidjose/pos-system
-
-# entra a la carpeta
 cd pos-system
 
-# instala dependencias
+# Instalar dependencias
 pnpm install
 
+<<<<<<< Current (Your changes)
 # inicia la app en modo desarrollo
 pnpm run tauri:dev
+=======
+# Variables de entorno (opcional)
+cp env.example .env
+
+# Desarrollo (web o desktop)
+pnpm dev          # servidor Nuxt
+pnpm tauri:dev    # app desktop con Tauri
+```
+
+### 🧰 Comandos útiles
+
+```bash
+# Calidad
+pnpm lint
+pnpm type-check
+pnpm test
+
+# Base de datos (Drizzle)
+pnpm db:generate
+pnpm db:migrate
+pnpm db:studio
+
+# Build
+pnpm build
+pnpm tauri:build
+```
+
+---
+
+## 🧭 Documentación
+
+- Documentación ampliada en `docs/README.md`:
+  - Estructura del proyecto y convenciones
+  - Base de datos y migraciones
+  - Integración Tauri y plugins
+  - Gestión de productos e inventario
+  - Testing y calidad
+  - Versionado y releases
+  - Variables de entorno y scripts
+
+Documentos relacionados en la raíz:
+- `ESTADO-ACTUAL-PROYECTO.md`, `ROADMAP-TAREAS-DESARROLLO.md`
+- `INTERFAZ-POS-COMPLETADA.md`, `GESTION-PRODUCTOS-COMPLETADA.md`
+- `BASE-DE-DATOS-INICIALIZADA.md`, `SEMANTIC-RELEASE-FIX.md`
+
+---
+
+## 🤝 Contribución
+
+Lee `CONTRIBUTING.md` y usa Conventional Commits para PRs.
+>>>>>>> Incoming (Background Agent changes)

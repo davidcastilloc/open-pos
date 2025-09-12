@@ -1,7 +1,10 @@
 export * from "./accounts";
 export * from "./config";
+export * from "./inventory";
 // Exportar todos los esquemas
 export * from "./products";
+export * from "./sales";
+
 // Re-exportar tipos principales
 export type {
 	Account,
@@ -9,11 +12,15 @@ export type {
 	Category,
 	Customer,
 	ExchangeRate,
+	InventoryMovement,
+	InventoryStats,
 	NewAccount,
 	NewCashClosing,
 	NewCategory,
 	NewCustomer,
 	NewExchangeRate,
+	NewInventoryMovement,
+	NewInventoryStats,
 	NewProduct,
 	NewSale,
 	NewSaleItem,
@@ -27,5 +34,3 @@ export type {
 	SystemConfig,
 	Transaction
 } from "./products";
-
-export * from "./sales";

@@ -384,7 +384,7 @@
 - [ ] **Tareas completadas:** 0/120
 - [ ] **Código escrito:** 0 líneas
 - [ ] **Tests implementados:** 0/50
-- [ ] **Documentación:** 0%
+- [x] **Documentación:** 70% (ver `docs/README.md`)
 
 ### 🎯 **Objetivos Semanales**
 - **Semana 1:** Configuración completa del entorno
