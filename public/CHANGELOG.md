@@ -1,3 +1,21 @@
+## 1.2.0 (2025-09-12)
+
+* Actualiza las versiones de las dependencias en `pnpm-lock.yaml` y agrega la configuración de paquetes en `pnpm-workspace.yaml` para incluir el directorio raíz. Se mejoran las versiones de varios paquetes, incluyendo `vue`, `eslint` y `vite`, para asegurar compatibilidad y mejoras de rendimiento. ([60cbeaac9b47268402651f078a06faf4ee938d39](https://github.com/davidcastilloc/open-pos/commit/60cbeaac9b47268402651f078a06faf4ee938d39))
+* Corrige errores en la configuración de semantic-release y mejora el workflow de GitHub Actions. Se simplificó la configuración en `.releaserc.json`, eliminando `commitPartial` para evitar errores de sintaxis en Handlebars y se documentaron los problemas identificados en el proceso. ([58ee9a7bd4f45805195bfe35d4e56ffcf5dfc3e0](https://github.com/davidcastilloc/open-pos/commit/58ee9a7bd4f45805195bfe35d4e56ffcf5dfc3e0))
+* Grant release workflow permissions for issues and PRs ([f4cb17590c4882092c1792b848af3598742a863a](https://github.com/davidcastilloc/open-pos/commit/f4cb17590c4882092c1792b848af3598742a863a))
+* Mejora la configuración de semantic-release y corrige errores en el workflow de GitHub Actions. Se agregaron tipos de commits en `.releaserc.json`, se creó un script de prueba para verificar la configuración y se actualizó el workflow para incluir un output faltante. Además, se añadió la dependencia `conventional-changelog-writer` y se corrigió el nombre del release de "Nuxtor" a "Open POS". ([2eedbe4dda76d9e02c205b9047f74624179780a3](https://github.com/davidcastilloc/open-pos/commit/2eedbe4dda76d9e02c205b9047f74624179780a3))
+* Merge pull request #8 from davidcastilloc/cursor/fix-github-actions-semantic-release-error-7d69 ([f31c1b348c171476e8c7ae9868b7321204fe1d9f](https://github.com/davidcastilloc/open-pos/commit/f31c1b348c171476e8c7ae9868b7321204fe1d9f)), closes [#8](https://github.com/davidcastilloc/open-pos/issues/8)
+* Update release.yml ([d4093005a4beb3d94e4f74ceb9f777d0b1200214](https://github.com/davidcastilloc/open-pos/commit/d4093005a4beb3d94e4f74ceb9f777d0b1200214))
+* feat: Add release workflow to sync production with main (#9) ([7dc8ac38fcfec7cf1a78ebd76c57f3ac66f1f887](https://github.com/davidcastilloc/open-pos/commit/7dc8ac38fcfec7cf1a78ebd76c57f3ac66f1f887)), closes [#9](https://github.com/davidcastilloc/open-pos/issues/9)
+
+## 1.1.0 (2025-09-11)
+
+* Grant release workflow permissions for issues and PRs (#5) ([585dad7](https://github.com/davidcastilloc/open-pos/commit/585dad7)), closes [#5](https://github.com/davidcastilloc/open-pos/issues/5)
+* Merge pull request #6 from davidcastilloc/cursor/update-release-workflow-for-multi-platform-builds-5 ([c629aec](https://github.com/davidcastilloc/open-pos/commit/c629aec)), closes [#6](https://github.com/davidcastilloc/open-pos/issues/6)
+* Merge pull request #7 from davidcastilloc/revert-6-cursor/update-release-workflow-for-multi-platform ([842cc15](https://github.com/davidcastilloc/open-pos/commit/842cc15)), closes [#7](https://github.com/davidcastilloc/open-pos/issues/7)
+* Revert "Update release workflow for multi-platform builds" ([fb618dd](https://github.com/davidcastilloc/open-pos/commit/fb618dd))
+* feat: Configure semantic-release for automated releases ([e47e3df](https://github.com/davidcastilloc/open-pos/commit/e47e3df))
+
 ## 1.0.0 (2025-09-11)
 
 * ci(release): dedupe workflow keys; merge triggers; guard jobs by branch (#4) ([9617a8f](https://github.com/davidcastilloc/open-pos/commit/9617a8f)), closes [#4](https://github.com/davidcastilloc/open-pos/issues/4)
