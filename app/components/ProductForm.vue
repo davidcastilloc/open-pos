@@ -269,10 +269,15 @@
 	// Props
 	interface Props {
 		product?: any
-		categories: Array<{ id: string, name: string }>
+		categories?: Array<{ id: string, name: string }>
+		initialData?: any
+		isQuickCreate?: boolean
 	}
 
-	const props = defineProps<Props>();
+	const props = withDefaults(defineProps<Props>(), {
+		categories: () => [],
+		isQuickCreate: false
+	});
 
 	// Emits
 	const emit = defineEmits<{
@@ -314,26 +319,28 @@
 
 	// Inicializar formulario
 	const initializeForm = () => {
-		if (props.product) {
+		const sourceData = props.product || props.initialData;
+		
+		if (sourceData) {
 			// Asegurar que currency sea un string
-			let currency = props.product.currency || "BS";
+			let currency = sourceData.currency || "BS";
 			if (typeof currency === "object" && currency?.value) {
 				currency = currency.value;
 			}
 
 			form.value = {
-				name: props.product.name || "",
-				description: props.product.description || "",
-				sku: props.product.sku || "",
-				barcode: props.product.barcode || "",
-				price: Number(props.product.price) || 0,
-				cost: Number(props.product.cost) || 0,
+				name: sourceData.name || "",
+				description: sourceData.description || "",
+				sku: sourceData.sku || "",
+				barcode: sourceData.barcode || "",
+				price: Number(sourceData.price) || 0,
+				cost: Number(sourceData.cost) || 0,
 				currency,
-				categoryId: props.product.categoryId || "",
-				stock: Number(props.product.stock) || 0,
-				minStock: Number(props.product.minStock) || 0,
-				images: props.product.images || [],
-				isActive: props.product.isActive !== false
+				categoryId: sourceData.categoryId || "",
+				stock: Number(sourceData.stock) || 0,
+				minStock: Number(sourceData.minStock) || 0,
+				images: sourceData.images || [],
+				isActive: sourceData.isActive !== false
 			};
 		}
 	};
@@ -431,7 +438,7 @@
 	};
 
 	// Watchers
-	watch(() => props.product, initializeForm, { immediate: true });
+	watch(() => [props.product, props.initialData], initializeForm, { immediate: true });
 
 	// Watcher para asegurar que currency sea siempre un string
 	watch(() => form.value.currency, (newCurrency: any) => {

@@ -1,33 +1,61 @@
 <template>
-	<form @submit.prevent="handleSubmit" class="space-y-6">
+	<form class="space-y-6" @submit.prevent="handleSubmit">
 		<!-- Selección de producto -->
 		<div>
 			<UFormGroup label="Producto" required>
-				<USelectMenu
-					v-model="selectedProduct"
-					:options="productOptions"
-					:loading="isLoadingProducts"
-					searchable
-					placeholder="Buscar producto..."
-					option-attribute="label"
-					value-attribute="value"
-				>
-					<template #option="{ option }">
-						<div class="flex items-center justify-between w-full">
-							<div>
-								<div class="font-medium">{{ option.name }}</div>
-								<div class="text-sm opacity-75 font-mono">{{ option.sku }}</div>
+				<div class="space-y-2">
+					<!-- Producto seleccionado -->
+					<div v-if="selectedProduct" class="p-4 border rounded-lg bg-gray-50 dark:bg-gray-800">
+						<div class="flex items-center justify-between">
+							<div class="flex-1">
+								<h4 class="font-medium text-lg">
+									{{ selectedProduct.name }}
+								</h4>
+								<div class="flex items-center space-x-4 mt-1">
+									<span class="text-sm font-mono bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded">
+										{{ selectedProduct.sku }}
+									</span>
+									<span v-if="selectedProduct.barcode" class="text-sm font-mono bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded">
+										{{ selectedProduct.barcode }}
+									</span>
+									<span v-if="selectedProduct.categoryName" class="text-sm opacity-75">
+										{{ selectedProduct.categoryName }}
+									</span>
+								</div>
+								<div class="flex items-center space-x-4 mt-2">
+									<span class="text-sm">
+										<strong>Stock:</strong> {{ selectedProduct.stock }} unidades
+									</span>
+									<span class="text-sm">
+										<strong>Precio:</strong> {{ formatCurrency(selectedProduct.price, selectedProduct.currency) }}
+									</span>
+								</div>
 							</div>
-							<div class="text-right text-sm">
-								<div>Stock: {{ option.stock }}</div>
-								<div class="opacity-75">{{ formatCurrency(option.price, option.currency) }}</div>
+							<div class="ml-4">
+								<UButton
+									variant="outline"
+									size="sm"
+									@click="clearSelectedProduct"
+								>
+									<UIcon name="i-heroicons-x-mark" />
+									Cambiar
+								</UButton>
 							</div>
 						</div>
-					</template>
-				</USelectMenu>
-				<p v-if="selectedProduct?.stock !== undefined" class="text-sm opacity-75 mt-1">
-					Stock actual: {{ selectedProduct.stock }} unidades
-				</p>
+					</div>
+
+					<!-- Botón para buscar producto -->
+					<div v-else>
+						<UButton
+							variant="outline"
+							class="w-full justify-start"
+							@click="showProductSearch = true"
+						>
+							<UIcon name="i-heroicons-magnifying-glass" />
+							Buscar producto...
+						</UButton>
+					</div>
+				</div>
 			</UFormGroup>
 		</div>
 
@@ -35,9 +63,11 @@
 		<div>
 			<UFormGroup label="Tipo de Movimiento" required>
 				<USelectMenu
-					v-model="form.movementType"
-					:options="movementTypeOptions"
+					v-model="selectedMovementType"
+					:items="movementTypeOptions"
 					placeholder="Seleccionar tipo"
+					value-attribute="value"
+					option-attribute="label"
 				/>
 			</UFormGroup>
 		</div>
@@ -89,9 +119,11 @@
 			<UFormGroup label="Razón del Movimiento" required>
 				<USelectMenu
 					v-model="selectedReason"
-					:options="reasonOptions"
+					:items="reasonOptions"
 					searchable
 					placeholder="Seleccionar razón o escribir una personalizada"
+					value-attribute="value"
+					option-attribute="label"
 				/>
 				<UTextarea
 					v-if="selectedReason?.value === 'custom'"
@@ -128,7 +160,9 @@
 
 		<!-- Resumen del movimiento -->
 		<div v-if="isFormValid" class="rounded-lg border p-4 bg-gray-50 dark:bg-gray-800">
-			<h4 class="font-semibold mb-2">Resumen del Movimiento</h4>
+			<h4 class="font-semibold mb-2">
+				Resumen del Movimiento
+			</h4>
 			<div class="space-y-1 text-sm">
 				<div class="flex justify-between">
 					<span>Producto:</span>
@@ -180,38 +214,49 @@
 			</UButton>
 		</div>
 	</form>
+
+	<!-- Modal de búsqueda de productos -->
+	<ProductSearchModal
+		:open="showProductSearch"
+		title="Seleccionar Producto"
+		description="Busca y selecciona el producto para el movimiento de inventario"
+		@close="showProductSearch = false"
+		@select="handleProductSelect"
+		@create="handleProductCreate"
+	/>
 </template>
 
 <script setup lang="ts">
+	import type { InventoryMovement } from "~/schemas/inventory";
 	import { computed, onMounted, ref, watch } from "vue";
-	import { useProducts } from "~/composables/useProducts";
 	import { useCurrency } from "~/composables/useCurrency";
-	import { 
-		MOVEMENT_TYPE_LABELS, 
+	import { useProducts } from "~/composables/useProducts";
+	import {
 		COMMON_MOVEMENT_REASONS,
-		validateInventoryMovement,
-		type InventoryMovement
+		MOVEMENT_TYPE_LABELS,
+		validateInventoryMovement
 	} from "~/schemas/inventory";
 
 	// Props y emits
 	const emit = defineEmits<{
-		submit: [data: Omit<InventoryMovement, "newStock" | "previousStock">];
-		cancel: [];
+		submit: [data: Omit<InventoryMovement, "newStock" | "previousStock">]
+		cancel: []
 	}>();
 
 	// Composables
-	const { products, loadProducts, formatPrice } = useProducts();
+	const { products, loadProducts, createProduct } = useProducts();
 	const { formatCurrency } = useCurrency();
 
 	// Estado
-	const isLoadingProducts = ref(false);
 	const isSubmitting = ref(false);
 	const selectedProduct = ref<any>(null);
 	const selectedReason = ref<any>(null);
+	const selectedMovementType = ref<any>(null);
+	const showProductSearch = ref(false);
 
 	// Formulario
 	const form = ref({
-		movementType: "",
+		movementType: "" as "entry" | "exit" | "adjustment" | "transfer" | "sale" | "return" | "",
 		quantity: 0,
 		unitCost: undefined as number | undefined,
 		reason: "",
@@ -220,9 +265,9 @@
 		createdBy: "user"
 	});
 
-	// Opciones para el formulario
-	const productOptions = computed(() => 
-		products.value.map(product => ({
+	// Opciones para el formulario (ya no se usa, pero mantenemos para compatibilidad)
+	const _productOptions = computed(() =>
+		products.value.map((product) => ({
 			label: `${product.name} (${product.sku})`,
 			value: product.id,
 			name: product.name,
@@ -244,9 +289,9 @@
 		if (!form.value.movementType) return [];
 
 		const commonReasons = COMMON_MOVEMENT_REASONS[form.value.movementType as keyof typeof COMMON_MOVEMENT_REASONS] || [];
-		
+
 		return [
-			...commonReasons.map(reason => ({ label: reason, value: reason })),
+			...commonReasons.map((reason) => ({ label: reason, value: reason })),
 			{ label: "Razón personalizada...", value: "custom" }
 		];
 	});
@@ -260,15 +305,21 @@
 	// Validación del formulario
 	const isFormValid = computed(() => {
 		return !!(
-			selectedProduct.value &&
-			form.value.movementType &&
-			form.value.quantity !== 0 &&
-			(selectedReason.value?.value !== "custom" ? selectedReason.value?.value : form.value.reason) &&
-			newStock.value >= 0 // No permitir stock negativo
+			selectedProduct.value
+			&& form.value.movementType
+			&& form.value.quantity !== 0
+			&& (selectedReason.value?.value !== "custom" ? selectedReason.value?.value : form.value.reason)
+			&& newStock.value >= 0 // No permitir stock negativo
 		);
 	});
 
 	// Watchers
+	watch(selectedMovementType, (newType) => {
+		if (newType) {
+			form.value.movementType = newType.value;
+		}
+	});
+
 	watch(() => form.value.movementType, (newType) => {
 		// Limpiar cantidad al cambiar tipo
 		form.value.quantity = 0;
@@ -276,18 +327,18 @@
 		form.value.reason = "";
 
 		// Ajustar signo de cantidad según el tipo
-		if (newType === 'exit' && form.value.quantity > 0) {
+		if (newType === "exit" && form.value.quantity > 0) {
 			form.value.quantity = -Math.abs(form.value.quantity);
-		} else if (newType === 'entry' && form.value.quantity < 0) {
+		} else if (newType === "entry" && form.value.quantity < 0) {
 			form.value.quantity = Math.abs(form.value.quantity);
 		}
 	});
 
 	watch(() => form.value.quantity, (newQuantity) => {
 		// Ajustar signo según el tipo de movimiento
-		if (form.value.movementType === 'exit' && newQuantity > 0) {
+		if (form.value.movementType === "exit" && newQuantity > 0) {
 			form.value.quantity = -Math.abs(newQuantity);
-		} else if (form.value.movementType === 'entry' && newQuantity < 0) {
+		} else if (form.value.movementType === "entry" && newQuantity < 0) {
 			form.value.quantity = Math.abs(newQuantity);
 		}
 	});
@@ -300,14 +351,9 @@
 		}
 	});
 
-	// Cargar productos al montar
+	// Cargar productos al montar (ya no es necesario cargar todos los productos)
 	onMounted(async () => {
-		isLoadingProducts.value = true;
-		try {
-			await loadProducts(1, {});
-		} finally {
-			isLoadingProducts.value = false;
-		}
+		// Los productos se cargarán cuando se abra el modal de búsqueda
 	});
 
 	// Manejar envío del formulario
@@ -337,7 +383,7 @@
 		try {
 			const movementData = {
 				productId: selectedProduct.value.id,
-				movementType: form.value.movementType,
+				movementType: form.value.movementType as "entry" | "exit" | "adjustment" | "transfer" | "sale" | "return",
 				quantity: form.value.quantity,
 				unitCost: form.value.unitCost,
 				totalCost: form.value.unitCost ? form.value.unitCost * Math.abs(form.value.quantity) : undefined,
@@ -347,7 +393,7 @@
 				createdBy: form.value.createdBy
 			};
 
-			emit('submit', movementData);
+			emit("submit", movementData);
 		} catch (error) {
 			console.error("Error en envío:", error);
 		} finally {
@@ -358,5 +404,34 @@
 	// Helper para obtener etiqueta del tipo de movimiento
 	const getMovementTypeLabel = (type: string) => {
 		return MOVEMENT_TYPE_LABELS[type as keyof typeof MOVEMENT_TYPE_LABELS] || type;
+	};
+
+	// Manejar selección de producto desde el modal
+	const handleProductSelect = (product: any) => {
+		selectedProduct.value = product;
+		showProductSearch.value = false;
+	};
+
+	// Manejar creación de producto desde el modal
+	const handleProductCreate = async (productData: any) => {
+		try {
+			const productId = await createProduct(productData);
+			// Recargar productos para obtener el nuevo producto
+			await loadProducts(1, {});
+			// Buscar el producto recién creado
+			const newProduct = products.value.find((p) => p.id === productId);
+			if (newProduct) {
+				selectedProduct.value = newProduct;
+			}
+			showProductSearch.value = false;
+		} catch (error) {
+			console.error("Error creando producto:", error);
+		}
+	};
+
+	// Limpiar producto seleccionado
+	const clearSelectedProduct = () => {
+		selectedProduct.value = null;
+		showProductSearch.value = true;
 	};
 </script>

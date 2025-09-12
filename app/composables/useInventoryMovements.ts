@@ -22,7 +22,7 @@ export interface InventoryMovementRecord extends InventoryMovement {
 }
 
 export function useInventoryMovements() {
-	const { query, execute } = useDatabase();
+	const { query, execute, transaction } = useDatabase();
 
 	// Estado
 	const movements = ref<InventoryMovementRecord[]>([]);
@@ -68,12 +68,10 @@ export function useInventoryMovements() {
 			const movementId = `mov_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 			const now = new Date().toISOString();
 
-			// Iniciar transacción
-			await execute("BEGIN TRANSACTION");
-
-			try {
+			// Usar transacción del composable useDatabase
+			const result = await transaction(async (db) => {
 				// Registrar movimiento
-				await execute(
+				await db.execute(
 					`INSERT INTO inventory_movements 
 					(id, tenant_id, product_id, movement_type, quantity, previous_stock, new_stock, 
 					 unit_cost, total_cost, reason, reference_document, notes, created_by, created_at)
@@ -97,25 +95,21 @@ export function useInventoryMovements() {
 				);
 
 				// Actualizar stock del producto
-				await execute(
+				await db.execute(
 					"UPDATE products SET stock = ?, updated_at = ? WHERE id = ? AND tenant_id = ?",
 					[newStock, now, movementData.productId, "default"]
 				);
 
 				// Si hay costo unitario, actualizar el costo promedio del producto
 				if (movementData.unitCost && movementData.quantity > 0) {
-					await updateAverageCost(movementData.productId, movementData.unitCost, movementData.quantity);
+					await updateAverageCostInTransaction(db, movementData.productId, movementData.unitCost, movementData.quantity);
 				}
 
-				await execute("COMMIT");
-
-				console.log(`✅ Movimiento registrado: ${movementData.movementType} - ${movementData.quantity} unidades`);
 				return movementId;
+			});
 
-			} catch (error) {
-				await execute("ROLLBACK");
-				throw error;
-			}
+			console.log(`✅ Movimiento registrado: ${movementData.movementType} - ${movementData.quantity} unidades`);
+			return result;
 
 		} catch (err) {
 			error.value = err instanceof Error ? err.message : "Error al registrar movimiento";
@@ -124,7 +118,35 @@ export function useInventoryMovements() {
 		}
 	};
 
-	// Actualizar costo promedio del producto
+	// Actualizar costo promedio del producto (dentro de transacción)
+	const updateAverageCostInTransaction = async (db: any, productId: string, newUnitCost: number, quantity: number) => {
+		try {
+			const productResult = await db.select(
+				"SELECT cost, stock FROM products WHERE id = ? AND tenant_id = ?",
+				[productId, "default"]
+			);
+
+			if (productResult.length === 0) return;
+
+			const currentCost = productResult[0].cost || 0;
+			const currentStock = productResult[0].stock || 0;
+			
+			// Calcular costo promedio ponderado
+			const totalCostValue = (currentCost * currentStock) + (newUnitCost * quantity);
+			const totalQuantity = currentStock + quantity;
+			const averageCost = totalQuantity > 0 ? totalCostValue / totalQuantity : newUnitCost;
+
+			await db.execute(
+				"UPDATE products SET cost = ? WHERE id = ? AND tenant_id = ?",
+				[averageCost, productId, "default"]
+			);
+
+		} catch (err) {
+			console.error("Error updating average cost:", err);
+		}
+	};
+
+	// Actualizar costo promedio del producto (fuera de transacción)
 	const updateAverageCost = async (productId: string, newUnitCost: number, quantity: number) => {
 		try {
 			const productResult = await query<any>(
@@ -162,35 +184,73 @@ export function useInventoryMovements() {
 		}
 
 		try {
-			await execute("BEGIN TRANSACTION");
-
 			const adjustmentId = `adj_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 			const movementIds: string[] = [];
 
-			for (const adjustment of adjustmentData.adjustments) {
-				if (adjustment.difference !== 0) {
-					const movementId = await recordMovement({
-						productId: adjustment.productId,
-						movementType: "adjustment",
-						quantity: adjustment.difference,
-						reason: `Ajuste de inventario: ${adjustmentData.reason}`,
-						referenceDocument: adjustmentId,
-						notes: adjustment.notes,
-						unitCost: adjustment.unitCost,
-						totalCost: adjustment.unitCost ? Math.abs(adjustment.difference) * adjustment.unitCost : undefined,
-						createdBy: adjustmentData.createdBy
-					});
-					movementIds.push(movementId);
-				}
-			}
+			// Usar transacción para el ajuste masivo
+			await transaction(async (db) => {
+				for (const adjustment of adjustmentData.adjustments) {
+					if (adjustment.difference !== 0) {
+						// Obtener stock actual del producto
+						const productResult = await db.select(
+							"SELECT stock FROM products WHERE id = ? AND tenant_id = ?",
+							[adjustment.productId, "default"]
+						);
 
-			await execute("COMMIT");
+						if (productResult.length === 0) {
+							throw new Error(`Producto no encontrado: ${adjustment.productId}`);
+						}
+
+						const currentStock = productResult[0].stock;
+						const newStock = currentStock + adjustment.difference;
+
+						// Validar que el nuevo stock no sea negativo
+						if (newStock < 0) {
+							throw new Error(`Stock insuficiente para producto ${adjustment.productId}. Stock actual: ${currentStock}, diferencia: ${adjustment.difference}`);
+						}
+
+						const movementId = `mov_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+						const now = new Date().toISOString();
+
+						// Registrar movimiento
+						await db.execute(
+							`INSERT INTO inventory_movements 
+							(id, tenant_id, product_id, movement_type, quantity, previous_stock, new_stock, 
+							 unit_cost, total_cost, reason, reference_document, notes, created_by, created_at)
+							VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+							[
+								movementId,
+								"default",
+								adjustment.productId,
+								"adjustment",
+								adjustment.difference,
+								currentStock,
+								newStock,
+								adjustment.unitCost || null,
+								adjustment.unitCost ? Math.abs(adjustment.difference) * adjustment.unitCost : null,
+								`Ajuste de inventario: ${adjustmentData.reason}`,
+								adjustmentId,
+								adjustment.notes || null,
+								adjustmentData.createdBy || "system",
+								now
+							]
+						);
+
+						// Actualizar stock del producto
+						await db.execute(
+							"UPDATE products SET stock = ?, updated_at = ? WHERE id = ? AND tenant_id = ?",
+							[newStock, now, adjustment.productId, "default"]
+						);
+
+						movementIds.push(movementId);
+					}
+				}
+			});
 			
 			console.log(`✅ Ajuste de inventario completado: ${movementIds.length} productos ajustados`);
 			return { adjustmentId, movementIds };
 
 		} catch (err) {
-			await execute("ROLLBACK");
 			error.value = err instanceof Error ? err.message : "Error al realizar ajuste";
 			console.error("Error performing inventory adjustment:", err);
 			throw err;

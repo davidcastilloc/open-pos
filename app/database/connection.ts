@@ -240,6 +240,39 @@ async function createTables() {
 			retry_count INTEGER NOT NULL DEFAULT 0,
 			created_at TEXT NOT NULL DEFAULT (datetime('now')),
 			updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+		)`,
+
+		// Tabla de movimientos de inventario
+		`CREATE TABLE IF NOT EXISTS inventory_movements (
+			id TEXT PRIMARY KEY,
+			tenant_id TEXT NOT NULL DEFAULT 'default',
+			product_id TEXT NOT NULL,
+			movement_type TEXT NOT NULL,
+			quantity INTEGER NOT NULL,
+			previous_stock INTEGER NOT NULL,
+			new_stock INTEGER NOT NULL,
+			unit_cost REAL,
+			total_cost REAL,
+			reason TEXT NOT NULL,
+			reference_document TEXT,
+			notes TEXT,
+			created_by TEXT NOT NULL DEFAULT 'system',
+			created_at TEXT NOT NULL DEFAULT (datetime('now')),
+			updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+			FOREIGN KEY (product_id) REFERENCES products(id)
+		)`,
+
+		// Tabla de estadísticas de inventario (cache)
+		`CREATE TABLE IF NOT EXISTS inventory_stats (
+			id TEXT PRIMARY KEY,
+			tenant_id TEXT NOT NULL DEFAULT 'default',
+			total_products INTEGER NOT NULL DEFAULT 0,
+			total_stock INTEGER NOT NULL DEFAULT 0,
+			total_value REAL NOT NULL DEFAULT 0,
+			low_stock_count INTEGER NOT NULL DEFAULT 0,
+			out_of_stock_count INTEGER NOT NULL DEFAULT 0,
+			last_movement_date TEXT,
+			last_updated TEXT NOT NULL DEFAULT (datetime('now'))
 		)`
 	];
 
@@ -248,10 +281,30 @@ async function createTables() {
 		await executeSQL(sql);
 	}
 
+	// Crear índices para las tablas de inventario
+	await createInventoryIndexes();
+
 	// Verificar y agregar columna currency si no existe
 	await ensureCurrencyColumn();
 
 	console.log("✅ Tablas creadas correctamente");
+}
+
+// Función para crear índices de inventario
+async function createInventoryIndexes() {
+	const indexes = [
+		"CREATE INDEX IF NOT EXISTS idx_inventory_movements_product_id ON inventory_movements(product_id)",
+		"CREATE INDEX IF NOT EXISTS idx_inventory_movements_tenant_id ON inventory_movements(tenant_id)",
+		"CREATE INDEX IF NOT EXISTS idx_inventory_movements_created_at ON inventory_movements(created_at)",
+		"CREATE INDEX IF NOT EXISTS idx_inventory_movements_movement_type ON inventory_movements(movement_type)",
+		"CREATE INDEX IF NOT EXISTS idx_inventory_stats_tenant_id ON inventory_stats(tenant_id)"
+	];
+
+	for (const indexSQL of indexes) {
+		await executeSQL(indexSQL);
+	}
+
+	console.log("✅ Índices de inventario creados correctamente");
 }
 
 // Función para ejecutar SQL directamente
