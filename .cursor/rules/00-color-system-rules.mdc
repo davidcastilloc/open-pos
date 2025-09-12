@@ -3,7 +3,13 @@
 ## Principio Fundamental: Sin Colores Explícitos
 
 ### REGLA PRINCIPAL
-**NUNCA especificar colores explícitos en textos ni fondos. Dejar que Tailwind CSS elija automáticamente los colores correctos según el tema y modo (claro/oscuro).**
+**NUNCA usar colores explícitos en clases CSS como text-gray-900, bg-white, text-red-600, bg-blue-50, etc. Dejar que Tailwind CSS elija automáticamente los colores correctos según el tema.**
+
+### Colores de Emergencia Permitidos
+**SOLO usar estos colores para indicar estados críticos del sistema:**
+- `text-error` - Para errores reales (errores de conexión, errores de API, stock sin existencias)
+- `text-warning` - Para advertencias (tasas de cambio no cargadas, stock bajo)
+- `text-success` - Para estados exitosos (conexión establecida, datos cargados, stock normal)
 
 ### Colores Permitidos SOLO en Componentes UI
 **SOLO usar estos colores del sistema de Nuxt UI para componentes específicos (UButton, UBadge, UAlert):**
@@ -14,14 +20,6 @@
 - `"error"` - Para errores
 - `"info"` - Para información
 - `"neutral"` - Para elementos neutros
-
-### Colores PROHIBIDOS en Clases CSS
-**NUNCA usar colores explícitos en clases de Tailwind:**
-- ❌ `text-gray-900`, `text-white`, `text-black`
-- ❌ `bg-gray-50`, `bg-white`, `bg-black`
-- ❌ `text-red-600`, `text-green-500`, `text-blue-400`
-- ❌ `bg-red-100`, `bg-green-50`, `bg-blue-200`
-- ❌ Cualquier clase con color específico de Tailwind CSS
 
 ### Justificación
 - **Consistencia**: Mantiene un sistema de colores coherente en toda la aplicación
@@ -44,17 +42,22 @@
 <!-- ✅ Correcto: Sin colores explícitos, Tailwind elige automáticamente -->
 <div class="p-4 rounded-lg border">
 	<h3 class="font-medium mb-2">Título</h3>
-	<p class="text-sm">Descripción del contenido</p>
+	<p class="text-sm opacity-75">Descripción del contenido</p>
 	<span class="font-bold">Precio</span>
 </div>
 
 <!-- ✅ Correcto: Usar solo clases estructurales -->
 <div class="space-y-2">
 	<div class="flex justify-between">
-		<span>Subtotal:</span>
+		<span class="opacity-75">Subtotal:</span>
 		<span class="font-semibold">$100</span>
 	</div>
 </div>
+
+<!-- ✅ Correcto: Colores de emergencia solo para estados críticos -->
+<div v-if="error" class="text-error">Error de conexión</div>
+<div v-if="warning" class="text-warning">Stock bajo</div>
+<div v-if="success" class="text-success">Operación exitosa</div>
 ```
 
 ### Ejemplos INCORRECTOS
@@ -66,6 +69,10 @@
 <h3 class="text-gray-900 font-medium">Título</h3>
 <p class="text-gray-500 text-sm">Descripción</p>
 <span class="text-red-600">Error</span>
+
+<!-- ❌ Incorrecto: Fondos hardcodeados -->
+<div class="bg-gray-50 rounded-lg p-4">
+<div class="bg-blue-100 border border-blue-200">
 
 <!-- ❌ Incorrecto: Colores fijos en componentes UI -->
 <UBadge color="red">Error</UBadge>
@@ -95,13 +102,23 @@ export default defineAppConfig({
 <div class="space-y-2 text-sm">
 <div class="flex justify-between items-center">
 <div class="font-medium">
-<div class="opacity-75">
+
+<!-- ✅ Correcto: Opacidades para jerarquía visual -->
+<div class="opacity-75">Texto secundario</div>
+<div class="opacity-50">Texto terciario</div>
+<div class="opacity-25">Elementos deshabilitados</div>
+
+<!-- ✅ Correcto: Fondos sin colores hardcodeados -->
+<div class="rounded-lg border p-4">
+<div class="shadow-sm border">
+<div class="hover:opacity-75">
 
 <!-- ❌ Incorrecto: Cualquier color explícito -->
 <div class="bg-primary-500 text-primary-50">
 <div class="bg-success-100 text-success-800">
 <div class="text-gray-900 bg-white">
 <div class="border-warning-300">
+<div class="bg-gray-50">
 ```
 
 ### Verificación
@@ -135,19 +152,41 @@ Al encontrar código con colores explícitos, eliminarlos:
 <div class="bg-white text-gray-900 border-gray-200">
 	<h3 class="text-gray-900 font-medium">Título</h3>
 	<p class="text-gray-500">Descripción</p>
+	<span class="text-red-600">Error</span>
 </div>
 
 <!-- ✅ Después -->
-<div class="border">
+<div class="rounded-lg border">
 	<h3 class="font-medium">Título</h3>
 	<p class="opacity-75">Descripción</p>
+	<span class="text-error">Error</span>
 </div>
+
+<!-- ❌ Antes: Fondos hardcodeados -->
+<div class="bg-gray-50 rounded-lg p-4">
+<div class="bg-blue-100 border border-blue-200">
+
+<!-- ✅ Después: Sin fondos hardcodeados -->
+<div class="rounded-lg border p-4">
+<div class="border rounded-lg">
 ```
 
 ### Alternativas a Colores Explícitos
 
-- `opacity-75` en lugar de `text-gray-500`
-- `opacity-50` en lugar de `text-gray-400`  
+**Para texto:**
+- `opacity-75` en lugar de `text-gray-500` (texto secundario)
+- `opacity-50` en lugar de `text-gray-400` (texto terciario)
+- `opacity-25` en lugar de `text-gray-300` (elementos deshabilitados)
 - `font-medium` o `font-semibold` para destacar texto
-- `border` sin color específico
+- `text-error`, `text-warning`, `text-success` solo para estados críticos
+
+**Para fondos:**
+- `border` en lugar de `bg-gray-50`
+- `rounded-lg border` en lugar de `bg-white rounded-lg`
 - `shadow-sm` para elementos elevados
+- `hover:opacity-75` en lugar de `hover:bg-gray-50`
+
+**Para bordes:**
+- `border` sin color específico
+- `border-dashed` para bordes punteados
+- `border-2` para bordes más gruesos

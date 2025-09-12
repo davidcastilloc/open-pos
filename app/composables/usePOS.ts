@@ -69,7 +69,7 @@ export function usePOS() {
 			// Convertir precio a la moneda actual
 			const price = convertAmount(
 				productData.price,
-				"BS", // Asumiendo que los precios están en BS
+				productData.currency || "BS", // Usar la moneda del producto
 				currentCurrency.value
 			);
 

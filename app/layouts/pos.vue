@@ -1,8 +1,8 @@
 <template>
-	<div class="min-h-screen">
+	<div class="min-h-screen flex flex-col">
 		<!-- Header del POS -->
 		<header class="shadow-sm border-b">
-			<div class="">
+			<div class="px-6 py-4">
 				<div class="flex items-center justify-between">
 					<!-- Logo y nombre -->
 					<div class="flex items-center space-x-4">
@@ -23,7 +23,7 @@
 					<div class="flex items-center space-x-6">
 						<!-- Estado de caja -->
 						<div class="flex items-center space-x-2">
-							<div class="w-3 h-3 rounded-full" style="background-color: #10b981;" />
+							<div class="w-3 h-3 rounded-full opacity-50" />
 							<span class="text-sm font-medium">Caja Abierta</span>
 						</div>
 
@@ -57,7 +57,7 @@
 					<!-- Estado de conexión -->
 					<div class="flex items-center space-x-4">
 						<div class="flex items-center space-x-2">
-							<div class="w-2 h-2 rounded-full" style="background-color: #10b981;" />
+							<div class="w-2 h-2 rounded-full opacity-50" />
 							<span class="opacity-75">Online</span>
 						</div>
 						<div class="opacity-50">
@@ -80,7 +80,7 @@
 		</div>
 
 		<!-- Contenido principal -->
-		<main class="flex-1">
+		<main class="flex-1 overflow-hidden">
 			<slot />
 		</main>
 
@@ -124,28 +124,46 @@
 
 	// Configuración de la aplicación
 	const appVersion = config.public.appVersion;
-	const currentCurrency = computed(() => getCurrencyConfig.value.defaultCurrency || "BS");
+	const currentCurrency = computed(() => {
+		try {
+			return getCurrencyConfig.value?.defaultCurrency || "BS";
+		} catch (error) {
+			console.error("Error getting currency config:", error);
+			return "BS";
+		}
+	});
 
 	// Saldos de cuentas
-	const accountBalances = computed(() => getTotalBalanceByCurrency.value);
+	const accountBalances = computed(() => {
+		try {
+			return getTotalBalanceByCurrency.value || {};
+		} catch (error) {
+			console.error("Error getting account balances:", error);
+			return {};
+		}
+	});
 
 	// Actualizar tiempo
 	const updateTime = () => {
-		const now = new Date();
-		currentTime.value = now.toLocaleTimeString("es-VE", {
-			hour: "2-digit",
-			minute: "2-digit",
-			second: "2-digit"
-		});
-		currentDate.value = now.toLocaleDateString("es-VE", {
-			year: "numeric",
-			month: "long",
-			day: "numeric"
-		});
+		try {
+			const now = new Date();
+			currentTime.value = now.toLocaleTimeString("es-VE", {
+				hour: "2-digit",
+				minute: "2-digit",
+				second: "2-digit"
+			});
+			currentDate.value = now.toLocaleDateString("es-VE", {
+				year: "numeric",
+				month: "long",
+				day: "numeric"
+			});
+		} catch (error) {
+			console.error("Error updating time:", error);
+		}
 	};
 
 	// Timer para actualizar tiempo
-	let timeInterval: NodeJS.Timeout;
+	let timeInterval: NodeJS.Timeout | null = null;
 
 	onMounted(() => {
 		updateTime();
@@ -161,6 +179,7 @@
 	onUnmounted(() => {
 		if (timeInterval) {
 			clearInterval(timeInterval);
+			timeInterval = null;
 		}
 	});
 

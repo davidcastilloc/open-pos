@@ -1,10 +1,12 @@
 <template>
-	<div>
+	<div class="min-h-screen flex flex-col">
 		<SiteNavbar class="sticky bg-(--ui-bg)/75 backdrop-blur" />
 		<SiteSidebar />
 
-		<UContainer>
-			<slot />
-		</UContainer>
+		<div class="flex-1">
+			<UContainer class="h-full">
+				<slot />
+			</UContainer>
+		</div>
 	</div>
 </template>

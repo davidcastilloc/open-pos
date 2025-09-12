@@ -20,7 +20,7 @@ export async function initDatabase() {
 		// Crear la instancia de Drizzle con el proxy de SQLite
 		db = drizzle<typeof schema>(
 			async (sql, params, method) => {
-				const sqlite = await Database.load("sqlite:src-tauri/pos.db");
+				const sqlite = await Database.load("sqlite:pos.db");
 				let rows: any = [];
 				let results = [];
 
@@ -91,6 +91,7 @@ async function createTables() {
 			sku TEXT NOT NULL,
 			barcode TEXT,
 			price REAL NOT NULL,
+			currency TEXT NOT NULL DEFAULT 'BS',
 			cost REAL NOT NULL,
 			category_id TEXT,
 			stock INTEGER NOT NULL DEFAULT 0,
@@ -247,6 +248,9 @@ async function createTables() {
 		await executeSQL(sql);
 	}
 
+	// Verificar y agregar columna currency si no existe
+	await ensureCurrencyColumn();
+
 	console.log("✅ Tablas creadas correctamente");
 }
 
@@ -257,6 +261,30 @@ async function executeSQL(sql: string, params: any[] = []) {
 		await sqlite.execute(sql, params);
 	} finally {
 		await sqlite.close();
+	}
+}
+
+// Función para asegurar que la columna currency existe en la tabla products
+async function ensureCurrencyColumn() {
+	try {
+		const sqlite = await Database.load("sqlite:pos.db");
+
+		// Verificar si la columna currency existe
+		const columns = await sqlite.select("PRAGMA table_info(products)") as any[];
+		const hasCurrencyColumn = columns.some((col: any) => col.name === "currency");
+
+		if (!hasCurrencyColumn) {
+			console.log("🔄 Agregando columna currency a la tabla products...");
+			await sqlite.execute("ALTER TABLE products ADD COLUMN currency TEXT DEFAULT 'BS' NOT NULL");
+			console.log("✅ Columna currency agregada correctamente");
+		} else {
+			console.log("✅ Columna currency ya existe en la tabla products");
+		}
+
+		await sqlite.close();
+	} catch (error) {
+		console.error("❌ Error verificando columna currency:", error);
+		// No lanzar el error para no interrumpir la inicialización
 	}
 }
 

@@ -11,6 +11,7 @@ export interface Product {
 	barcode?: string
 	price: number
 	cost: number
+	currency: string
 	categoryId?: string
 	categoryName?: string
 	stock: number
@@ -98,14 +99,8 @@ export function useProducts() {
 
 			const results = await query<any>(sql, params);
 
-			// Convertir precios a la moneda actual
-			const convertedProducts = results.map((row: any) => {
-				const convertedPrice = convertAmount(
-					row.price,
-					"BS", // Asumiendo que los precios están en BS
-					currentCurrency.value
-				);
-
+			// Mantener precios en su moneda original
+			const productsWithOriginalPrices = results.map((row: any) => {
 				return {
 					id: row.id,
 					tenantId: row.tenant_id,
@@ -113,8 +108,9 @@ export function useProducts() {
 					description: row.description,
 					sku: row.sku,
 					barcode: row.barcode,
-					price: convertedPrice,
+					price: row.price, // Mantener precio original
 					cost: row.cost,
+					currency: row.currency || "BS",
 					categoryId: row.category_id,
 					categoryName: row.category_name,
 					stock: row.stock,
@@ -126,8 +122,8 @@ export function useProducts() {
 				} as Product;
 			});
 
-			products.value = convertedProducts;
-			console.log(`✅ Productos cargados: ${convertedProducts.length}`);
+			products.value = productsWithOriginalPrices;
+			console.log(`✅ Productos cargados: ${productsWithOriginalPrices.length}`);
 		} catch (err) {
 			error.value = "Error al cargar productos";
 			console.error("Error loading products:", err);
@@ -168,11 +164,6 @@ export function useProducts() {
 			}
 
 			const row = results[0];
-			const convertedPrice = convertAmount(
-				row.price,
-				"BS",
-				currentCurrency.value
-			);
 
 			return {
 				id: row.id,
@@ -181,8 +172,9 @@ export function useProducts() {
 				description: row.description,
 				sku: row.sku,
 				barcode: row.barcode,
-				price: convertedPrice,
+				price: row.price, // Mantener precio original
 				cost: row.cost,
+				currency: row.currency || "BS",
 				categoryId: row.category_id,
 				stock: row.stock,
 				minStock: row.min_stock,
@@ -210,11 +202,6 @@ export function useProducts() {
 			}
 
 			const row = results[0];
-			const convertedPrice = convertAmount(
-				row.price,
-				"BS",
-				currentCurrency.value
-			);
 
 			return {
 				id: row.id,
@@ -223,8 +210,9 @@ export function useProducts() {
 				description: row.description,
 				sku: row.sku,
 				barcode: row.barcode,
-				price: convertedPrice,
+				price: row.price, // Mantener precio original
 				cost: row.cost,
+				currency: row.currency || "BS",
 				categoryId: row.category_id,
 				stock: row.stock,
 				minStock: row.min_stock,
@@ -246,8 +234,8 @@ export function useProducts() {
 
 			await execute(
 				`INSERT INTO products 
-         (id, tenant_id, name, description, sku, barcode, price, cost, category_id, stock, min_stock, images, is_active, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+         (id, tenant_id, name, description, sku, barcode, price, cost, currency, category_id, stock, min_stock, images, is_active, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
 				[
 					id,
 					"default",
@@ -257,6 +245,7 @@ export function useProducts() {
 					productData.barcode || null,
 					productData.price,
 					productData.cost,
+					productData.currency || "BS",
 					productData.categoryId || null,
 					productData.stock,
 					productData.minStock,
@@ -307,6 +296,10 @@ export function useProducts() {
 				setClause.push("cost = ?");
 				values.push(updates.cost);
 			}
+			if (updates.currency !== undefined) {
+				setClause.push("currency = ?");
+				values.push(updates.currency);
+			}
 			if (updates.categoryId !== undefined) {
 				setClause.push("category_id = ?");
 				values.push(updates.categoryId);
@@ -341,6 +334,22 @@ export function useProducts() {
 		} catch (err) {
 			error.value = "Error al actualizar producto";
 			console.error("Error updating product:", err);
+			throw err;
+		}
+	};
+
+	// Eliminar producto
+	const deleteProduct = async (id: string) => {
+		try {
+			await execute("DELETE FROM products WHERE id = ?", [id]);
+
+			// Recargar productos
+			await loadProducts(currentPage.value, filters.value);
+
+			console.log("✅ Producto eliminado:", id);
+		} catch (err) {
+			error.value = "Error al eliminar producto";
+			console.error("Error deleting product:", err);
 			throw err;
 		}
 	};
@@ -397,6 +406,7 @@ export function useProducts() {
 		findProductBySku,
 		createProduct,
 		updateProduct,
+		deleteProduct,
 		changeCurrency,
 		formatPrice
 	};

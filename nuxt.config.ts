@@ -1,7 +1,7 @@
 export default defineNuxtConfig({
 	modules: [
-		"@vueuse/nuxt",
 		"@nuxt/ui",
+		"@vueuse/nuxt",
 		"nuxt-svgo",
 		"reka-ui/nuxt",
 		"@nuxt/eslint",
@@ -19,11 +19,11 @@ export default defineNuxtConfig({
 		},
 		pageTransition: {
 			name: "page",
-			mode: "out-in"
+			mode: "default"
 		},
 		layoutTransition: {
 			name: "layout",
-			mode: "out-in"
+			mode: "default"
 		}
 	},
 	css: [
@@ -74,6 +74,12 @@ export default defineNuxtConfig({
 	},
 	devtools: {
 		enabled: false
+	},
+
+	// Configuración específica para Nuxt UI
+	ui: {
+		global: true,
+		icons: ["heroicons"]
 	},
 	experimental: {
 		typedPages: true

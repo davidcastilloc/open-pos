@@ -109,7 +109,7 @@
 			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 				<UCard class="cursor-pointer hover:shadow-md transition-shadow" @click="navigateTo('/pos')">
 					<div class="text-center">
-						<UIcon name="i-heroicons-shopping-cart" class="w-12 h-12 text-primary mx-auto mb-4" />
+						<UIcon name="i-heroicons-shopping-cart" class="w-12 h-12 opacity-50 mx-auto mb-4" />
 						<h3 class="text-lg font-medium">
 							Punto de Venta
 						</h3>
@@ -131,9 +131,21 @@
 					</div>
 				</UCard>
 
+				<UCard class="cursor-pointer hover:shadow-md transition-shadow" @click="navigateTo('/categories')">
+					<div class="text-center">
+						<UIcon name="i-heroicons-tag" class="w-12 h-12 opacity-50 mx-auto mb-4" />
+						<h3 class="text-lg font-medium">
+							Categorías
+						</h3>
+						<p class="text-sm opacity-70">
+							Organizar productos
+						</p>
+					</div>
+				</UCard>
+
 				<UCard class="cursor-pointer hover:shadow-md transition-shadow" @click="navigateTo('/reports')">
 					<div class="text-center">
-						<UIcon name="i-heroicons-chart-bar" class="w-12 h-12 text-secondary mx-auto mb-4" />
+						<UIcon name="i-heroicons-chart-bar" class="w-12 h-12 opacity-50 mx-auto mb-4" />
 						<h3 class="text-lg font-medium">
 							Reportes
 						</h3>
@@ -185,7 +197,7 @@
 									{{ rate.source }}
 								</div>
 							</div>
-							<div class="text-2xl font-bold text-primary">
+							<div class="text-2xl font-bold">
 								{{ rate.rate.toFixed(4) }}
 							</div>
 						</div>

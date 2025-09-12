@@ -10,6 +10,7 @@ export const products = sqliteTable("products", {
 	barcode: text("barcode"),
 	price: real("price").notNull(),
 	cost: real("cost").notNull(),
+	currency: text("currency").notNull().default("BS"), // Moneda del precio
 	categoryId: text("category_id"),
 	stock: integer("stock").notNull().default(0),
 	minStock: integer("min_stock").notNull().default(0),
