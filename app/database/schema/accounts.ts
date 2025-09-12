@@ -27,6 +27,8 @@ export const transactions = sqliteTable("transactions", {
 	exchangeRate: real("exchange_rate"),
 	reference: text("reference"),
 	description: text("description"),
+	cashierId: text("cashier_id"),
+	saleId: text("sale_id"),
 	createdAt: text("created_at").notNull().$defaultFn(() => new Date().toISOString())
 });
 

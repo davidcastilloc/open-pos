@@ -154,6 +154,15 @@
 								<UIcon name="i-heroicons-trash" />
 								Limpiar
 							</UButton>
+							<UButton
+								variant="outline"
+								size="sm"
+								class="ml-2"
+								@click="showExpenseModal = true"
+							>
+								<UIcon name="i-heroicons-banknotes" />
+								Registrar egreso
+							</UButton>
 						</div>
 					</div>
 
@@ -314,6 +323,17 @@
 								placeholder="Seleccionar método"
 							/>
 						</div>
+						<!-- Cuenta de pago -->
+						<div class="mt-4">
+							<label class="block text-sm font-medium mb-2">
+								Cuenta de pago
+							</label>
+							<USelectMenu
+								v-model="selectedPaymentAccount"
+								:items="paymentAccounts"
+								placeholder="Seleccionar cuenta"
+							/>
+						</div>
 					</div>
 				</template>
 
@@ -334,6 +354,46 @@
 						>
 							Confirmar Pago
 						</UButton>
+					</div>
+				</template>
+			</UModal>
+			<!-- Modal de egreso -->
+			<UModal
+				v-model:open="showExpenseModal"
+				title="Registrar egreso"
+				description="Registra un gasto desde una cuenta de caja"
+			>
+				<template #body>
+					<div class="space-y-4">
+						<div>
+							<label class="block text-sm font-medium mb-2">Cuenta</label>
+							<USelectMenu
+								v-model="expenseForm.accountId"
+								:items="paymentAccounts"
+								placeholder="Seleccionar cuenta"
+							/>
+						</div>
+						<div>
+							<label class="block text-sm font-medium mb-2">Monto</label>
+							<UInput v-model="expenseForm.amount" placeholder="0.00" />
+						</div>
+						<div>
+							<label class="block text-sm font-medium mb-2">Moneda</label>
+							<USelectMenu
+								v-model="expenseForm.currency"
+								:items="currencyOptions"
+							/>
+						</div>
+						<div>
+							<label class="block text-sm font-medium mb-2">Descripción</label>
+							<UTextarea v-model="expenseForm.description" placeholder="Motivo del egreso" />
+						</div>
+					</div>
+				</template>
+				<template #footer>
+					<div class="flex space-x-3">
+						<UButton variant="outline" class="flex-1" @click="showExpenseModal = false">Cancelar</UButton>
+						<UButton color="primary" class="flex-1" @click="saveExpense">Guardar egreso</UButton>
 					</div>
 				</template>
 			</UModal>
@@ -376,6 +436,21 @@
 		changeCurrency
 	} = useProducts();
 
+  // Cargar cuentas de pago reales desde la base de datos (simple: cash activas por moneda)
+  onMounted(async () => {
+  	try {
+  		const db = await (await import("@tauri-apps/plugin-sql")).default.load("sqlite:pos.db");
+  		const rows = await db.select(
+  			"SELECT id, name FROM accounts WHERE is_active = 1 AND type = 'cash' AND currency = ? ORDER BY name",
+  			[currentCurrency.value]
+  		);
+  		await db.close();
+  		paymentAccounts.value = rows.map((r: any) => ({ label: r.name, value: r.id }));
+  	} catch (e) {
+  		console.error("No se pudieron cargar las cuentas de pago:", e);
+  	}
+  });
+
 	// Estado local
 	const searchQuery = ref("");
 	const selectedCategory = ref({ label: "Todas las categorías", value: "" });
@@ -384,7 +459,13 @@
 	const showLowStock = ref(false);
 	const discountInput = ref("");
 	const showPaymentModal = ref(false);
+	const showExpenseModal = ref(false);
 	const selectedPaymentMethod = ref({ label: "Efectivo", value: "cash" });
+	const selectedPaymentAccount = ref<{ label: string; value: string } | null>(null);
+
+	// Cuentas de pago cargadas desde DB
+	const paymentAccounts = ref<Array<{ label: string; value: string }>>([]);
+	const selectedPaymentAccount = ref({ label: "Cuenta 1", value: "account1" });
 
 	// Opciones para selects
 	const categoryOptions = computed(() => [
@@ -406,6 +487,12 @@
 		{ label: "Pago Móvil", value: "mobile_payment" }
 	];
 
+	const paymentAccounts = [
+		{ label: "Cuenta 1", value: "account1" },
+		{ label: "Cuenta 2", value: "account2" },
+		{ label: "Cuenta 3", value: "account3" }
+	];
+
 	// Configuración de paginación
 	const itemsPerPage = 20;
 
@@ -414,6 +501,27 @@
 		await loadCategories();
 		await loadProducts(1, {});
 	});
+
+  // Egreso (MVP)
+  const expenseForm = ref({ accountId: "", amount: 0, currency: { label: "BS", value: "BS" }, description: "" });
+  const saveExpense = async () => {
+  	try {
+  		if (!expenseForm.value.accountId || !expenseForm.value.amount || expenseForm.value.amount <= 0) return;
+  		const { useTransactions } = await import("~/composables/useTransactions");
+  		const { createExpenseTx } = useTransactions();
+  		await createExpenseTx({
+  			type: "expense",
+  			accountId: expenseForm.value.accountId,
+  			amount: Number(expenseForm.value.amount),
+  			currency: expenseForm.value.currency.value as any,
+  			description: expenseForm.value.description
+  		} as any);
+  		showExpenseModal.value = false;
+  		expenseForm.value = { accountId: "", amount: 0, currency: { label: "BS", value: "BS" }, description: "" };
+  	} catch (e) {
+  		console.error("Error guardando egreso:", e);
+  	}
+  };
 
 	// Manejar búsqueda
 	const handleSearch = () => {
@@ -468,7 +576,7 @@
 		try {
 			// selectedPaymentMethod.value ahora es un objeto con { label, value }
 			const paymentMethodValue = selectedPaymentMethod.value.value || selectedPaymentMethod.value;
-			await processSale(paymentMethodValue);
+			await processSale(paymentMethodValue, selectedPaymentAccount.value?.value);
 
 			// Refrescar la lista de productos para mostrar los nuevos valores de stock
 			await loadProducts(currentPage.value, {

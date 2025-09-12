@@ -268,8 +268,8 @@ export function usePOS() {
 				// Registrar transacción contable de la venta
 				const txId = `tx_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 				await db.execute(
-					`INSERT INTO transactions (id, tenant_id, account_id, type, amount, currency, exchange_rate, reference, description, created_at)
-					 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
+					`INSERT INTO transactions (id, tenant_id, account_id, type, amount, currency, exchange_rate, reference, description, cashier_id, sale_id, created_at)
+					 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
 					[
 						txId,
 						"default",
@@ -279,7 +279,9 @@ export function usePOS() {
 						currentCurrency.value,
 						null,
 						saleId,
-						`Venta POS ${saleId}`
+						`Venta POS ${saleId}`,
+						cashierId.value,
+						saleId
 					]
 				);
 

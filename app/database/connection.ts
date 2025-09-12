@@ -287,6 +287,9 @@ async function createTables() {
 	// Verificar y agregar columna currency si no existe
 	await ensureCurrencyColumn();
 
+	// Verificar columnas e índices de transactions
+	await ensureTransactionsColumns();
+
 	console.log("✅ Tablas creadas correctamente");
 }
 
@@ -339,6 +342,34 @@ async function ensureCurrencyColumn() {
 		console.error("❌ Error verificando columna currency:", error);
 		// No lanzar el error para no interrumpir la inicialización
 	}
+}
+
+// Asegurar columnas e índices de transactions (cashier_id, sale_id, índices)
+async function ensureTransactionsColumns() {
+  try {
+    const sqlite = await Database.load("sqlite:pos.db");
+
+    // Columnas
+    const txCols = await sqlite.select("PRAGMA table_info(transactions)") as any[];
+    const hasCashier = txCols.some((c: any) => c.name === "cashier_id");
+    const hasSaleId = txCols.some((c: any) => c.name === "sale_id");
+    if (!hasCashier) {
+      await sqlite.execute("ALTER TABLE transactions ADD COLUMN cashier_id TEXT");
+    }
+    if (!hasSaleId) {
+      await sqlite.execute("ALTER TABLE transactions ADD COLUMN sale_id TEXT");
+    }
+
+    // Índices
+    await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_transactions_account_id ON transactions(account_id)");
+    await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON transactions(created_at)");
+    await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_transactions_type ON transactions(type)");
+    await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_transactions_sale_id ON transactions(sale_id)");
+
+    await sqlite.close();
+  } catch (error) {
+    console.error("❌ Error asegurando columnas/índices de transactions:", error);
+  }
 }
 
 // Función para insertar datos por defecto
