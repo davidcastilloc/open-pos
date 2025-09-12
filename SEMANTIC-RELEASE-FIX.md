@@ -23,6 +23,16 @@ Error: Parse error on line 1:
 Expecting 'OPEN_ENDBLOCK', got 'EOF'
 ```
 
+### Error 3: Production Branch Sync Conflict
+El workflow fallaba al sincronizar la rama production:
+
+```
+! [rejected]        production -> production (non-fast-forward)
+error: failed to push some refs to 'https://github.com/davidcastilloc/open-pos'
+hint: Updates were rejected because the tip of your current branch is behind
+hint: its remote counterpart.
+```
+
 ## 🛠️ Soluciones Implementadas
 
 ### 1. Configuración Mejorada de `.releaserc.json`
@@ -49,6 +59,13 @@ Expecting 'OPEN_ENDBLOCK', got 'EOF'
 - **Creado script** `scripts/test-semantic-release.js` para verificar la configuración
 - **Agregado comando** `pnpm test:semantic-release` al package.json
 
+### 5. Sincronización Robusta de Rama Production
+
+- **Creado script** `scripts/sync-production-branch.sh` para manejar conflictos de merge
+- **Manejo automático** de conflictos usando la versión de main
+- **Resolución robusta** de problemas de push con force-with-lease
+- **Actualización automática** de archivos de producción (CHANGELOG.md, version.json)
+
 ## 🧪 Cómo Probar la Corrección
 
 ### Opción 1: Script de Prueba Local
@@ -61,7 +78,12 @@ pnpm test:semantic-release
 npx semantic-release --dry-run
 ```
 
-### Opción 3: Verificar en GitHub Actions
+### Opción 3: Probar Script de Sincronización
+```bash
+./scripts/sync-production-branch.sh
+```
+
+### Opción 4: Verificar en GitHub Actions
 1. Hacer un commit con mensaje convencional (ej: `feat: nueva funcionalidad`)
 2. Hacer push a la rama `main`
 3. Verificar que el workflow se ejecute sin errores
@@ -86,8 +108,10 @@ La configuración ahora soporta los siguientes tipos de commits:
 1. `.releaserc.json` - Configuración principal de semantic-release
 2. `.github/workflows/release.yml` - Workflow de GitHub Actions
 3. `package.json` - Dependencias y scripts
-4. `scripts/test-semantic-release.js` - Script de prueba (nuevo)
-5. `SEMANTIC-RELEASE-FIX.md` - Esta documentación (nuevo)
+4. `pnpm-workspace.yaml` - Configuración de workspace corregida
+5. `scripts/test-semantic-release.js` - Script de prueba (nuevo)
+6. `scripts/sync-production-branch.sh` - Script de sincronización de production (nuevo)
+7. `SEMANTIC-RELEASE-FIX.md` - Esta documentación (nuevo)
 
 ## ✅ Resultado Esperado
 
@@ -97,8 +121,9 @@ Después de estos cambios, el workflow de semantic-release debería:
 2. ✅ Generar notas de release sin errores de fecha
 3. ✅ Generar notas de release sin errores de sintaxis de Handlebars
 4. ✅ Crear releases en GitHub automáticamente
-5. ✅ Construir y publicar binarios de Tauri
-6. ✅ Actualizar el CHANGELOG.md
+5. ✅ Sincronizar rama production sin conflictos
+6. ✅ Construir y publicar binarios de Tauri
+7. ✅ Actualizar el CHANGELOG.md y version.json
 
 ## 🚀 Próximos Pasos
 
