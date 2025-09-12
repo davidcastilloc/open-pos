@@ -26,8 +26,6 @@ export default defineAppConfig({
 		}
 	},
 	ui: {
-		primary: "green",
-		neutral: "zinc",
 		button: {
 			slots: {
 				base: "cursor-pointer"
