@@ -12,7 +12,28 @@
     ],
     [
       "@semantic-release/release-notes-generator",
-      { "preset": "conventionalcommits" }
+      {
+        "preset": "conventionalcommits",
+        "presetConfig": {
+          "types": [
+            { "type": "feat", "section": "Features" },
+            { "type": "fix", "section": "Bug Fixes" },
+            { "type": "chore", "section": "Maintenance" },
+            { "type": "docs", "section": "Documentation" },
+            { "type": "style", "section": "Styling" },
+            { "type": "refactor", "section": "Code Refactoring" },
+            { "type": "perf", "section": "Performance Improvements" },
+            { "type": "test", "section": "Tests" },
+            { "type": "build", "section": "Build System" },
+            { "type": "ci", "section": "Continuous Integration" }
+          ]
+        },
+        "writerOpts": {
+          "transform": {
+            "commit": "conventional-changelog-writer"
+          }
+        }
+      }
     ],
     [
       "@semantic-release/changelog",
