@@ -1,7 +1,8 @@
 # 🔧 Corrección del Error de Semantic Release
 
-## 📋 Problema Identificado
+## 📋 Problemas Identificados
 
+### Error 1: Date.prototype.toString
 El workflow de GitHub Actions estaba fallando con el siguiente error:
 
 ```
@@ -12,6 +13,16 @@ TypeError: Method Date.prototype.toString called on incompatible receiver [objec
     at Object.formatDate (file:///home/david.c/actions-runner-2/_work/_actions/cycjimmy/semantic-release-action/v4/node_modules/conventional-changelog-writer/dist/utils.js:8:12)
 ```
 
+### Error 2: Handlebars Syntax Error
+Después de la primera corrección, apareció un error de sintaxis en Handlebars:
+
+```
+Error: Parse error on line 1:
+...each}}{{/if}}{{/if}}
+-----------------------^
+Expecting 'OPEN_ENDBLOCK', got 'EOF'
+```
+
 ## 🛠️ Soluciones Implementadas
 
 ### 1. Configuración Mejorada de `.releaserc.json`
@@ -19,7 +30,8 @@ TypeError: Method Date.prototype.toString called on incompatible receiver [objec
 - **Agregada configuración robusta** para `@semantic-release/release-notes-generator`
 - **Definidos tipos de commits** con secciones organizadas
 - **Configurado `writerOpts`** con transformaciones personalizadas
-- **Agregado `commitPartial`** para manejo correcto de fechas
+- **Simplificada configuración** para evitar errores de sintaxis de Handlebars
+- **Removido `commitPartial`** problemático que causaba error de parsing
 
 ### 2. Actualización del Workflow de GitHub Actions
 
@@ -83,9 +95,10 @@ Después de estos cambios, el workflow de semantic-release debería:
 
 1. ✅ Analizar commits correctamente
 2. ✅ Generar notas de release sin errores de fecha
-3. ✅ Crear releases en GitHub automáticamente
-4. ✅ Construir y publicar binarios de Tauri
-5. ✅ Actualizar el CHANGELOG.md
+3. ✅ Generar notas de release sin errores de sintaxis de Handlebars
+4. ✅ Crear releases en GitHub automáticamente
+5. ✅ Construir y publicar binarios de Tauri
+6. ✅ Actualizar el CHANGELOG.md
 
 ## 🚀 Próximos Pasos
 

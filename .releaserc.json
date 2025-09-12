@@ -31,8 +31,7 @@
         "writerOpts": {
           "transform": {
             "commit": "conventional-changelog-writer"
-          },
-          "commitPartial": "{{#if @root.linkReferences~}}[{{hash}}]({{@root.host}}/{{@root.owner}}/{{@root.repository}}/commit/{{hash}}){{~else}}{{~hash}}{{~endif}} {{#if scope}}**{{scope}}:** {{/if}}{{subject}}{{#if @root.linkReferences}} {{#if references}}, closes{{#each references}} {{#if @root.linkReferences}}[{{this.issue}}]({{@root.host}}/{{@root.owner}}/{{@root.repository}}/issues/{{this.issue}}){{~else}}{{this.issue}}{{/if}}{{/each}}{{/if}}{{/if}}"
+          }
         }
       }
     ],
