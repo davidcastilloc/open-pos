@@ -1,3 +1,43 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-production-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Configure Git user
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Sync production with main (force-with-lease)
+        run: |
+          set -euo pipefail
+          git fetch origin --prune
+          if git show-ref --verify --quiet refs/remotes/origin/main; then
+            git switch -C production
+            git reset --hard origin/main
+            git push --force-with-lease origin production
+          else
+            echo "origin/main not found. Exiting." >&2
+            exit 1
+          fi
+
 name: Automated Release Pipeline
 
 on:
