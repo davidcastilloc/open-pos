@@ -66,11 +66,10 @@ jobs:
         run: |
           if [ -f pnpm-lock.yaml ]; then git checkout -- pnpm-lock.yaml; fi
 
-      - name: Sync production branch with main
+      - name: Sync production branch
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git
           ./scripts/sync-production-branch.sh
 
       - name: Verify Deployment Assets
