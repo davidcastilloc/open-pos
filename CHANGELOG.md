@@ -1,3 +1,10 @@
+## 1.3.0 (2025-09-12)
+
+* Merge pull request #11 from davidcastilloc/fix ([3c5c9163c00154eca66bf8bf379796ef8d8f3f25](https://github.com/davidcastilloc/open-pos/commit/3c5c9163c00154eca66bf8bf379796ef8d8f3f25)), closes [#11](https://github.com/davidcastilloc/open-pos/issues/11)
+* feat(ci): add robust production branch synchronization ([8c574efc2ae4c9b38704d384dd8a4ba2639fb582](https://github.com/davidcastilloc/open-pos/commit/8c574efc2ae4c9b38704d384dd8a4ba2639fb582))
+* fix(ci): improve production branch sync and semantic-release configuration ([2eebec249cbf2059e650f4229da1f8b609fab9bb](https://github.com/davidcastilloc/open-pos/commit/2eebec249cbf2059e650f4229da1f8b609fab9bb))
+* fix(ci): improve semantic-release configuration and add production branch sync script ([95b3f72771befdd9a75caa5ffa9b06e26e3d6a95](https://github.com/davidcastilloc/open-pos/commit/95b3f72771befdd9a75caa5ffa9b06e26e3d6a95))
+
 ## 1.2.0 (2025-09-12)
 
 * Actualiza las versiones de las dependencias en `pnpm-lock.yaml` y agrega la configuración de paquetes en `pnpm-workspace.yaml` para incluir el directorio raíz. Se mejoran las versiones de varios paquetes, incluyendo `vue`, `eslint` y `vite`, para asegurar compatibilidad y mejoras de rendimiento. ([60cbeaac9b47268402651f078a06faf4ee938d39](https://github.com/davidcastilloc/open-pos/commit/60cbeaac9b47268402651f078a06faf4ee938d39))
