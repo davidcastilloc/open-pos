@@ -28,6 +28,9 @@ export interface ProductFilters {
 	maxPrice?: number
 	inStock?: boolean
 	search?: string
+	isActive?: boolean
+	lowStock?: boolean
+	outOfStock?: boolean
 }
 
 export function useProducts() {
@@ -57,7 +60,7 @@ export function useProducts() {
         SELECT p.*, c.name as category_name
         FROM products p
         LEFT JOIN categories c ON p.category_id = c.id
-        WHERE p.tenant_id = ? AND p.is_active = 1
+        WHERE p.tenant_id = ?
       `;
 			const params: any[] = ["default"];
 
@@ -73,6 +76,11 @@ export function useProducts() {
 				params.push(filters.value.category);
 			}
 
+			if (filters.value.isActive !== undefined) {
+				sql += " AND p.is_active = ?";
+				params.push(filters.value.isActive ? 1 : 0);
+			}
+
 			if (filters.value.minPrice !== undefined) {
 				sql += " AND p.price >= ?";
 				params.push(filters.value.minPrice);
@@ -85,6 +93,14 @@ export function useProducts() {
 
 			if (filters.value.inStock) {
 				sql += " AND p.stock > 0";
+			}
+
+			if (filters.value.lowStock) {
+				sql += " AND p.stock > 0 AND p.stock <= p.min_stock";
+			}
+
+			if (filters.value.outOfStock) {
+				sql += " AND p.stock = 0";
 			}
 
 			// Contar total de items
@@ -354,6 +370,25 @@ export function useProducts() {
 		}
 	};
 
+	// Activar/desactivar producto
+	const toggleProductStatus = async (id: string, isActive: boolean) => {
+		try {
+			await execute(
+				"UPDATE products SET is_active = ?, updated_at = datetime('now') WHERE id = ?",
+				[isActive ? 1 : 0, id]
+			);
+
+			// Recargar productos
+			await loadProducts(currentPage.value, filters.value);
+
+			console.log(`✅ Producto ${isActive ? 'activado' : 'desactivado'}:`, id);
+		} catch (err) {
+			error.value = `Error al ${isActive ? 'activar' : 'desactivar'} producto`;
+			console.error("Error toggling product status:", err);
+			throw err;
+		}
+	};
+
 	// Cambiar moneda
 	const changeCurrency = async (newCurrency: string) => {
 		currentCurrency.value = newCurrency;
@@ -407,6 +442,7 @@ export function useProducts() {
 		createProduct,
 		updateProduct,
 		deleteProduct,
+		toggleProductStatus,
 		changeCurrency,
 		formatPrice
 	};

@@ -20,10 +20,21 @@
 				<!-- SKU -->
 				<div>
 					<UFormField label="SKU" name="sku" required>
-						<UInput
-							v-model="form.sku"
-							placeholder="Ej: COCA-350"
-						/>
+						<div class="flex space-x-2">
+							<UInput
+								v-model="form.sku"
+								placeholder="Ej: COCA-350"
+								class="flex-1"
+							/>
+							<UButton
+								variant="outline"
+								size="sm"
+								title="Generar SKU automáticamente"
+								@click="generateSku"
+							>
+								<UIcon name="i-heroicons-sparkles" />
+							</UButton>
+						</div>
 					</UFormField>
 				</div>
 
@@ -320,7 +331,7 @@
 	// Inicializar formulario
 	const initializeForm = () => {
 		const sourceData = props.product || props.initialData;
-		
+
 		if (sourceData) {
 			// Asegurar que currency sea un string
 			let currency = sourceData.currency || "BS";
@@ -400,24 +411,45 @@
 		form.value.images.splice(index, 1);
 	};
 
+	// Generar SKU automáticamente
+	const generateSku = () => {
+		if (!form.value.name) return;
+
+		// Tomar las primeras letras de cada palabra del nombre
+		const words = form.value.name.toUpperCase().split(" ").filter((word) => word.length > 0);
+		let sku = "";
+
+		// Tomar hasta 3 palabras para el SKU
+		for (let i = 0; i < Math.min(3, words.length); i++) {
+			const word = words[i];
+			if (word) {
+				sku += word.substring(0, 3);
+			}
+		}
+
+		// Agregar un número aleatorio de 3 dígitos
+		sku += `-${Math.floor(Math.random() * 900 + 100)}`;
+
+		form.value.sku = sku;
+	};
+
 	// Función de validación adicional (opcional - la validación principal se hace con el schema)
-	const _validate = (state: any) => {
-		const errors = [];
+	const validateForm = (state: any) => {
+		const errors: any = {};
 
 		// Validación adicional: verificar que el precio sea mayor que el costo si ambos están presentes
 		if (state.price && state.cost && state.price < state.cost) {
-			errors.push({
-				name: "price",
-				message: "El precio de venta debe ser mayor que el costo"
-			});
+			errors.price = ["El precio de venta debe ser mayor que el costo"];
 		}
 
 		// Validación adicional: verificar que el stock mínimo no sea mayor que el stock actual
 		if (state.stock !== undefined && state.minStock !== undefined && state.minStock > state.stock) {
-			errors.push({
-				name: "minStock",
-				message: "El stock mínimo no puede ser mayor que el stock actual"
-			});
+			errors.minStock = ["El stock mínimo no puede ser mayor que el stock actual"];
+		}
+
+		// Validación adicional: verificar que el SKU sea único (esto se podría hacer con una consulta a la BD)
+		if (state.sku && state.sku.length < 3) {
+			errors.sku = ["El SKU debe tener al menos 3 caracteres"];
 		}
 
 		return errors;
@@ -429,6 +461,15 @@
 		try {
 			// Los datos ya están validados por el schema
 			const formData = event.data || form.value;
+
+			// Validaciones adicionales
+			const additionalErrors = validateForm(formData);
+			if (Object.keys(additionalErrors).length > 0) {
+				console.error("Errores de validación:", additionalErrors);
+				// Aquí podrías mostrar los errores al usuario
+				return;
+			}
+
 			emit("submit", formData as Product);
 		} catch (error) {
 			console.error("Error submitting form:", error);

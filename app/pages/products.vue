@@ -270,19 +270,30 @@
 									</UBadge>
 								</td>
 								<td class="py-3 px-4 text-center">
-									<div class="flex items-center justify-center space-x-2">
+									<div class="flex items-center justify-center space-x-1">
 										<UButton
 											variant="ghost"
 											size="sm"
 											@click="editProduct(product)"
+											title="Editar producto"
 										>
 											<UIcon name="i-heroicons-pencil" />
 										</UButton>
 										<UButton
 											variant="ghost"
 											size="sm"
+											:color="product.isActive ? 'warning' : 'success'"
+											@click="handleToggleStatus(product)"
+											:title="product.isActive ? 'Desactivar producto' : 'Activar producto'"
+										>
+											<UIcon :name="product.isActive ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'" />
+										</UButton>
+										<UButton
+											variant="ghost"
+											size="sm"
 											color="error"
 											@click="handleDeleteProduct(product)"
+											title="Eliminar producto"
 										>
 											<UIcon name="i-heroicons-trash" />
 										</UButton>
@@ -365,6 +376,51 @@
 				</div>
 			</template>
 		</UModal>
+
+		<!-- Modal de confirmación de cambio de estado -->
+		<UModal
+			v-model:open="showToggleModal"
+			:title="productToToggle?.isActive ? 'Desactivar Producto' : 'Activar Producto'"
+			:description="productToToggle?.isActive ? 'El producto no aparecerá en el POS' : 'El producto estará disponible en el POS'"
+			@close="showToggleModal = false; productToToggle = null"
+		>
+			<template #body>
+				<div class="space-y-4">
+					<p>¿Estás seguro de que quieres {{ productToToggle?.isActive ? 'desactivar' : 'activar' }} este producto?</p>
+					<div v-if="productToToggle" class="rounded-lg p-4 border">
+						<h4 class="font-medium">
+							{{ productToToggle.name }}
+						</h4>
+						<p class="text-sm opacity-75">
+							SKU: {{ productToToggle.sku }}
+						</p>
+						<p class="text-sm opacity-75">
+							Estado actual: {{ productToToggle.isActive ? 'Activo' : 'Inactivo' }}
+						</p>
+					</div>
+				</div>
+			</template>
+
+			<template #footer>
+				<div class="flex space-x-3">
+					<UButton
+						variant="outline"
+						class="flex-1"
+						@click="showToggleModal = false"
+					>
+						Cancelar
+					</UButton>
+					<UButton
+						:color="productToToggle?.isActive ? 'warning' : 'success'"
+						class="flex-1"
+						:loading="isToggling"
+						@click="confirmToggleStatus"
+					>
+						{{ productToToggle?.isActive ? 'Desactivar' : 'Activar' }}
+					</UButton>
+				</div>
+			</template>
+		</UModal>
 	</NuxtLayout>
 </template>
 
@@ -385,6 +441,7 @@
 		createProduct,
 		updateProduct,
 		deleteProduct,
+		toggleProductStatus,
 		formatPrice
 	} = useProducts();
 
@@ -398,10 +455,13 @@
 	const showOutOfStock = ref(false);
 	const itemsPerPage = ref({ label: "20", value: 20 });
 	const showCreateModal = ref(false);
-	const showDeleteModal = ref(false);
-	const editingProduct = ref<any>(null);
-	const productToDelete = ref<any>(null);
-	const isDeleting = ref(false);
+		const showDeleteModal = ref(false);
+		const showToggleModal = ref(false);
+		const editingProduct = ref<any>(null);
+		const productToDelete = ref<any>(null);
+		const productToToggle = ref<any>(null);
+		const isDeleting = ref(false);
+		const isToggling = ref(false);
 
 	// Opciones para selects
 	const categoryOptions = computed(() => [
@@ -456,7 +516,12 @@
 		}
 
 		if (selectedStatus.value?.value) {
-			filters.isActive = selectedStatus.value.value === "active";
+			if (selectedStatus.value.value === "active") {
+				filters.isActive = true;
+			} else if (selectedStatus.value.value === "inactive") {
+				filters.isActive = false;
+			}
+			// Si es "all" o vacío, no aplicamos filtro de estado
 		}
 
 		if (showLowStock.value) {
@@ -510,6 +575,28 @@
 			console.error("Error eliminando producto:", error);
 		} finally {
 			isDeleting.value = false;
+		}
+	};
+
+	// Activar/desactivar producto
+	const handleToggleStatus = (product: any) => {
+		productToToggle.value = product;
+		showToggleModal.value = true;
+	};
+
+	// Confirmar cambio de estado
+	const confirmToggleStatus = async () => {
+		if (!productToToggle.value) return;
+
+		isToggling.value = true;
+		try {
+			await toggleProductStatus(productToToggle.value.id, !productToToggle.value.isActive);
+			showToggleModal.value = false;
+			productToToggle.value = null;
+		} catch (error) {
+			console.error("Error cambiando estado del producto:", error);
+		} finally {
+			isToggling.value = false;
 		}
 	};
 
