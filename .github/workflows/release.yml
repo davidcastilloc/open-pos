@@ -19,6 +19,7 @@ jobs:
     outputs:
       new_release_published: ${{ steps.semantic.outputs.new_release_published }}
       new_release_version: ${{ steps.semantic.outputs.new_release_version }}
+      new_release_git_tag: ${{ steps.semantic.outputs.new_release_git_tag }}
 
     steps:
       - name: Checkout Repository
@@ -54,6 +55,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           extra_plugins: |
+            @semantic-release/changelog
+            @semantic-release/git
+          dry_run: false
+          extend_plugins: |
             @semantic-release/changelog
             @semantic-release/git
 
@@ -139,7 +144,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: ${{ needs.release.outputs.new_release_git_tag }}
-          releaseName: Nuxtor ${{ needs.release.outputs.new_release_git_tag }}
+          releaseName: Open POS ${{ needs.release.outputs.new_release_version }}
           releaseBody: Automated Tauri release for Linux and Windows.
           releaseDraft: false
           prerelease: false
