@@ -1,3 +1,10 @@
+## 1.11.0 (2025-09-13)
+
+* Merge pull request #24 from davidcastilloc/test-rules ([d6af62ed224b409fa896603f0c7303af0e88d74a](https://github.com/davidcastilloc/open-pos/commit/d6af62ed224b409fa896603f0c7303af0e88d74a)), closes [#24](https://github.com/davidcastilloc/open-pos/issues/24)
+* docs: Actualizar documentación sobre cierre de caja y contrato de `useDatabase` ([c48e0e1a49aee6759fda8317717ac762ae2022cd](https://github.com/davidcastilloc/open-pos/commit/c48e0e1a49aee6759fda8317717ac762ae2022cd))
+* refactor: Mejorar la estructura y legibilidad del archivo de documentación ([b9080f317245e9561399936f0e914ccdffb9ce5d](https://github.com/davidcastilloc/open-pos/commit/b9080f317245e9561399936f0e914ccdffb9ce5d))
+* feat: Añadir nuevas reglas de validación y documentación para el sistema POS ([a3f04030b68b6e6ac163b60adab11fedf4048e6e](https://github.com/davidcastilloc/open-pos/commit/a3f04030b68b6e6ac163b60adab11fedf4048e6e))
+
 ## 1.10.0 (2025-09-13)
 
 * Merge pull request #23 from davidcastilloc/refactor-code ([922eabda85e525d9ebbfecfc101c39ad3893527a](https://github.com/davidcastilloc/open-pos/commit/922eabda85e525d9ebbfecfc101c39ad3893527a)), closes [#23](https://github.com/davidcastilloc/open-pos/issues/23)
