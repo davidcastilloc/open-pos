@@ -40,6 +40,8 @@ Construido con [Nuxt 4](https://nuxt.com) y [Tauri 2](https://v2.tauri.app).
 - **Gestión de impuestos** (IVA 16%, ISLR 2%)
 - **Selección de clientes** en ventas
 - **Creación rápida** de clientes desde POS
+- **Sistema de notificaciones** en tiempo real
+- **Gestión de usuarios/cajeros** con roles
 
 ### 📦 **Gestión de Productos**
 - **CRUD completo** de productos con interfaz moderna
@@ -52,9 +54,18 @@ Construido con [Nuxt 4](https://nuxt.com) y [Tauri 2](https://v2.tauri.app).
 
 ### 💰 **Sistema Multi-Moneda**
 - **Conversión automática** entre BS, USD, EUR
-- **Tasas de cambio** con actualización manual (integración preparada BCV/DolarToday)
+- **Tasas de cambio** con APIs externas (BCV y DolarToday)
+- **Actualización automática** de tasas de cambio
 - **Formateo local** según estándares venezolanos
-- **Histórico de tasas** de cambio
+- **Histórico de tasas** de cambio con persistencia
+- **Fallback automático** a tasas por defecto
+
+### 👤 **Sistema de Usuarios y Notificaciones**
+- **Gestión de usuarios/cajeros** con roles (admin, cashier, manager)
+- **Sistema de notificaciones** en tiempo real con Nuxt UI
+- **Feedback visual** para todas las operaciones
+- **Persistencia de sesiones** de usuario
+- **Información dinámica** del cajero actual
 
 ### 🖥️ **Aplicación Desktop**
 - **Ejecución nativa** con Tauri 2
@@ -79,6 +90,8 @@ Construido con [Nuxt 4](https://nuxt.com) y [Tauri 2](https://v2.tauri.app).
 - Cálculo automático de impuestos
 - Selección de clientes en ventas
 - Creación rápida de clientes
+- **Sistema de notificaciones** para feedback del usuario
+- **Gestión de sesiones de caja** con apertura/cierre
 
 ### 📦 **Gestión de Productos** (`/products`)
 - **CRUD completo** de productos
@@ -180,9 +193,12 @@ Documentos relacionados en la raíz:
 
 ## 🧾 Cierre de Caja (Resumen)
 
-- Abrir caja desde el layout del POS con el botón “Abrir Caja”.
-- Página `cash-closing`: generar reporte y terminar turno.
-- Documentación completa en `docs/cash-closing.md`.
+- **Apertura de caja** desde el layout del POS con el botón "Abrir Caja"
+- **Gestión de sesiones** con persistencia en base de datos
+- **Página `cash-closing`**: generar reporte y terminar turno
+- **Sistema de usuarios** con información del cajero actual
+- **Notificaciones** para confirmación de operaciones
+- Documentación completa en `docs/cash-closing.md`
 
 ---
 

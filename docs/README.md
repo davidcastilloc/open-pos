@@ -10,6 +10,8 @@ Bienvenido a la documentación del proyecto Open POS System.
 - [Integración Tauri 2 y plugins](./tauri.md)
 - [Gestión de productos e inventario](./products-inventory.md)
 - [Cierre de caja](./cash-closing.md)
+- [Sistema de usuarios y notificaciones](./users-notifications.md) 🆕
+- [APIs de tasas de cambio](./currency-apis.md) 🆕
 - [Testing (Vitest) y calidad](./testing.md)
 - [Versionado y releases](./versioning.md)
 - [Variables de entorno y configuración](./env.md)
