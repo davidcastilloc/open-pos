@@ -1,5 +1,11 @@
 # 🗓️ Roadmap de Tareas - Sistema POS Venezuela
 
+> Resumen de avance (13 Sep 2025)
+>
+> - MVP core operativo: POS, productos, clientes, cierre de caja, métodos de pago
+> - CI/CD automatizado con semantic-release y sincronización de `production`
+> - Próximas 3 metas: Devoluciones, Tickets/Facturas, Reportes básicos
+
 ## 📋 Lista de Tareas Organizadas por Fases
 
 ### 🎯 **FASE 1: MVP (3 meses) - Tareas Críticas**

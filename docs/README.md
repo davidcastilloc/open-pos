@@ -5,6 +5,7 @@ Bienvenido a la documentación del proyecto Open POS System.
 ## Índice
 
 - [Estructura del proyecto](./project-structure.md)
+- [Guías de UI y colores](./ui-guidelines.md)
 - [Base de datos y migraciones](./database.md)
 - [Integración Tauri 2 y plugins](./tauri.md)
 - [Gestión de productos e inventario](./products-inventory.md)
