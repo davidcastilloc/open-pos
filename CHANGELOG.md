@@ -1,3 +1,11 @@
+## 1.9.0 (2025-09-13)
+
+* Merge pull request #20 from davidcastilloc/transaction ([9c2a7194740390d6a0c27a3976ff08445ec88008](https://github.com/davidcastilloc/open-pos/commit/9c2a7194740390d6a0c27a3976ff08445ec88008)), closes [#20](https://github.com/davidcastilloc/open-pos/issues/20)
+* Merge pull request #21 from davidcastilloc/form-procesar-pago ([0673a7e54c165eb6b14a97a18e184ffb7b7d9fd7](https://github.com/davidcastilloc/open-pos/commit/0673a7e54c165eb6b14a97a18e184ffb7b7d9fd7)), closes [#21](https://github.com/davidcastilloc/open-pos/issues/21)
+* refactor: Eliminar uso de useHead en customers.vue ([d09e2bfaf6e17e5948638d12c13e00cbda334bae](https://github.com/davidcastilloc/open-pos/commit/d09e2bfaf6e17e5948638d12c13e00cbda334bae))
+* refactor: Simplificar la búsqueda de clientes en customers.vue ([d35cac3841df04337d9fab928e44bd55dd5d78ae](https://github.com/davidcastilloc/open-pos/commit/d35cac3841df04337d9fab928e44bd55dd5d78ae))
+* feat: Añadir reglas del sistema de colores y componentes UI ([3243627a05a91e7d5f9a8d7024ea51eac447f6e6](https://github.com/davidcastilloc/open-pos/commit/3243627a05a91e7d5f9a8d7024ea51eac447f6e6))
+
 ## <small>1.8.1 (2025-09-13)</small>
 
 * Merge pull request #19 from davidcastilloc/transaction ([e789be4dc3f1e57a604b11dab8ba05ede350b773](https://github.com/davidcastilloc/open-pos/commit/e789be4dc3f1e57a604b11dab8ba05ede350b773)), closes [#19](https://github.com/davidcastilloc/open-pos/issues/19)
