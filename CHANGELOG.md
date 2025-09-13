@@ -1,3 +1,10 @@
+## 1.8.0 (2025-09-13)
+
+* Merge pull request #18 from davidcastilloc/transaction ([49b57c51bf1ae6eb0a113a151ae479b2d4da8e45](https://github.com/davidcastilloc/open-pos/commit/49b57c51bf1ae6eb0a113a151ae479b2d4da8e45)), closes [#18](https://github.com/davidcastilloc/open-pos/issues/18)
+* fix(pos): abrir modales (v-model:open) y estabilizar inicialización BD/inventario; exportar currentPage; readonly imports; PRAGMA via query; manejar errores idempotentes en execute; useCustomers usa execute ([2795569f4e9fafa4bec6d69e2c03cca050a5c9d2](https://github.com/davidcastilloc/open-pos/commit/2795569f4e9fafa4bec6d69e2c03cca050a5c9d2))
+* feat: Actualizar estado del proyecto y completar tareas ([bb8df901270ca864b7c97b2ef4d78e35774c9c93](https://github.com/davidcastilloc/open-pos/commit/bb8df901270ca864b7c97b2ef4d78e35774c9c93))
+* feat: Añadir manejo de métodos de pago ([a4d753bf9a708dc42df2e8ad0b6e3a9782cacfc1](https://github.com/davidcastilloc/open-pos/commit/a4d753bf9a708dc42df2e8ad0b6e3a9782cacfc1))
+
 ## 1.8.0 (2025-01-12)
 
 ### ✨ **Nuevas Funcionalidades**
