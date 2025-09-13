@@ -192,7 +192,7 @@ export function usePOS() {
 	};
 
 	// Procesar venta
-	const processSale = async (paymentMethod: string, paymentAccountId?: string) => {
+	const processSale = async (paymentMethod: string, paymentAccountId?: string, saleCustomerId?: string) => {
 		if (cart.value.length === 0) {
 			throw new Error("El carrito está vacío");
 		}
@@ -213,7 +213,7 @@ export function usePOS() {
 					[
 						saleId,
 						"default",
-						customerId.value,
+						saleCustomerId || customerId.value,
 						subtotal.value,
 						tax.value,
 						discountAmount.value,
@@ -293,6 +293,22 @@ export function usePOS() {
 					"UPDATE accounts SET balance = balance + ?, updated_at = datetime('now') WHERE id = ?",
 					[total.value, accountRow.id]
 				);
+
+				// Registrar venta del cliente si hay un cliente asociado
+				if (saleCustomerId || customerId.value) {
+					const finalCustomerId = saleCustomerId || customerId.value;
+					await db.execute(
+						`INSERT INTO customer_sales (id, customer_id, sale_id, total_amount, currency, created_at)
+						 VALUES (?, ?, ?, ?, ?, datetime('now'))`,
+						[
+							`cs_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+							finalCustomerId,
+							saleId,
+							total.value,
+							currentCurrency.value
+						]
+					);
+				}
 			});
 
 			// Limpiar carrito después de la venta exitosa

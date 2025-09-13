@@ -50,10 +50,18 @@ export async function initDatabase() {
 		);
 
 		// Crear tablas si no existen
-		await createTables();
+		try {
+			await createTables();
+		} catch (error) {
+			console.log("⚠️ Algunas tablas ya existen, continuando...");
+		}
 
 		// Insertar datos por defecto
-		await insertDefaultData();
+		try {
+			await insertDefaultData();
+		} catch (error) {
+			console.log("⚠️ Algunos datos por defecto ya existen, continuando...");
+		}
 
 		console.log("✅ Base de datos inicializada correctamente");
 	} catch (error) {
@@ -354,6 +362,13 @@ async function executeSQL(sql: string, params: any[] = []) {
 	const sqlite = await Database.load("sqlite:pos.db");
 	try {
 		await sqlite.execute(sql, params);
+	} catch (error) {
+		// Ignorar errores de tablas ya existentes
+		if (error instanceof Error && error.message.includes("already exists")) {
+			console.log(`⚠️ Tabla ya existe, ignorando: ${sql.substring(0, 50)}...`);
+			return;
+		}
+		throw error;
 	} finally {
 		await sqlite.close();
 	}

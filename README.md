@@ -38,6 +38,8 @@ Construido con [Nuxt 4](https://nuxt.com) y [Tauri 2](https://v2.tauri.app).
 - **Carrito de compras** con descuentos y cálculos automáticos
 - **Procesamiento de pagos** multi-moneda (BS, USD, EUR)
 - **Gestión de impuestos** (IVA 16%, ISLR 2%)
+- **Selección de clientes** en ventas
+- **Creación rápida** de clientes desde POS
 
 ### 📦 **Gestión de Productos**
 - **CRUD completo** de productos con interfaz moderna
@@ -75,6 +77,8 @@ Construido con [Nuxt 4](https://nuxt.com) y [Tauri 2](https://v2.tauri.app).
 - Carrito de compras interactivo
 - Procesamiento de pagos multi-moneda
 - Cálculo automático de impuestos
+- Selección de clientes en ventas
+- Creación rápida de clientes
 
 ### 📦 **Gestión de Productos** (`/products`)
 - **CRUD completo** de productos
@@ -82,6 +86,14 @@ Construido con [Nuxt 4](https://nuxt.com) y [Tauri 2](https://v2.tauri.app).
 - Generador automático de SKU
 - Gestión de imágenes y categorías
 - Activar/desactivar productos
+
+### 👥 **Gestión de Clientes** (`/customers`)
+- **CRUD completo** de clientes
+- Búsqueda avanzada por múltiples criterios
+- Filtros por estado (activos/inactivos)
+- Formularios con validación en tiempo real
+- Vista detallada de información del cliente
+- Estadísticas en tiempo real
 
 ### 🧪 **Página de Pruebas** (`/test`)
 - Estado de la base de datos

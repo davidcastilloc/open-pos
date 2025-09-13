@@ -1,4 +1,4 @@
-import { computed, ref } from "vue";
+import { computed, ref, readonly } from "vue";
 import { useDatabase } from "./useDatabase";
 
 export interface Account {

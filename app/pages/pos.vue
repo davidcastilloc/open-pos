@@ -70,6 +70,9 @@
 						<p class="opacity-75">
 							Intenta ajustar los filtros de búsqueda
 						</p>
+						<p class="text-xs opacity-50 mt-2">
+							Total: {{ products.length }} productos, Cargando: {{ isLoading }}
+						</p>
 					</div>
 
 					<div v-else class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4" :class="{ 'opacity-50': !isCashSessionOpen }">
@@ -326,8 +329,32 @@
 							</div>
 						</div>
 
-						<!-- Método de pago -->
+						<!-- Cliente (opcional) -->
 						<div>
+							<label class="block text-sm font-medium mb-2">
+								Cliente (opcional)
+							</label>
+							<div class="flex gap-2">
+								<USelectMenu
+									v-model="selectedCustomer"
+									:items="customerOptions"
+									placeholder="Seleccionar cliente"
+									searchable
+									class="flex-1"
+								/>
+								<UButton
+									icon="i-heroicons-plus"
+									variant="outline"
+									size="sm"
+									@click="showCustomerModal = true"
+								>
+									Nuevo
+								</UButton>
+							</div>
+						</div>
+
+						<!-- Método de pago -->
+						<div class="mt-4">
 							<label class="block text-sm font-medium mb-2">
 								Método de pago
 							</label>
@@ -416,6 +443,46 @@
 					</div>
 				</template>
 			</UModal>
+
+			<!-- Modal para crear cliente rápido -->
+			<UModal v-model:open="showCustomerModal" title="Nuevo Cliente">
+				<template #body>
+					<div class="space-y-4">
+						<UFormGroup label="Nombre *" name="name">
+							<UInput v-model="quickCustomerForm.name" placeholder="Nombre completo" />
+						</UFormGroup>
+
+						<UFormGroup label="Email" name="email">
+							<UInput v-model="quickCustomerForm.email" type="email" placeholder="email@ejemplo.com" />
+						</UFormGroup>
+
+						<UFormGroup label="Teléfono" name="phone">
+							<UInput v-model="quickCustomerForm.phone" placeholder="+58 412 123 4567" />
+						</UFormGroup>
+					</div>
+				</template>
+
+				<template #footer>
+					<div class="flex space-x-3">
+						<UButton
+							variant="outline"
+							class="flex-1"
+							@click="showCustomerModal = false"
+						>
+							Cancelar
+						</UButton>
+						<UButton
+							:loading="isCreatingCustomer"
+							:disabled="!quickCustomerForm.name.trim()"
+							color="primary"
+							class="flex-1"
+							@click="createQuickCustomer"
+						>
+							Crear Cliente
+						</UButton>
+					</div>
+				</template>
+			</UModal>
 		</div>
 	</NuxtLayout>
 </template>
@@ -424,9 +491,10 @@
 	import { computed, nextTick, onMounted, ref, watch } from "vue";
 	import { useAccounts } from "~/composables/useAccounts";
 	import { useCashClosing } from "~/composables/useCashClosing";
+	import { useCustomers } from "~/composables/useCustomers";
+	import { PAYMENT_METHOD_OPTIONS } from "~/composables/usePaymentMethods";
 	import { usePOS } from "~/composables/usePOS";
 	import { useProducts } from "~/composables/useProducts";
-	import { PAYMENT_METHOD_OPTIONS } from "~/composables/usePaymentMethods";
 
 	// Composables
 	const {
@@ -445,6 +513,8 @@
 		processSale,
 		formatPrice
 	} = usePOS();
+
+	const { customers, getCustomers, createCustomer } = useCustomers();
 
 	const {
 		isCashSessionOpen,
@@ -472,11 +542,70 @@
 	const discountInput = ref("");
 	const showPaymentModal = ref(false);
 	const showExpenseModal = ref(false);
+	const showCustomerModal = ref(false);
 	const selectedPaymentMethod = ref({ label: "Efectivo", value: "cash" as const });
 	const selectedPaymentAccount = ref<{ label: string, value: string } | undefined>(undefined);
+	const selectedCustomer = ref<{ label: string, value: string } | undefined>(undefined);
+	const isCreatingCustomer = ref(false);
+
+	// Formulario para crear cliente rápido
+	const quickCustomerForm = ref({
+		name: "",
+		email: "",
+		phone: ""
+	});
 
 	// Cargar cuentas de pago usando el composable useAccounts
 	const { loadAccounts, getCashAccounts } = useAccounts();
+
+	// Construir filtros para la búsqueda
+	const buildFilters = () => {
+		const filters: any = {
+			isActive: true // Siempre mostrar solo productos activos
+		};
+
+		// Solo agregar filtros que tengan valores válidos
+		if (searchQuery.value.trim()) {
+			filters.search = searchQuery.value.trim();
+		}
+
+		if (selectedCategory.value && selectedCategory.value.value && selectedCategory.value.value !== "") {
+			filters.category = selectedCategory.value.value;
+		}
+
+		if (showOnlyInStock.value) {
+			filters.inStock = true;
+		}
+
+		// Nota: showLowStock no se implementa en el backend aún, pero se mantiene para futuras mejoras
+		// if (showLowStock.value) {
+		//   filters.lowStock = true;
+		// }
+
+		console.log("🔧 buildFilters() ejecutado:", {
+			searchQuery: searchQuery.value,
+			selectedCategory: selectedCategory.value,
+			showOnlyInStock: showOnlyInStock.value,
+			showLowStock: showLowStock.value,
+			result: filters
+		});
+
+		return filters;
+	};
+
+	// Limpiar filtros
+	const clearFilters = () => {
+		console.log("🧹 clearFilters() ejecutado");
+		searchQuery.value = "";
+		selectedCategory.value = { label: "Todas las categorías", value: "" };
+		showOnlyInStock.value = false;
+		showLowStock.value = false;
+		// Cargar productos usando buildFilters() (que incluye isActive: true por defecto)
+		const filters = buildFilters();
+		console.log("🧹 Filtros después de limpiar:", filters);
+		console.log("🧹 Llamando loadProducts con:", { page: 1, filters });
+		loadProducts(1, filters);
+	};
 
 	// Cuentas de pago reactivas - se recalculan cuando cambia la moneda
 	const paymentAccounts = computed(() => {
@@ -499,25 +628,101 @@
 
 	const paymentMethods = PAYMENT_METHOD_OPTIONS;
 
+	// Opciones de clientes
+	const customerOptions = computed(() => {
+		return customers.value.map((customer) => ({
+			label: customer.name,
+			value: customer.id
+		}));
+	});
+
 	// Configuración de paginación
 	const itemsPerPage = 20;
+
+	// Función para crear cliente rápido
+	const createQuickCustomer = async () => {
+		if (!quickCustomerForm.value.name.trim()) return;
+
+		isCreatingCustomer.value = true;
+		try {
+			const newCustomer = await createCustomer({
+				tenantId: "default",
+				name: quickCustomerForm.value.name.trim(),
+				email: quickCustomerForm.value.email.trim() || undefined,
+				phone: quickCustomerForm.value.phone.trim() || undefined,
+				isActive: true
+			});
+
+			// Seleccionar el cliente recién creado
+			selectedCustomer.value = {
+				label: newCustomer.name,
+				value: newCustomer.id
+			};
+
+			// Limpiar formulario y cerrar modal
+			quickCustomerForm.value = { name: "", email: "", phone: "" };
+			showCustomerModal.value = false;
+		} catch (error) {
+			console.error("Error creando cliente:", error);
+		} finally {
+			isCreatingCustomer.value = false;
+		}
+	};
+
+	// Watcher para productos
+	watch(products, (newProducts) => {
+		console.log("🔄 Productos cargados:", newProducts.length);
+	}, { immediate: true });
+
+	// Watcher para sesión de caja
+	watch(isCashSessionOpen, (isOpen) => {
+		console.log("💰 Sesión de caja:", isOpen ? "ABIERTA" : "CERRADA");
+	}, { immediate: true });
 
 	// Cargar datos iniciales - unificado
 	onMounted(async () => {
 		try {
-			// Cargar cuentas y categorías en paralelo
+			console.log("🚀 Iniciando carga de datos...");
+
+			// Inicializar base de datos primero
+			const { useDatabase } = await import("~/composables/useDatabase");
+			const { initialize, isReady } = useDatabase();
+			await initialize();
+			console.log("✅ Base de datos inicializada");
+			console.log("🔍 Estado de la base de datos:", { isReady: isReady.value });
+
+			// Cargar cuentas, categorías y clientes en paralelo
 			await Promise.all([
 				loadAccounts(),
-				loadCategories()
+				loadCategories(),
+				getCustomers(true) // Solo clientes activos
 			]);
+
+			console.log("✅ Cuentas, categorías y clientes cargados");
 
 			// Inicializar sesión de caja
 			await initializeCashSession();
+			console.log("✅ Sesión de caja inicializada");
 
-			// Cargar productos iniciales
-			await loadProducts(1, {});
+			// Cargar productos iniciales - directamente con filtros mínimos
+			console.log("📦 Cargando productos...");
+			// Usar nextTick para asegurar que los valores reactivos estén sincronizados
+			await nextTick();
+
+			// Resetear filtros manualmente
+			searchQuery.value = "";
+			selectedCategory.value = { label: "Todas las categorías", value: "" };
+			showOnlyInStock.value = false;
+			showLowStock.value = false;
+
+			// Cargar productos sin filtros (apagar filtro por defecto en carga inicial)
+			const initialFilters = {} as any;
+			console.log("🔍 Filtros iniciales directos (sin filtros):", initialFilters);
+			console.log("🔍 Llamando loadProducts con:", { page: 1, filters: initialFilters });
+			await loadProducts(1, initialFilters);
+			console.log("✅ Productos cargados, total:", products.value.length);
 		} catch (e) {
-			console.error("Error cargando datos iniciales:", e);
+			console.error("❌ Error cargando datos iniciales:", e);
 		}
 	});
 
@@ -542,45 +747,11 @@
 		}
 	};
 
-	// Construir filtros para la búsqueda
-	const buildFilters = () => {
-		const filters: any = {};
-
-		// Solo agregar filtros que tengan valores válidos
-		if (searchQuery.value.trim()) {
-			filters.search = searchQuery.value.trim();
-		}
-
-		if (selectedCategory.value && selectedCategory.value.value && selectedCategory.value.value !== "") {
-			filters.category = selectedCategory.value.value;
-		}
-
-		if (showOnlyInStock.value) {
-			filters.inStock = true;
-		}
-
-		// Nota: showLowStock no se implementa en el backend aún, pero se mantiene para futuras mejoras
-		// if (showLowStock.value) {
-		//   filters.lowStock = true;
-		// }
-
-		return filters;
-	};
-
 	// Manejar búsqueda
 	const handleSearch = () => {
 		const filters = buildFilters();
+		console.log("🔍 handleSearch() ejecutado, llamando loadProducts con:", { page: 1, filters });
 		loadProducts(1, filters);
-	};
-
-	// Limpiar filtros
-	const clearFilters = () => {
-		searchQuery.value = "";
-		selectedCategory.value = { label: "Todas las categorías", value: "" };
-		showOnlyInStock.value = false;
-		showLowStock.value = false;
-		// Cargar todos los productos sin filtros
-		loadProducts(1, {});
 	};
 
 	// Aplicar descuento desde input
@@ -615,7 +786,9 @@
 		try {
 			// selectedPaymentMethod.value ahora es un objeto con { label, value }
 			const paymentMethodValue = typeof selectedPaymentMethod.value === "string" ? selectedPaymentMethod.value : selectedPaymentMethod.value.value;
-			await processSale(paymentMethodValue, selectedPaymentAccount.value.value);
+			const customerId = selectedCustomer.value?.value;
+
+			await processSale(paymentMethodValue, selectedPaymentAccount.value.value, customerId);
 
 			// Refrescar la lista de productos para mostrar los nuevos valores de stock
 			const filters = buildFilters();
@@ -624,6 +797,7 @@
 			showPaymentModal.value = false;
 			selectedPaymentMethod.value = { label: "Efectivo", value: "cash" as const };
 			selectedPaymentAccount.value = undefined;
+			selectedCustomer.value = undefined;
 			discountInput.value = ""; // Limpiar descuento después de la venta
 			// TODO: Mostrar mensaje de éxito
 		} catch (error) {

@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE `inventory_movements` (
+CREATE TABLE IF NOT EXISTS `inventory_movements` (
 	`id` TEXT PRIMARY KEY NOT NULL,
 	`tenant_id` TEXT NOT NULL DEFAULT 'default',
 	`product_id` TEXT NOT NULL,
@@ -13,12 +13,12 @@ CREATE TABLE `inventory_movements` (
 	`reference_document` TEXT,
 	`notes` TEXT,
 	`created_by` TEXT NOT NULL DEFAULT 'system',
-	`created_at` TEXT NOT NULL DEFAULT (datetime('now')),
-	`updated_at` TEXT NOT NULL DEFAULT (datetime('now'))
+	`created_at` TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`updated_at` TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- CreateTable
-CREATE TABLE `inventory_stats` (
+CREATE TABLE IF NOT EXISTS `inventory_stats` (
 	`id` TEXT PRIMARY KEY NOT NULL,
 	`tenant_id` TEXT NOT NULL DEFAULT 'default',
 	`total_products` INTEGER NOT NULL DEFAULT 0,
@@ -27,7 +27,7 @@ CREATE TABLE `inventory_stats` (
 	`low_stock_count` INTEGER NOT NULL DEFAULT 0,
 	`out_of_stock_count` INTEGER NOT NULL DEFAULT 0,
 	`last_movement_date` TEXT,
-	`last_updated` TEXT NOT NULL DEFAULT (datetime('now'))
+	`last_updated` TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- CreateIndex
