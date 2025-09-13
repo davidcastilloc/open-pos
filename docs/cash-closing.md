@@ -86,6 +86,17 @@ pnpm db:studio
 - Botones usan colores semánticos de Nuxt UI (`success`, `error`, etc.).
 - Estados y tiempos localizados a `es-VE`.
 
+## Detalles de Implementación y Correcciones
+
+- `useCashClosing.refreshTodayTransactions()` normaliza el retorno de `listTodaySales` a un arreglo antes de asignarlo a `todayTransactions`.
+  - Razón: `useDatabase.query` retorna `{ rows }`. Esta normalización evita errores como `txs.forEach is not a function` al resumir ventas y métodos de pago.
+- `useDatabase.query` mantiene contrato `{ rows: T[] }`. Los consumidores deben acceder vía `result.rows`.
+- `getPaymentMethodsSummary` y `getSalesSummary` iteran sobre `todayTransactions` (arreglo garantizado).
+
+### Recomendación
+
+Si agregas nuevos lectores de DB para el cierre de caja, usa siempre el contrato `{ rows }` y convierte a arreglo cuando debas iterar.
+
 ## Próximos pasos
 
 - Asociar transacciones diarias reales a la sesión: `cashier_id` y `sale_id`.

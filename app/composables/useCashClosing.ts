@@ -72,8 +72,12 @@ export function useCashClosing() {
 	const refreshTodayTransactions = async () => {
 		try {
 			const cashierId = currentSession.value?.cashierId as string | undefined;
-			const rows = await transactions.listTodaySales(cashierId ? { cashierId } : undefined);
-			todayTransactions.value = rows;
+			const result = await transactions.listTodaySales(cashierId ? { cashierId } : undefined);
+			// Normalizar a arreglo por compatibilidad (query puede retornar { rows })
+			const normalized = Array.isArray((result as any)?.rows)
+				? (result as any).rows
+				: (Array.isArray(result) ? (result as any) : []);
+			todayTransactions.value = normalized;
 		} catch (error) {
 			console.error("Error getting today transactions:", error);
 			todayTransactions.value = [];

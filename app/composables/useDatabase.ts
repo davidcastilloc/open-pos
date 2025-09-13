@@ -57,7 +57,7 @@ export function useDatabase() {
 			let result;
 
 			if (isSelect) {
-				const rows = await sqlite.select(sql, params);
+				const rows = await sqlite.select(sql, params) as any[];
 				result = { rows };
 			} else {
 				await sqlite.execute(sql, params);

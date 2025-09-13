@@ -1,40 +1,8 @@
 ---
-id: pos-system-nuxt4-tauri-rule
-title: "POS System — Nuxt 4 + Tauri (Reglas MDC)"
-description: Reglas para proyectos POS System (Nuxt 4 + TypeScript + @nuxt/ui + Tauri). Aplicación cliente-only (`ssr: false`) ejecutada siempre con `pnpm tauri:dev`.
+globs: app/**/*.vue,app/composables/**/*.ts,
 alwaysApply: false
-author: "David Castillo"
-version: 1.1.0
-fileGlobs:
-  - "**/*.vue"
-  - "composables/**/*.ts"
-  - "pages/**/*.vue"
-excludeGlobs:
-  - "node_modules/**"
-  - ".nuxt/**"
-  - "dist/**"
-docsIndex:
-  - "@NuxtUi"
-  - "@Vue"
-  - "@Nuxt"
-
-tags:
-  - nuxt4
-  - vue
-  - typescript
-  - zod
-  - tauri
-  - eslint
 ---
 rules:
-  - id: enforce-client-only
-    level: error
-    message: "La app debe configurarse como `ssr: false` en `nuxt.config.ts` (Tauri es cliente-only)."
-    appliesTo: "nuxt.config.ts"
-    pattern: "ssr:\\s*true"
-    references:
-      - "@Nuxt"
-
   - id: script-setup-lang-ts
     level: error
     message: "Usar `<script setup lang=\"ts\">` en todos los SFC (.vue)."
@@ -133,6 +101,13 @@ rules:
     appliesTo: "*.vue"
     pattern: "<img\\b"
     negativePattern: "<NuxtImage|<NuxtPicture"
+    references:
+      - "@NuxtUi"
+  
+  - id: color-rules
+    level: warning 
+    message: "Prohibido aplicar colores de texto o de fondo a los componentes."
+    appliesTo: "*.vue"
     references:
       - "@NuxtUi"
 

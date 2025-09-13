@@ -49,6 +49,19 @@ pnpm db:studio
 - Mantén sincronizado Drizzle (esquemas) con migraciones.
 - Evita cambios manuales en SQL generados salvo necesidades avanzadas.
 
+### Contrato de `useDatabase`
+
+- `query<T>(sql, params?): Promise<{ rows: T[] }>`
+  - Siempre retorna `{ rows }` con un arreglo tipado; los consumidores deben usar `result.rows`.
+- `execute(sql, params?): Promise<{ rows: any[] }>`
+  - Si el SQL es `SELECT ...`, retorna `{ rows }` con arreglo; en otro caso `{ rows: [] }`.
+- `get<T>(sql, params?): Promise<T | undefined>`
+  - Retorna la primera fila o `undefined`.
+- `transaction(cb): Promise<any>`
+  - Maneja BEGIN/COMMIT/ROLLBACK automáticamente.
+
+Motivación: unificar acceso a datos y evitar ambigüedades entre objetos y arreglos, previniendo errores de ejecución.
+
 ## Solución de Problemas de Migraciones
 
 ### Error: "table already exists"
