@@ -1,3 +1,10 @@
+## 1.7.0 (2025-09-13)
+
+* Merge pull request #17 from davidcastilloc/cursor/planear-cierre-de-caja-y-cuentas-m-ltiples-f1b1 ([89c799909aa854d4be0b10415218e364850daf68](https://github.com/davidcastilloc/open-pos/commit/89c799909aa854d4be0b10415218e364850daf68)), closes [#17](https://github.com/davidcastilloc/open-pos/issues/17)
+* feat: Add expense tracking and transaction fields ([059e5b749147bda86172dcf8ce820d356f066865](https://github.com/davidcastilloc/open-pos/commit/059e5b749147bda86172dcf8ce820d356f066865))
+* feat: Implementar auditoría y verificación de uso de useHead() ([65db706cffa54bdffb401a9402895c7666a602a6](https://github.com/davidcastilloc/open-pos/commit/65db706cffa54bdffb401a9402895c7666a602a6))
+* Refactor: Extract transaction logic to useTransactions composable ([92bc3199cafc0669d2b315553fb9608c7e543e65](https://github.com/davidcastilloc/open-pos/commit/92bc3199cafc0669d2b315553fb9608c7e543e65))
+
 ## 1.6.0 (2025-09-12)
 
 * feat: Implementación completa del CRUD de productos ([939697b5a758557a0eaa9879bd443e117bfff640](https://github.com/davidcastilloc/open-pos/commit/939697b5a758557a0eaa9879bd443e117bfff640))
