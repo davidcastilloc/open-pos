@@ -22,6 +22,34 @@
       "when": 1757699019831,
       "tag": "0002_add_cash_closing_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1757609782246,
+      "tag": "0002_inventory_movements",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1757609782247,
+      "tag": "0003_add_payment_method_to_transactions",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1757609782248,
+      "tag": "0003_add_tx_fields",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1757609782249,
+      "tag": "0004_add_customers_tables",
+      "breakpoints": true
     }
   ]
 }

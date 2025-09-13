@@ -49,6 +49,41 @@ pnpm db:studio
 - Mantén sincronizado Drizzle (esquemas) con migraciones.
 - Evita cambios manuales en SQL generados salvo necesidades avanzadas.
 
+## Solución de Problemas de Migraciones
+
+### Error: "table already exists"
+
+Si encuentras errores como `table 'inventory_movements' already exists` al ejecutar migraciones:
+
+**Causa:** Inconsistencias entre el estado de la base de datos y el sistema de migraciones de Drizzle.
+
+**Solución:**
+1. Verificar el estado actual: `sqlite3 src-tauri/pos.db "SELECT * FROM __drizzle_migrations ORDER BY created_at;"`
+2. Sincronizar el journal: Actualizar `src-tauri/database/migrations/meta/_journal.json`
+3. Corregir sintaxis SQL en archivos de migración:
+   - Usar `CURRENT_TIMESTAMP` en lugar de `datetime('now')`
+   - Agregar `IF NOT EXISTS` a declaraciones `CREATE TABLE`
+   - Eliminar `ADD COLUMN IF NOT EXISTS` (no soportado en SQLite)
+
+**Archivos afectados típicamente:**
+- `src-tauri/database/migrations/0002_add_cash_closing_tables.sql`
+- `src-tauri/database/migrations/0002_inventory_movements.sql`
+- `src-tauri/database/migrations/meta/_journal.json`
+
+### Verificación Post-Fix
+
+Después de aplicar correcciones:
+```bash
+# Verificar migraciones
+pnpm db:migrate
+
+# Verificar tablas
+sqlite3 src-tauri/pos.db ".tables"
+
+# Verificar estado de migraciones
+sqlite3 src-tauri/pos.db "SELECT * FROM __drizzle_migrations ORDER BY created_at;"
+```
+
 ### Puntos de integración
 
 - `app/database/migrate.ts` asegura creación/upgrade de tablas de caja si es necesario.
