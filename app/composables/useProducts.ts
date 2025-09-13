@@ -35,7 +35,7 @@ export interface ProductFilters {
 
 export function useProducts() {
 	const { query, execute } = useDatabase();
-	const { convertAmount, formatCurrency } = useCurrency();
+	const { formatCurrency } = useCurrency();
 
 	// Estado
 	const products = ref<Product[]>([]);

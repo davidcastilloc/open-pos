@@ -376,12 +376,6 @@
 		}))
 	]);
 
-	// Cargar datos iniciales
-	onMounted(async () => {
-		await loadMovements();
-		await refreshStats();
-	});
-
 	// Cargar movimientos con filtros
 	const loadMovements = async () => {
 		const filters: Partial<MovementFilters> = {
@@ -412,6 +406,12 @@
 			isLoadingStats.value = false;
 		}
 	};
+
+	// Cargar datos iniciales
+	onMounted(async () => {
+		await loadMovements();
+		await refreshStats();
+	});
 
 	// Limpiar filtros
 	const clearFilters = () => {

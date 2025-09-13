@@ -188,7 +188,7 @@
 
 	const formatTotalBalance = () => {
 		const total = Object.entries(initialBalances.value)
-			.reduce((sum, [currency, amount]) => sum + amount, 0);
+			.reduce((sum, [, amount]) => sum + amount, 0);
 		return formatCurrency(total, "BS"); // Mostrar en BS como referencia
 	};
 
@@ -201,6 +201,12 @@
 		if (!initialBalances.value.BS) {
 			initialBalances.value.BS = 0;
 		}
+	};
+
+	const closeModal = () => {
+		isOpen.value = false;
+		observations.value = "";
+		loadCurrentBalances();
 	};
 
 	const handleOpenSession = async () => {
@@ -230,12 +236,6 @@
 		} finally {
 			isProcessing.value = false;
 		}
-	};
-
-	const closeModal = () => {
-		isOpen.value = false;
-		observations.value = "";
-		loadCurrentBalances();
 	};
 
 	// Watchers

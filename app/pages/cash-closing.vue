@@ -304,7 +304,6 @@
 	import { computed, onMounted, ref } from "vue";
 	import { useCashClosing } from "~/composables/useCashClosing";
 	import { useCurrency } from "~/composables/useCurrency";
-	import { useCustomers } from "~/composables/useCustomers";
 	import { getPaymentMethodIcon, getPaymentMethodLabel } from "~/composables/usePaymentMethods";
 
 	// Composables
@@ -320,7 +319,7 @@
 		isCashSessionOpen
 	} = useCashClosing();
 	const { formatCurrency } = useCurrency();
-	const { getCustomerStats } = useCustomers();
+	// const { getCustomerStats } = useCustomers();
 
 	// Estado local
 	const currentTime = ref("");

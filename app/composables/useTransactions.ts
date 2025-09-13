@@ -48,13 +48,7 @@ export interface TransactionRecord {
 }
 
 export function useTransactions() {
-	const { query, execute, transaction } = useDatabase();
-
-	// Util: obtener cuenta
-	const getAccountRow = async (accountId: string) => {
-		const rows = await query<any>("SELECT * FROM accounts WHERE id = ? AND is_active = 1", [accountId]);
-		return rows[0];
-	};
+	const { query, transaction } = useDatabase();
 
 	// Crear transacción de venta y actualizar saldo (+amount)
 	const createSaleTx = async (input: CreateSaleTxInput) => {

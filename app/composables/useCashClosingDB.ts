@@ -238,10 +238,10 @@ export function useCashClosingDB() {
 			`;
 
 			// Validar fechas antes de convertir a ISO string
-			if (!(data.startTime instanceof Date) || isNaN(data.startTime.getTime())) {
+			if (!(data.startTime instanceof Date) || Number.isNaN(data.startTime.getTime())) {
 				throw new TypeError(`startTime inválida: ${data.startTime}`);
 			}
-			if (!(data.endTime instanceof Date) || isNaN(data.endTime.getTime())) {
+			if (!(data.endTime instanceof Date) || Number.isNaN(data.endTime.getTime())) {
 				throw new TypeError(`endTime inválida: ${data.endTime}`);
 			}
 

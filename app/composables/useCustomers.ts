@@ -14,6 +14,27 @@ export const useCustomers = () => {
 		return `customer_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 	};
 
+	// Obtener todos los clientes
+	const getCustomers = async (activeOnly: boolean = true): Promise<Customer[]> => {
+		loading.value = true;
+		error.value = null;
+
+		try {
+			const query = activeOnly
+				? "SELECT * FROM customers WHERE is_active = 1 ORDER BY name ASC"
+				: "SELECT * FROM customers ORDER BY name ASC";
+
+			const result = await execute(query);
+			customers.value = result.rows as Customer[];
+			return customers.value;
+		} catch (err) {
+			error.value = err instanceof Error ? err.message : "Error al obtener clientes";
+			throw err;
+		} finally {
+			loading.value = false;
+		}
+	};
+
 	// Crear cliente
 	const createCustomer = async (data: CreateCustomerInput): Promise<Customer> => {
 		loading.value = true;
@@ -66,27 +87,6 @@ export const useCustomers = () => {
 			return newCustomer as Customer;
 		} catch (err) {
 			error.value = err instanceof Error ? err.message : "Error al crear cliente";
-			throw err;
-		} finally {
-			loading.value = false;
-		}
-	};
-
-	// Obtener todos los clientes
-	const getCustomers = async (activeOnly: boolean = true): Promise<Customer[]> => {
-		loading.value = true;
-		error.value = null;
-
-		try {
-			const query = activeOnly
-				? "SELECT * FROM customers WHERE is_active = 1 ORDER BY name ASC"
-				: "SELECT * FROM customers ORDER BY name ASC";
-
-			const result = await execute(query);
-			customers.value = result.rows as Customer[];
-			return customers.value;
-		} catch (err) {
-			error.value = err instanceof Error ? err.message : "Error al obtener clientes";
 			throw err;
 		} finally {
 			loading.value = false;

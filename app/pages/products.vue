@@ -483,7 +483,7 @@
 	];
 
 	// Computed properties
-	const currentCurrency = ref("BS");
+	// const currentCurrency = ref("BS");
 
 	const productsWithStock = computed(() => {
 		return products.value.filter((p) => p.stock > 0).length;

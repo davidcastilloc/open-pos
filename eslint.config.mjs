@@ -2,8 +2,8 @@ import eslintConfig from "@antfu/eslint-config";
 import nuxtConfig from "./.nuxt/eslint.config.mjs";
 
 export default eslintConfig(
-	// General
 	{
+		ignores: ["**/*.md"],
 		typescript: true,
 		vue: true,
 		stylistic: {
@@ -33,8 +33,6 @@ export default eslintConfig(
 			"node/prefer-global/process": ["off"]
 		}
 	},
-
-	// Vue
 	{
 		files: ["**/*.vue"],
 		rules: {

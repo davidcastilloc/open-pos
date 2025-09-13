@@ -32,7 +32,7 @@ export function useCurrency() {
 	const lastUpdate = ref<Date | null>(null);
 
 	// Obtener tasa de cambio
-	const getExchangeRate = (from: string, to: string, date?: Date): number => {
+	const getExchangeRate = (from: string, to: string, _date?: Date): number => {
 		const key = `${from}_${to}`;
 
 		// Si es la misma moneda, retornar 1
@@ -49,8 +49,8 @@ export function useCurrency() {
 	};
 
 	// Convertir cantidad entre monedas
-	const convertAmount = (amount: number, from: string, to: string, date?: Date): number => {
-		const rate = getExchangeRate(from, to, date);
+	const convertAmount = (amount: number, from: string, to: string, _date?: Date): number => {
+		const rate = getExchangeRate(from, to, _date);
 		return amount * rate;
 	};
 
@@ -184,7 +184,7 @@ export function useCurrency() {
 	};
 
 	// Obtener historial de tasas
-	const getRateHistory = (from: string, to: string, days: number = 30) => {
+	const getRateHistory = (from: string, to: string, _days: number = 30) => {
 		// TODO: Implementar obtención de historial desde la base de datos
 		return [];
 	};

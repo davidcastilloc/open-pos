@@ -24,6 +24,33 @@ export interface InventoryMovementRecord extends InventoryMovement {
 export function useInventoryMovements() {
 	const { query, execute, transaction } = useDatabase();
 
+	// Actualizar costo promedio del producto (dentro de transacción)
+	const updateAverageCostInTransaction = async (db: any, productId: string, newUnitCost: number, quantity: number) => {
+		try {
+			const productResult = await db.select(
+				"SELECT cost, stock FROM products WHERE id = ? AND tenant_id = ?",
+				[productId, "default"]
+			);
+
+			if (productResult.length === 0) return;
+
+			const currentCost = productResult[0].cost || 0;
+			const currentStock = productResult[0].stock || 0;
+
+			// Calcular costo promedio ponderado
+			const totalCostValue = (currentCost * currentStock) + (newUnitCost * quantity);
+			const totalQuantity = currentStock + quantity;
+			const averageCost = totalQuantity > 0 ? totalCostValue / totalQuantity : newUnitCost;
+
+			await db.execute(
+				"UPDATE products SET cost = ? WHERE id = ? AND tenant_id = ?",
+				[averageCost, productId, "default"]
+			);
+		} catch (err) {
+			console.error("Error updating average cost:", err);
+		}
+	};
+
 	// Estado
 	const movements = ref<InventoryMovementRecord[]>([]);
 	const stats = ref<InventoryStats | null>(null);
@@ -114,33 +141,6 @@ export function useInventoryMovements() {
 			error.value = err instanceof Error ? err.message : "Error al registrar movimiento";
 			console.error("Error recording movement:", err);
 			throw err;
-		}
-	};
-
-	// Actualizar costo promedio del producto (dentro de transacción)
-	const updateAverageCostInTransaction = async (db: any, productId: string, newUnitCost: number, quantity: number) => {
-		try {
-			const productResult = await db.select(
-				"SELECT cost, stock FROM products WHERE id = ? AND tenant_id = ?",
-				[productId, "default"]
-			);
-
-			if (productResult.length === 0) return;
-
-			const currentCost = productResult[0].cost || 0;
-			const currentStock = productResult[0].stock || 0;
-
-			// Calcular costo promedio ponderado
-			const totalCostValue = (currentCost * currentStock) + (newUnitCost * quantity);
-			const totalQuantity = currentStock + quantity;
-			const averageCost = totalQuantity > 0 ? totalCostValue / totalQuantity : newUnitCost;
-
-			await db.execute(
-				"UPDATE products SET cost = ? WHERE id = ? AND tenant_id = ?",
-				[averageCost, productId, "default"]
-			);
-		} catch (err) {
-			console.error("Error updating average cost:", err);
 		}
 	};
 
@@ -465,11 +465,11 @@ export function useInventoryMovements() {
 	});
 
 	// Helpers para la UI
-	const getMovementTypeLabel = (type: string) => {
-		return MOVEMENT_TYPE_LABELS[type as keyof typeof MOVEMENT_TYPE_LABELS] || type;
+	const getMovementTypeLabel = (_type: string) => {
+		return MOVEMENT_TYPE_LABELS[_type as keyof typeof MOVEMENT_TYPE_LABELS] || _type;
 	};
 
-	const formatMovementQuantity = (quantity: number, type: string) => {
+	const formatMovementQuantity = (quantity: number, _type: string) => {
 		const sign = quantity > 0 ? "+" : "";
 		return `${sign}${quantity}`;
 	};

@@ -304,6 +304,13 @@
 		{ label: "Stock bajo", value: "low_stock" }
 	];
 
+	const loadData = async () => {
+		await Promise.all([
+			loadProducts(1, {}),
+			loadCategories()
+		]);
+	};
+
 	// Productos filtrados
 	const filteredProducts = computed(() => {
 		let filtered = products.value.filter((product) =>
@@ -379,12 +386,6 @@
 	});
 
 	// Métodos
-	const loadData = async () => {
-		await Promise.all([
-			loadProducts(1, {}),
-			loadCategories()
-		]);
-	};
 
 	const handleSearch = () => {
 		isSearching.value = true;
@@ -410,6 +411,16 @@
 		await loadData();
 	};
 
+	const handleClose = () => {
+		isOpen.value = false;
+		// Limpiar estado
+		searchQuery.value = "";
+		selectedCategory.value = null;
+		stockFilter.value = null;
+		maxPrice.value = null;
+		showFilters.value = false;
+	};
+
 	const selectProduct = (product: Product) => {
 		emit("select", product);
 		handleClose();
@@ -424,16 +435,6 @@
 		showCreateProduct.value = false;
 		// Recargar productos para mostrar el nuevo
 		loadData();
-	};
-
-	const handleClose = () => {
-		isOpen.value = false;
-		// Limpiar estado
-		searchQuery.value = "";
-		selectedCategory.value = null;
-		stockFilter.value = null;
-		maxPrice.value = null;
-		showFilters.value = false;
 	};
 
 	const getStockStatusClass = (stock: number, minStock: number) => {

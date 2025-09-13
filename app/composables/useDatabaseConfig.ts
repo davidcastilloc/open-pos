@@ -2,7 +2,7 @@ import { computed, ref } from "vue";
 import { useDatabase } from "./useDatabase";
 
 export function useDatabaseConfig() {
-	const { query, get, execute } = useDatabase();
+	const { query, execute } = useDatabase();
 	const config = ref<Record<string, any>>({});
 	const isLoading = ref(false);
 	const error = ref<string | null>(null);

@@ -256,8 +256,8 @@
 												icon="i-heroicons-trash"
 												size="sm"
 												variant="ghost"
-												color="red"
-												@click="deleteCustomer(customer)"
+												color="error"
+												@click="requestDeleteCustomer(customer)"
 											>
 												Eliminar
 											</UButton>
@@ -460,6 +460,38 @@
 				</template>
 			</UCard>
 		</UModal>
+
+		<!-- Delete Confirm Modal -->
+		<UModal v-model="isDeleteModalOpen" :ui="{ width: 'sm:max-w-md' }">
+			<UCard>
+				<template #header>
+					<h3 class="text-lg font-semibold">
+						Confirmar Eliminación
+					</h3>
+				</template>
+				<div class="space-y-4">
+					<p>¿Estás seguro de que quieres eliminar este cliente?</p>
+					<div v-if="customerToDelete" class="rounded-lg p-4 border">
+						<h4 class="font-medium">
+							{{ customerToDelete.name }}
+						</h4>
+						<p class="text-sm opacity-75">
+							Esta acción no se puede deshacer.
+						</p>
+					</div>
+				</div>
+				<template #footer>
+					<div class="flex gap-3 justify-end">
+						<UButton variant="outline" @click="isDeleteModalOpen = false">
+							Cancelar
+						</UButton>
+						<UButton color="error" :loading="loading" @click="confirmDeleteCustomer">
+							Eliminar
+						</UButton>
+					</div>
+				</template>
+			</UCard>
+		</UModal>
 	</div>
 </template>
 
@@ -495,8 +527,10 @@
 	const searchResults = ref<Customer[]>([]);
 	const isModalOpen = ref(false);
 	const isViewModalOpen = ref(false);
+	const isDeleteModalOpen = ref(false);
 	const isEditing = ref(false);
 	const selectedCustomer = ref<Customer | null>(null);
+	const customerToDelete = ref<Customer | null>(null);
 
 	// Form state
 	const formState = ref<CreateCustomerInput | UpdateCustomerInput>({
@@ -614,29 +648,21 @@
 		isViewModalOpen.value = true;
 	};
 
-	const deleteCustomer = async (customer: Customer) => {
-		if (confirm(`¿Estás seguro de que quieres eliminar al cliente "${customer.name}"?`)) {
-			try {
-				await deleteCustomerComposable(customer.id);
-				await loadCustomers();
-			} catch (err) {
-				console.error("Error deleting customer:", err);
-			}
-		}
+	const requestDeleteCustomer = (customer: Customer) => {
+		customerToDelete.value = customer;
+		isDeleteModalOpen.value = true;
 	};
 
-	const handleSubmit = async () => {
+	const confirmDeleteCustomer = async () => {
+		if (!customerToDelete.value) return;
 		try {
-			if (isEditing.value) {
-				await updateCustomer((formState.value as UpdateCustomerInput).id!, formState.value as UpdateCustomerInput);
-			} else {
-				await createCustomer(formState.value as CreateCustomerInput);
-			}
-
-			closeModal();
+			await deleteCustomerComposable(customerToDelete.value.id);
 			await loadCustomers();
 		} catch (err) {
-			console.error("Error saving customer:", err);
+			console.error("Error deleting customer:", err);
+		} finally {
+			isDeleteModalOpen.value = false;
+			customerToDelete.value = null;
 		}
 	};
 
@@ -653,6 +679,21 @@
 			notes: "",
 			isActive: true
 		};
+	};
+
+	const handleSubmit = async () => {
+		try {
+			if (isEditing.value) {
+				await updateCustomer((formState.value as UpdateCustomerInput).id!, formState.value as UpdateCustomerInput);
+			} else {
+				await createCustomer(formState.value as CreateCustomerInput);
+			}
+
+			closeModal();
+			await loadCustomers();
+		} catch (err) {
+			console.error("Error saving customer:", err);
+		}
 	};
 
 	const closeViewModal = () => {

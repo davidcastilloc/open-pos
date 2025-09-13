@@ -298,6 +298,12 @@
 		}
 	};
 
+	// Cerrar modal
+	const closeModal = () => {
+		showCreateModal.value = false;
+		editingCategory.value = null;
+	};
+
 	// Manejar envío del formulario
 	const handleCategorySubmit = async (categoryData: any) => {
 		try {
@@ -310,11 +316,5 @@
 		} catch (error) {
 			console.error("Error guardando categoría:", error);
 		}
-	};
-
-	// Cerrar modal
-	const closeModal = () => {
-		showCreateModal.value = false;
-		editingCategory.value = null;
 	};
 </script>
