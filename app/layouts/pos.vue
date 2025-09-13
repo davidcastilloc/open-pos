@@ -23,8 +23,9 @@
 					<div class="flex items-center space-x-6">
 						<!-- Estado de caja -->
 						<div class="flex items-center space-x-2">
-							<div class="w-3 h-3 rounded-full opacity-50" />
-							<span class="text-sm font-medium">Caja Abierta</span>
+							<UBadge :color="isCashSessionOpen ? 'success' : 'error'" variant="soft">
+								{{ isCashSessionOpen ? 'Caja Abierta' : 'Caja Cerrada' }}
+							</UBadge>
 						</div>
 
 						<!-- Vendedor -->
@@ -45,6 +46,30 @@
 								<span class="font-semibold">{{ formatCurrency(balance, currency) }}</span>
 							</div>
 						</div>
+
+						<!-- Botón Terminar Turno (solo visible si hay sesión abierta) -->
+						<UButton
+							v-if="isCashSessionOpen"
+							color="error"
+							variant="outline"
+							size="sm"
+							@click="navigateTo('/cash-closing')"
+						>
+							<UIcon name="i-heroicons-lock-closed" />
+							Terminar Turno
+						</UButton>
+
+						<!-- Botón Abrir Caja (solo visible si hay sesión cerrada) -->
+						<UButton
+							v-else
+							color="success"
+							variant="outline"
+							size="sm"
+							@click="showOpenCashModal = true"
+						>
+							<UIcon name="i-heroicons-lock-open" />
+							Abrir Caja
+						</UButton>
 					</div>
 				</div>
 			</div>
@@ -98,12 +123,19 @@
 				</div>
 			</div>
 		</footer>
+
+		<!-- Modal para abrir sesión de caja -->
+		<OpenCashSessionModal
+			v-model:open="showOpenCashModal"
+			@success="handleCashSessionOpened"
+		/>
 	</div>
 </template>
 
 <script setup lang="ts">
-	import { computed, onMounted, onUnmounted, ref } from "vue";
+	import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 	import { useAccounts } from "~/composables/useAccounts";
+	import { useCashClosing } from "~/composables/useCashClosing";
 	import { useConfig } from "~/composables/useConfig";
 	import { useCurrency } from "~/composables/useCurrency";
 
@@ -112,6 +144,7 @@
 	const { getCurrencyConfig } = useConfig();
 	const { formatCurrency } = useCurrency();
 	const { getTotalBalanceByCurrency } = useAccounts();
+	const { isCashSessionOpen, openCashSession, initializeCashSession } = useCashClosing();
 
 	// Estado local
 	const currentTime = ref("");
@@ -121,6 +154,7 @@
 	const totalProducts = ref(0);
 	const todaySales = ref(0);
 	const lastSync = ref("Nunca");
+	const showOpenCashModal = ref(false);
 
 	// Configuración de la aplicación
 	const appVersion = config.public.appVersion;
@@ -162,12 +196,46 @@
 		}
 	};
 
+	// Manejar apertura de caja (función legacy, no se usa actualmente)
+	const _handleOpenCashSession = async () => {
+		try {
+			await openCashSession();
+		} catch (error) {
+			console.error("Error opening cash session:", error);
+		}
+	};
+
+	// Manejar cuando se abre exitosamente la sesión de caja
+	const handleCashSessionOpened = async () => {
+		try {
+			console.log("✅ Sesión de caja abierta exitosamente");
+
+			// Recargar la sesión de caja para asegurar que el estado esté actualizado
+			await initializeCashSession();
+
+			// Forzar actualización del estado
+			await nextTick();
+
+			// Verificar que el estado se haya actualizado correctamente
+			if (isCashSessionOpen.value) {
+				console.log("✅ Estado de caja actualizado correctamente - Caja abierta");
+			} else {
+				console.warn("⚠️ Estado de caja no se actualizó correctamente");
+			}
+		} catch (error) {
+			console.error("❌ Error actualizando estado de caja:", error);
+		}
+	};
+
 	// Timer para actualizar tiempo
 	let timeInterval: NodeJS.Timeout | null = null;
 
-	onMounted(() => {
+	onMounted(async () => {
 		updateTime();
 		timeInterval = setInterval(updateTime, 1000);
+
+		// Inicializar sesión de caja desde la base de datos
+		await initializeCashSession();
 
 		// Simular datos (en el futuro esto vendrá de la base de datos)
 		lowStockCount.value = 3;
@@ -176,15 +244,15 @@
 		lastSync.value = new Date().toLocaleTimeString("es-VE");
 	});
 
+	// Watcher para detectar cambios en el estado de la caja
+	watch(isCashSessionOpen, (newValue, oldValue) => {
+		console.log("🔄 [Layout] Estado de caja cambió:", { oldValue, newValue });
+	}, { immediate: true });
+
 	onUnmounted(() => {
 		if (timeInterval) {
 			clearInterval(timeInterval);
 			timeInterval = null;
 		}
-	});
-
-	// Meta de la página
-	useHead({
-		title: "POS Venezuela - Punto de Venta"
 	});
 </script>

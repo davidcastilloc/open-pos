@@ -180,23 +180,62 @@ async function createTables() {
 			FOREIGN KEY (account_id) REFERENCES accounts(id)
 		)`,
 
+		// Tabla de sesiones de caja
+		`CREATE TABLE IF NOT EXISTS cash_sessions (
+			id TEXT PRIMARY KEY,
+			tenant_id TEXT NOT NULL,
+			cashier_id TEXT NOT NULL,
+			cashier_name TEXT NOT NULL,
+			start_time TEXT NOT NULL,
+			end_time TEXT,
+			initial_balances TEXT NOT NULL,
+			status TEXT NOT NULL DEFAULT 'open',
+			created_at TEXT NOT NULL DEFAULT (datetime('now')),
+			updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+		)`,
+
 		// Tabla de cierres de caja
 		`CREATE TABLE IF NOT EXISTS cash_closings (
 			id TEXT PRIMARY KEY,
 			tenant_id TEXT NOT NULL,
+			session_id TEXT NOT NULL,
 			cashier_id TEXT NOT NULL,
-			date TEXT NOT NULL,
-			account_id TEXT NOT NULL,
-			initial_balance TEXT NOT NULL,
-			sales TEXT NOT NULL,
-			expenses TEXT NOT NULL,
-			final_balance TEXT NOT NULL,
-			difference TEXT NOT NULL,
-			status TEXT NOT NULL DEFAULT 'open',
-			notes TEXT,
+			cashier_name TEXT NOT NULL,
+			start_time TEXT NOT NULL,
+			end_time TEXT NOT NULL,
+			shift_duration TEXT NOT NULL,
+			initial_balances TEXT NOT NULL,
+			final_balances TEXT NOT NULL,
+			balance_differences TEXT NOT NULL,
+			total_transactions INTEGER NOT NULL DEFAULT 0,
+			sales_by_currency TEXT NOT NULL,
+			sales_by_payment_method TEXT NOT NULL,
+			total_sales_amount REAL NOT NULL DEFAULT 0,
+			expenses TEXT NOT NULL DEFAULT '{}',
+			adjustments TEXT NOT NULL DEFAULT '{}',
+			observations TEXT,
+			status TEXT NOT NULL DEFAULT 'closed',
+			audited_by TEXT,
+			audited_at TEXT,
 			created_at TEXT NOT NULL DEFAULT (datetime('now')),
-			closed_at TEXT,
-			FOREIGN KEY (account_id) REFERENCES accounts(id)
+			updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+			FOREIGN KEY (session_id) REFERENCES cash_sessions(id)
+		)`,
+
+		// Tabla de reportes generados
+		`CREATE TABLE IF NOT EXISTS cash_reports (
+			id TEXT PRIMARY KEY,
+			tenant_id TEXT NOT NULL,
+			session_id TEXT NOT NULL,
+			cashier_id TEXT NOT NULL,
+			cashier_name TEXT NOT NULL,
+			report_type TEXT NOT NULL DEFAULT 'closing_report',
+			report_data TEXT NOT NULL,
+			file_name TEXT,
+			file_path TEXT,
+			generated_at TEXT NOT NULL DEFAULT (datetime('now')),
+			created_at TEXT NOT NULL DEFAULT (datetime('now')),
+			FOREIGN KEY (session_id) REFERENCES cash_sessions(id)
 		)`,
 
 		// Tabla de configuración del sistema
@@ -287,6 +326,9 @@ async function createTables() {
 	// Verificar y agregar columna currency si no existe
 	await ensureCurrencyColumn();
 
+	// Verificar columnas e índices de transactions
+	await ensureTransactionsColumns();
+
 	console.log("✅ Tablas creadas correctamente");
 }
 
@@ -339,6 +381,39 @@ async function ensureCurrencyColumn() {
 		console.error("❌ Error verificando columna currency:", error);
 		// No lanzar el error para no interrumpir la inicialización
 	}
+}
+
+// Asegurar columnas e índices de transactions (cashier_id, sale_id, payment_method, índices)
+async function ensureTransactionsColumns() {
+  try {
+    const sqlite = await Database.load("sqlite:pos.db");
+
+    // Columnas
+    const txCols = await sqlite.select("PRAGMA table_info(transactions)") as any[];
+    const hasCashier = txCols.some((c: any) => c.name === "cashier_id");
+    const hasSaleId = txCols.some((c: any) => c.name === "sale_id");
+    const hasPaymentMethod = txCols.some((c: any) => c.name === "payment_method");
+    if (!hasCashier) {
+      await sqlite.execute("ALTER TABLE transactions ADD COLUMN cashier_id TEXT");
+    }
+    if (!hasSaleId) {
+      await sqlite.execute("ALTER TABLE transactions ADD COLUMN sale_id TEXT");
+    }
+    if (!hasPaymentMethod) {
+      await sqlite.execute("ALTER TABLE transactions ADD COLUMN payment_method TEXT");
+    }
+
+    // Índices
+    await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_transactions_account_id ON transactions(account_id)");
+    await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON transactions(created_at)");
+    await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_transactions_type ON transactions(type)");
+    await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_transactions_sale_id ON transactions(sale_id)");
+    await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_transactions_payment_method ON transactions(payment_method)");
+
+    await sqlite.close();
+  } catch (error) {
+    console.error("❌ Error asegurando columnas/índices de transactions:", error);
+  }
 }
 
 // Función para insertar datos por defecto

@@ -225,8 +225,4 @@
 		}
 	};
 
-	// Meta de la página
-	useHead({
-		title: "Prueba de Base de Datos - POS Venezuela"
-	});
 </script>

@@ -5,32 +5,22 @@ export * from "./inventory";
 export * from "./products";
 export * from "./sales";
 
-// Re-exportar tipos principales
+// Re-exportar tipos principales de cuentas y cierres de caja
 export type {
 	Account,
 	CashClosing,
-	Category,
-	Customer,
-	ExchangeRate,
-	InventoryMovement,
-	InventoryStats,
+	CashSession,
 	NewAccount,
 	NewCashClosing,
-	NewCategory,
-	NewCustomer,
-	NewExchangeRate,
-	NewInventoryMovement,
-	NewInventoryStats,
-	NewProduct,
-	NewSale,
-	NewSaleItem,
-	NewSyncQueue,
-	NewSystemConfig,
+	NewCashSession,
 	NewTransaction,
-	Product,
-	Sale,
-	SaleItem,
-	SyncQueue,
-	SystemConfig,
 	Transaction
+} from "./accounts";
+
+// Re-exportar tipos de productos (solo los que existen)
+export type {
+	Category,
+	NewCategory,
+	NewProduct,
+	Product
 } from "./products";

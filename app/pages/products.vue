@@ -666,8 +666,4 @@
 		loadProducts(1, {});
 	});
 
-	// Meta de la página
-	useHead({
-		title: "Gestión de Productos - POS Venezuela"
-	});
 </script>

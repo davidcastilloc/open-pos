@@ -402,8 +402,7 @@
 		selectedMovementType.value = { label: "Todos los tipos", value: "" };
 		dateFrom.value = "";
 		dateTo.value = "";
-		currentPage.value = 1;
-		loadMovements();
+		loadMovementsData({ page: 1 });
 	};
 
 	// Cerrar modal de movimiento
@@ -424,8 +423,9 @@
 	};
 
 	// Obtener color del tipo de movimiento
-	const getMovementTypeColor = (type: string) => {
-		return MOVEMENT_TYPE_COLORS[type as keyof typeof MOVEMENT_TYPE_COLORS] || "neutral";
+	const getMovementTypeColor = (type: string): "primary" | "secondary" | "success" | "info" | "warning" | "error" | "neutral" => {
+		const color = MOVEMENT_TYPE_COLORS[type as keyof typeof MOVEMENT_TYPE_COLORS] || "neutral";
+		return color as "primary" | "secondary" | "success" | "info" | "warning" | "error" | "neutral";
 	};
 
 	// Formatear números
@@ -452,10 +452,6 @@
 		});
 	};
 
-	// Meta de la página
-	useHead({
-		title: "Control de Inventario - POS Venezuela"
-	});
 
 	// Metadata para navegación
 	definePageMeta({

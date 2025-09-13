@@ -1,4 +1,5 @@
 export default defineNuxtConfig({
+	devtools: { enabled: false },
 	modules: [
 		"@nuxt/ui",
 		"@vueuse/nuxt",
@@ -8,15 +9,6 @@ export default defineNuxtConfig({
 		"@pinia/nuxt"
 	],
 	app: {
-		head: {
-			title: "POS Venezuela - Sistema de Punto de Venta",
-			charset: "utf-8",
-			viewport: "width=device-width, initial-scale=1",
-			meta: [
-				{ name: "format-detection", content: "no" },
-				{ name: "description", content: "Sistema POS moderno para Venezuela con soporte multi-moneda" }
-			]
-		},
 		pageTransition: {
 			name: "page",
 			mode: "default"
@@ -60,7 +52,7 @@ export default defineNuxtConfig({
 		]
 	},
 	devServer: {
-		host: "0.0.0.0"
+		host: process.env.TAURI_DEV_HOST || "localhost"
 	},
 	router: {
 		options: {
@@ -72,17 +64,8 @@ export default defineNuxtConfig({
 			standalone: false
 		}
 	},
-	devtools: {
-		enabled: false
-	},
 
 	// Configuración específica para Nuxt UI
-	ui: {
-		global: true,
-		icons: ["heroicons"],
-		primary: "green",
-		neutral: "zinc"
-	},
 	experimental: {
 		typedPages: true
 	},

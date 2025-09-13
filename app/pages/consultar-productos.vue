@@ -237,8 +237,4 @@
 		consultarProductos();
 	});
 
-	// Meta de la página
-	useHead({
-		title: "Consulta de Productos - POS Venezuela"
-	});
 </script>

@@ -318,8 +318,4 @@
 		editingCategory.value = null;
 	};
 
-	// Meta de la página
-	useHead({
-		title: "Gestión de Categorías - POS Venezuela"
-	});
 </script>

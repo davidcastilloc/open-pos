@@ -8,6 +8,7 @@ Bienvenido a la documentación del proyecto Open POS System.
 - [Base de datos y migraciones](./database.md)
 - [Integración Tauri 2 y plugins](./tauri.md)
 - [Gestión de productos e inventario](./products-inventory.md)
+- [Cierre de caja](./cash-closing.md)
 - [Testing (Vitest) y calidad](./testing.md)
 - [Versionado y releases](./versioning.md)
 - [Variables de entorno y configuración](./env.md)
