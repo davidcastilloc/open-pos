@@ -828,7 +828,7 @@
 			selectedPaymentAccount.value = undefined;
 			selectedCustomer.value = undefined;
 			discountInput.value = ""; // Limpiar descuento después de la venta
-			notifications.success("Venta procesada", `Venta completada por ${formatCurrency(total.value, currentCurrency.value)}`);
+			notifications.success("Venta procesada", `Venta completada`);
 		} catch (error) {
 			notifications.error("Error en la venta", "No se pudo procesar la venta. Intente nuevamente.");
 			console.error("Error processing payment:", error);
