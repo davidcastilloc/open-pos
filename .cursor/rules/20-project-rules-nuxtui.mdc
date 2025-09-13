@@ -1,10 +1,10 @@
 ---
-id: pos-system-nuxt4-vue-rule
-title: "POS System — Nuxt 4 / Vue SFC (Reglas MDC)"
-description: Reglas para proyectos POS System (Nuxt 4 + TypeScript + @nuxt/ui). Aplica únicamente sobre archivos Nuxt/Vue (.vue y directorios composables/pages).
+id: pos-system-nuxt4-tauri-rule
+title: "POS System — Nuxt 4 + Tauri (Reglas MDC)"
+description: Reglas para proyectos POS System (Nuxt 4 + TypeScript + @nuxt/ui + Tauri). Aplicación cliente-only (`ssr: false`) ejecutada siempre con `pnpm tauri:dev`.
 alwaysApply: false
 author: "David Castillo"
-version: 1.0.1
+version: 1.1.0
 fileGlobs:
   - "**/*.vue"
   - "composables/**/*.ts"
@@ -15,6 +15,8 @@ excludeGlobs:
   - "dist/**"
 docsIndex:
   - "@NuxtUi"
+  - "@Vue"
+  - "@Nuxt"
 
 tags:
   - nuxt4
@@ -25,6 +27,14 @@ tags:
   - eslint
 ---
 rules:
+  - id: enforce-client-only
+    level: error
+    message: "La app debe configurarse como `ssr: false` en `nuxt.config.ts` (Tauri es cliente-only)."
+    appliesTo: "nuxt.config.ts"
+    pattern: "ssr:\\s*true"
+    references:
+      - "@Nuxt"
+
   - id: script-setup-lang-ts
     level: error
     message: "Usar `<script setup lang=\"ts\">` en todos los SFC (.vue)."
@@ -32,7 +42,7 @@ rules:
     pattern: (?s)"<script(?:(?!setup).)*>"
     mustMatch: (?s)"<script[^>]*setup[^>]*lang=(?:\"|')ts(?:\"|')"
     references:
-      - "@NuxtUi"
+      - "@Vue"
 
   - id: ban-options-api
     level: error
@@ -40,7 +50,7 @@ rules:
     appliesTo: "*.vue"
     pattern: "export\\s+default\\s*\\{"
     references:
-      - "@NuxtUi"
+      - "@Vue"
 
   - id: enforce-pascalcase-filenames
     level: warning
@@ -48,7 +58,7 @@ rules:
     appliesTo: "*.vue"
     fileNamePattern: "^[A-Z][A-Za-z0-9]+\\.vue$"
     references:
-      - "@NuxtUi"
+      - "@Vue"
 
   - id: composables-location-name
     level: error
@@ -56,7 +66,7 @@ rules:
     appliesTo: "composables/**/*.ts"
     pattern: "export\\s+function\\s+(?!use)[A-Za-z0-9_]+\\s*\\("
     references:
-      - "@NuxtUi"
+      - "@Nuxt"
 
   - id: defineprops-definemits-typed
     level: error
@@ -65,7 +75,7 @@ rules:
     pattern: "defineProps\\s*\\(|defineEmits\\s*\\("
     negativePattern: "defineProps\\s*\\(\\s*\\)|defineEmits\\s*\\(\\s*\\)"
     references:
-      - "@NuxtUi"
+      - "@Vue"
 
   - id: avoid-any
     level: error
@@ -73,7 +83,7 @@ rules:
     appliesTo: "*.vue, **/*.ts"
     pattern: "(:|as)\\s*any\\b"
     references:
-      - "@NuxtUi"
+      - "@Vue"
 
   - id: enforce-zod-validation
     level: error
@@ -82,7 +92,7 @@ rules:
     pattern: "(v-model|@submit|@submit.prevent|onSubmit|handleSubmit)"
     negativePattern: "from\\s+['\"]zod['\"]|z\\.object\\("
     references:
-      - "@NuxtUi"
+      - "zod"
 
   - id: tauri-apis-encapsulate
     level: warning
@@ -90,7 +100,7 @@ rules:
     appliesTo: "*.vue"
     pattern: "from\\s+['\"]@tauri-apps/[^'\"]+['\"]"
     references:
-      - "@NuxtUi"
+      - "tauri"
 
   - id: nuxt-auto-imports
     level: info
@@ -98,24 +108,24 @@ rules:
     appliesTo: "*.vue"
     pattern: "import\\s+\\{[^}]*\\b(ref|reactive|useState|useRouter|useFetch)\\b[^}]*\\}\\s+from\\s+['\"]vue|nuxt['\"]"
     references:
-      - "@NuxtUi"
+      - "@Nuxt"
 
   - id: prefer-useFetch-in-pages
     level: warning
-    message: "En páginas y componentes SSR-prefiere `useFetch`. Usa `$fetch` sólo en handlers/eventos o llamadas puntuales del cliente."
+    message: "En páginas y componentes prefiere `useFetch` con `{ server: false }`. Usa `$fetch` sólo en handlers/eventos del cliente."
     appliesTo: "pages/**, components/**"
     pattern: "\\$fetch\\s*\\("
     references:
-      - "@NuxtUi"
+      - "@Nuxt"
 
   - id: useAsyncData-options-recommendation
     level: info
-    message: "Cuando uses `useAsyncData` considera `lazy: true` y `server: false` si aplica."
+    message: "Cuando uses `useAsyncData` considera `lazy: true` y `server: false` en Tauri (cliente-only)."
     appliesTo: "*.vue"
     pattern: "useAsyncData\\s*\\("
     negativePattern: "lazy\\s*:\\s*true|server\\s*:\\s*false"
     references:
-      - "@NuxtUi"
+      - "@Nuxt"
 
   - id: prefer-nuxtimage-nuxtpicture
     level: info
@@ -132,12 +142,12 @@ rules:
     appliesTo: "package.json, .eslintrc*"
     pattern: "\"@antfu/eslint-config\""
     references:
-      - "@NuxtUi"
+      - "eslint"
 
   - id: vitest-required-for-critical
     level: info
     message: "Agregar tests unitarios (Vitest) para funciones críticas (pagos, auth, stores)."
     appliesTo: "tests/**, composables/**"
     references:
-      - "@NuxtUi"
+      - "@Vue"
 ---
