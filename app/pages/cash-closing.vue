@@ -124,6 +124,75 @@
 				</div>
 			</UCard>
 
+			<!-- Estadísticas de Clientes -->
+			<UCard class="mb-6">
+				<template #header>
+					<div class="flex items-center space-x-2">
+						<UIcon name="i-heroicons-users" class="w-5 h-5" />
+						<h2 class="text-xl font-semibold">
+							Estadísticas de Clientes
+						</h2>
+					</div>
+				</template>
+
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+					<div class="text-center p-4 border rounded-lg">
+						<div class="text-2xl font-bold mb-1 text-blue-600">
+							{{ customerStats.totalCustomers }}
+						</div>
+						<div class="text-sm opacity-75 mb-2">
+							Clientes Atendidos
+						</div>
+						<div class="text-xs opacity-50">
+							{{ customerStats.uniqueCustomers }} únicos
+						</div>
+					</div>
+					<div class="text-center p-4 border rounded-lg">
+						<div class="text-2xl font-bold mb-1 text-green-600">
+							{{ formatCurrency(customerStats.totalCustomerSales, 'BS') }}
+						</div>
+						<div class="text-sm opacity-75 mb-2">
+							Ventas a Clientes
+						</div>
+						<div class="text-xs opacity-50">
+							{{ customerStats.customerSalesCount }} transacciones
+						</div>
+					</div>
+					<div class="text-center p-4 border rounded-lg">
+						<div class="text-2xl font-bold mb-1 text-purple-600">
+							{{ formatCurrency(customerStats.averageTicket, 'BS') }}
+						</div>
+						<div class="text-sm opacity-75 mb-2">
+							Ticket Promedio
+						</div>
+						<div class="text-xs opacity-50">
+							Por cliente
+						</div>
+					</div>
+				</div>
+
+				<!-- Top 5 clientes -->
+				<div v-if="customerStats.topCustomers.length > 0" class="mt-6">
+					<h3 class="text-lg font-medium mb-4">Top 5 Clientes del Turno</h3>
+					<div class="space-y-2">
+						<div v-for="(customer, index) in customerStats.topCustomers" :key="customer.id" class="flex items-center justify-between p-3 border rounded-lg">
+							<div class="flex items-center space-x-3">
+								<div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+									<span class="text-sm font-bold text-blue-600">#{{ index + 1 }}</span>
+								</div>
+								<div>
+									<div class="font-medium">{{ customer.name }}</div>
+									<div class="text-sm opacity-75">{{ customer.salesCount }} compras</div>
+								</div>
+							</div>
+							<span class="text-lg font-semibold">
+								{{ formatCurrency(customer.totalAmount, 'BS') }}
+							</span>
+						</div>
+					</div>
+				</div>
+			</UCard>
+
 			<!-- Observaciones -->
 			<UCard class="mb-6">
 				<template #header>
@@ -228,7 +297,9 @@
 <script setup lang="ts">
 	import { computed, onMounted, ref } from "vue";
 	import { useCashClosing } from "~/composables/useCashClosing";
+	import { useCustomers } from "~/composables/useCustomers";
 	import { useCurrency } from "~/composables/useCurrency";
+	import { getPaymentMethodIcon, getPaymentMethodLabel } from "~/composables/usePaymentMethods";
 
 	// Composables
 	const {
@@ -243,6 +314,7 @@
 		isCashSessionOpen
 	} = useCashClosing();
 	const { formatCurrency } = useCurrency();
+	const { getCustomerStats } = useCustomers();
 
 	// Estado local
 	const currentTime = ref("");
@@ -250,6 +322,21 @@
 	const cashierName = ref("Administrador");
 	const observations = ref("");
 	const showConfirmModal = ref(false);
+	
+	// Estadísticas de clientes
+	const customerStats = ref({
+		totalCustomers: 0,
+		uniqueCustomers: 0,
+		totalCustomerSales: 0,
+		customerSalesCount: 0,
+		averageTicket: 0,
+		topCustomers: [] as Array<{
+			id: string;
+			name: string;
+			totalAmount: number;
+			salesCount: number;
+		}>
+	});
 
 	// Computed
 	const salesSummary = computed(() => {
@@ -275,23 +362,8 @@
 		});
 	};
 
-	const getPaymentMethodIcon = (method: string) => {
-		const icons: Record<string, string> = {
-			cash: "i-heroicons-banknotes",
-			card: "i-heroicons-credit-card",
-			transfer: "i-heroicons-arrow-path"
-		};
-		return icons[method] || "i-heroicons-question-mark-circle";
-	};
-
-	const getPaymentMethodName = (method: string) => {
-		const names: Record<string, string> = {
-			cash: "Efectivo",
-			card: "Tarjeta",
-			transfer: "Transferencia"
-		};
-		return names[method] || method;
-	};
+	// Usar las funciones del helper
+	const getPaymentMethodName = getPaymentMethodLabel;
 
 	const goBack = () => {
 		navigateTo("/");
@@ -338,6 +410,60 @@
 		}
 	};
 
+	// Función para cargar estadísticas de clientes
+	const loadCustomerStats = async () => {
+		try {
+			const { useDatabase } = await import("~/composables/useDatabase");
+			const { execute } = useDatabase();
+			
+			// Obtener estadísticas de clientes del turno actual
+			const result = await execute(`
+				SELECT 
+					COUNT(DISTINCT cs.customer_id) as uniqueCustomers,
+					COUNT(cs.id) as totalSales,
+					COALESCE(SUM(cs.total_amount), 0) as totalAmount,
+					COALESCE(AVG(cs.total_amount), 0) as averageTicket
+				FROM customer_sales cs
+				INNER JOIN sales s ON cs.sale_id = s.id
+				WHERE s.created_at >= datetime('now', '-8 hours')
+			`);
+			
+			const stats = result.rows[0] as any;
+			
+			// Obtener top 5 clientes del turno
+			const topCustomersResult = await execute(`
+				SELECT 
+					c.id,
+					c.name,
+					COUNT(cs.id) as salesCount,
+					SUM(cs.total_amount) as totalAmount
+				FROM customer_sales cs
+				INNER JOIN customers c ON cs.customer_id = c.id
+				INNER JOIN sales s ON cs.sale_id = s.id
+				WHERE s.created_at >= datetime('now', '-8 hours')
+				GROUP BY c.id, c.name
+				ORDER BY totalAmount DESC
+				LIMIT 5
+			`);
+			
+			customerStats.value = {
+				totalCustomers: stats.totalSales || 0,
+				uniqueCustomers: stats.uniqueCustomers || 0,
+				totalCustomerSales: stats.totalAmount || 0,
+				customerSalesCount: stats.totalSales || 0,
+				averageTicket: stats.averageTicket || 0,
+				topCustomers: topCustomersResult.rows.map((row: any) => ({
+					id: row.id,
+					name: row.name,
+					totalAmount: row.totalAmount,
+					salesCount: row.salesCount
+				}))
+			};
+		} catch (error) {
+			console.error("Error cargando estadísticas de clientes:", error);
+		}
+	};
+
 	// Lifecycle
 	onMounted(async () => {
 		updateTime();
@@ -345,6 +471,9 @@
 
 		// Inicializar sesión de caja desde la base de datos
 		await initializeCashSession();
+
+		// Cargar estadísticas de clientes
+		await loadCustomerStats();
 
 		// Simular inicio de turno (en el futuro esto vendrá de la base de datos)
 		shiftStartTime.value = new Date(Date.now() - 8 * 60 * 60 * 1000).toLocaleTimeString("es-VE", {

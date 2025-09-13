@@ -1,4 +1,4 @@
-import { computed, ref } from "vue";
+import { computed, ref, readonly } from "vue";
 import { z } from "zod";
 
 // Schema para tasas de cambio

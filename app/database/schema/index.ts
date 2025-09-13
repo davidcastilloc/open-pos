@@ -1,5 +1,6 @@
 export * from "./accounts";
 export * from "./config";
+export * from "./customers";
 export * from "./inventory";
 // Exportar todos los esquemas
 export * from "./products";
@@ -24,3 +25,11 @@ export type {
 	NewProduct,
 	Product
 } from "./products";
+
+// Re-exportar tipos de clientes
+export type {
+	Customer,
+	CustomerSale,
+	NewCustomer,
+	NewCustomerSale
+} from "./customers";

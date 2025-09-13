@@ -9,8 +9,12 @@ export function useDatabase() {
 
 	// Inicializar base de datos
 	const initialize = async () => {
-		if (isInitialized.value) return;
+		if (isInitialized.value) {
+			console.log("🔍 Base de datos ya inicializada, saltando...");
+			return;
+		}
 
+		console.log("🔄 Inicializando base de datos...");
 		isLoading.value = true;
 		error.value = null;
 
@@ -29,12 +33,14 @@ export function useDatabase() {
 	// Ejecutar consulta
 	const query = async <T>(sql: string, params: any[] = []): Promise<T[]> => {
 		try {
+			console.log("🔍 Ejecutando query:", { sql, params });
 			const sqlite = await Database.load("sqlite:pos.db");
 			const rows = await sqlite.select(sql, params);
 			await sqlite.close();
+			console.log("✅ Query ejecutado exitosamente, filas:", rows.length);
 			return rows as T[];
 		} catch (err) {
-			console.error("Error executing query:", err);
+			console.error("❌ Error executing query:", err);
 			throw err;
 		}
 	};
@@ -42,12 +48,20 @@ export function useDatabase() {
 	// Ejecutar comando
 	const execute = async (sql: string, params: any[] = []): Promise<any> => {
 		try {
+			console.log("🔧 Ejecutando comando:", { sql, params });
 			const sqlite = await Database.load("sqlite:pos.db");
 			const result = await sqlite.execute(sql, params);
 			await sqlite.close();
+			console.log("✅ Comando ejecutado exitosamente");
 			return result;
-		} catch (err) {
-			console.error("Error executing command:", err);
+		} catch (err: any) {
+			// Suavizar errores comunes en operaciones idempotentes
+			const message = String(err?.message || err);
+			if (message.includes("already exists") || message.includes("duplicate column name")) {
+				console.warn("⚠️ Operación idempotente:", message);
+				return null;
+			}
+			console.error("❌ Error executing command:", err);
 			throw err;
 		}
 	};
@@ -55,26 +69,31 @@ export function useDatabase() {
 	// Obtener una fila
 	const get = async <T>(sql: string, params: any[] = []): Promise<T | undefined> => {
 		try {
+			console.log("🔍 Obteniendo fila:", { sql, params });
 			const sqlite = await Database.load("sqlite:pos.db");
 			const rows = await sqlite.select(sql, params);
 			await sqlite.close();
+			console.log("✅ Fila obtenida exitosamente");
 			return (rows as any[])[0] as T | undefined;
 		} catch (err) {
-			console.error("Error getting row:", err);
+			console.error("❌ Error getting row:", err);
 			throw err;
 		}
 	};
 
 	// Transacción
 	const transaction = async <T>(callback: (db: any) => Promise<T>): Promise<T> => {
+		console.log("🔄 Iniciando transacción");
 		const sqlite = await Database.load("sqlite:pos.db");
 		try {
 			await sqlite.execute("BEGIN TRANSACTION");
 			const result = await callback(sqlite);
 			await sqlite.execute("COMMIT");
+			console.log("✅ Transacción completada exitosamente");
 			return result;
 		} catch (err) {
 			await sqlite.execute("ROLLBACK");
+			console.error("❌ Error en transacción, haciendo rollback:", err);
 			throw err;
 		} finally {
 			await sqlite.close();
@@ -82,7 +101,11 @@ export function useDatabase() {
 	};
 
 	// Verificar si la base de datos está lista
-	const isReady = computed(() => isInitialized.value && !isLoading.value);
+	const isReady = computed(() => {
+		const ready = isInitialized.value && !isLoading.value;
+		console.log("🔍 Estado de la base de datos:", { isInitialized: isInitialized.value, isLoading: isLoading.value, isReady: ready });
+		return ready;
+	});
 
 	return {
 		isInitialized,

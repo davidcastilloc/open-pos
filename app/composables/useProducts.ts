@@ -1,4 +1,4 @@
-import { computed, ref } from "vue";
+import { computed, ref, readonly } from "vue";
 import { useCurrency } from "./useCurrency";
 import { useDatabase } from "./useDatabase";
 
@@ -50,12 +50,15 @@ export function useProducts() {
 
 	// Cargar productos
 	const loadProducts = async (page: number = 1, searchFilters: ProductFilters = {}) => {
+		console.log("🔄 loadProducts() llamado con:", { page, searchFilters });
+		console.log("🔍 Estado antes de cargar:", { isLoading: isLoading.value, productsCount: products.value.length });
 		isLoading.value = true;
 		error.value = null;
 		currentPage.value = page;
 		filters.value = { ...searchFilters };
 
 		try {
+			console.log("🔍 Cargando productos con filtros:", searchFilters);
 			let sql = `
         SELECT p.*, c.name as category_name
         FROM products p
@@ -63,60 +66,77 @@ export function useProducts() {
         WHERE p.tenant_id = ?
       `;
 			const params: any[] = ["default"];
+			console.log("🔍 SQL base:", sql);
+			console.log("🔍 Parámetros base:", params);
 
 			// Aplicar filtros
 			if (filters.value.search) {
 				sql += " AND (p.name LIKE ? OR p.sku LIKE ? OR p.barcode LIKE ?)";
 				const searchTerm = `%${filters.value.search}%`;
 				params.push(searchTerm, searchTerm, searchTerm);
+				console.log("🔍 Filtro de búsqueda aplicado:", searchTerm);
 			}
 
 			if (filters.value.category) {
 				sql += " AND p.category_id = ?";
 				params.push(filters.value.category);
+				console.log("🔍 Filtro de categoría aplicado:", filters.value.category);
 			}
 
 			if (filters.value.isActive !== undefined) {
 				sql += " AND p.is_active = ?";
 				params.push(filters.value.isActive ? 1 : 0);
+				console.log("🔍 Filtro de activo aplicado:", filters.value.isActive);
 			}
 
 			if (filters.value.minPrice !== undefined) {
 				sql += " AND p.price >= ?";
 				params.push(filters.value.minPrice);
+				console.log("🔍 Filtro de precio mínimo aplicado:", filters.value.minPrice);
 			}
 
 			if (filters.value.maxPrice !== undefined) {
 				sql += " AND p.price <= ?";
 				params.push(filters.value.maxPrice);
+				console.log("🔍 Filtro de precio máximo aplicado:", filters.value.maxPrice);
 			}
 
 			if (filters.value.inStock) {
 				sql += " AND p.stock > 0";
+				console.log("🔍 Filtro de stock aplicado: inStock");
 			}
 
 			if (filters.value.lowStock) {
 				sql += " AND p.stock > 0 AND p.stock <= p.min_stock";
+				console.log("🔍 Filtro de stock aplicado: lowStock");
 			}
 
 			if (filters.value.outOfStock) {
 				sql += " AND p.stock = 0";
+				console.log("🔍 Filtro de stock aplicado: outOfStock");
 			}
 
 			// Contar total de items
 			const countSql = sql.replace("SELECT p.*, c.name as category_name", "SELECT COUNT(*) as total");
 			const countResult = await query<any>(countSql, params);
 			totalItems.value = countResult[0]?.total || 0;
+			console.log("🔍 Total de items encontrados:", totalItems.value);
 
 			// Aplicar paginación
 			const offset = (page - 1) * itemsPerPage.value;
 			sql += " ORDER BY p.name LIMIT ? OFFSET ?";
 			params.push(itemsPerPage.value, offset);
+			console.log("🔍 Paginación aplicada:", { page, itemsPerPage: itemsPerPage.value, offset });
 
+			console.log("📝 SQL final:", sql);
+			console.log("📝 Parámetros:", params);
 			const results = await query<any>(sql, params);
+			console.log("🔍 Resultados de la consulta:", results.length, "filas");
+			console.log("🔍 Primer resultado:", results[0]);
 
 			// Mantener precios en su moneda original
 			const productsWithOriginalPrices = results.map((row: any) => {
+				console.log("🔍 Procesando fila:", { id: row.id, name: row.name, is_active: row.is_active });
 				return {
 					id: row.id,
 					tenantId: row.tenant_id,
@@ -140,11 +160,27 @@ export function useProducts() {
 
 			products.value = productsWithOriginalPrices;
 			console.log(`✅ Productos cargados: ${productsWithOriginalPrices.length}`);
+			console.log("🔍 Productos en el array:", productsWithOriginalPrices.map(p => ({ id: p.id, name: p.name, isActive: p.isActive })));
+			console.log("🔍 products.value después de asignar:", products.value.length);
+			console.log("🔍 products.value contenido:", products.value);
 		} catch (err) {
 			error.value = "Error al cargar productos";
-			console.error("Error loading products:", err);
+			console.error("❌ Error loading products:", err);
+			console.error("❌ Error details:", err);
 		} finally {
 			isLoading.value = false;
+			console.log("🔍 isLoading.value después de cargar:", isLoading.value);
+			console.log("🔍 Estado final:", { isLoading: isLoading.value, productsCount: products.value.length, error: error.value });
+			console.log("🔍 products.value final:", products.value);
+			console.log("🔍 products.value final length:", products.value.length);
+			console.log("🔍 products.value final type:", typeof products.value);
+			console.log("🔍 products.value final isArray:", Array.isArray(products.value));
+			console.log("🔍 products.value final keys:", Object.keys(products.value));
+			console.log("🔍 products.value final constructor:", products.value.constructor.name);
+			console.log("🔍 products.value final toString:", products.value.toString());
+			console.log("🔍 products.value final JSON:", JSON.stringify(products.value));
+			console.log("🔍 products.value final JSON length:", JSON.stringify(products.value).length);
+			console.log("🔍 products.value final JSON preview:", JSON.stringify(products.value).substring(0, 200));
 		}
 	};
 
@@ -423,7 +459,9 @@ export function useProducts() {
 		categories: readonly(categories),
 		isLoading: readonly(isLoading),
 		error: readonly(error),
-		currentPage: readonly(currentPage),
+		// currentPage debe ser escribible para v-model en UPagination
+		currentPage,
+		itemsPerPage: readonly(itemsPerPage),
 		totalItems: readonly(totalItems),
 		filters: readonly(filters),
 		currentCurrency: readonly(currentCurrency),

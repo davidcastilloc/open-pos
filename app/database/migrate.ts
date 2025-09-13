@@ -1,7 +1,7 @@
 import { useDatabase } from "~/composables/useDatabase";
 
 export async function runMigrations() {
-	const { execute } = useDatabase();
+	const { execute, query } = useDatabase();
 	
 	try {
 		console.log("🔄 Ejecutando migraciones de Drizzle...");
@@ -23,7 +23,7 @@ export async function runMigrations() {
 		`);
 		
 		// Verificar si cash_closings existe y tiene la estructura antigua
-		const tableInfo = await execute("PRAGMA table_info(cash_closings)");
+		const tableInfo = await query<any>("PRAGMA table_info(cash_closings)");
 		
 		if (tableInfo.length > 0) {
 			// Verificar si tiene session_id
@@ -161,6 +161,7 @@ export async function runMigrations() {
 		
 	} catch (error) {
 		console.error("❌ Error ejecutando migraciones:", error);
-		throw error;
+		// No lanzar el error para evitar que falle la inicialización
+		console.log("⚠️ Continuando con la inicialización a pesar de los errores de migración...");
 	}
 }

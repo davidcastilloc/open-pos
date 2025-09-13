@@ -1,3 +1,38 @@
+## 1.8.0 (2025-01-12)
+
+### ✨ **Nuevas Funcionalidades**
+- **Sistema de Gestión de Clientes Completo**
+  - CRUD completo de clientes con interfaz moderna
+  - Búsqueda avanzada por nombre, email, teléfono, documento
+  - Filtros por estado (activos/inactivos)
+  - Formularios inteligentes con validación en tiempo real
+  - Vista detallada de información del cliente
+  - Estadísticas en tiempo real (total, activos, inactivos)
+
+- **Integración de Clientes con POS**
+  - Selección de clientes en el modal de pago
+  - Creación rápida de clientes desde el POS
+  - Persistencia del cliente en las ventas
+  - Historial automático de compras por cliente
+
+- **Reportes de Clientes en Cierre de Caja**
+  - Estadísticas de clientes del turno
+  - Top 5 clientes por monto de compras
+  - Métricas clave (clientes atendidos, ventas, ticket promedio)
+  - Integración completa con el sistema de reportes
+
+### 🏗️ **Mejoras Técnicas**
+- **Base de datos**: Nuevas tablas `customers` y `customer_sales`
+- **Esquemas Zod**: Validación robusta para datos de clientes
+- **Composable useCustomers**: Gestión completa de clientes
+- **Índices optimizados**: Búsquedas eficientes en base de datos
+- **Migraciones**: Sistema de migraciones actualizado
+
+### 📊 **Progreso del Proyecto**
+- **Tareas completadas**: 11/12 (91.7%)
+- **Estado**: Sistema POS Completo y Funcional con Gestión de Clientes
+- **Páginas funcionando**: 7 páginas completamente operativas
+
 ## 1.7.0 (2025-09-13)
 
 * Merge pull request #17 from davidcastilloc/cursor/planear-cierre-de-caja-y-cuentas-m-ltiples-f1b1 ([89c799909aa854d4be0b10415218e364850daf68](https://github.com/davidcastilloc/open-pos/commit/89c799909aa854d4be0b10415218e364850daf68)), closes [#17](https://github.com/davidcastilloc/open-pos/issues/17)

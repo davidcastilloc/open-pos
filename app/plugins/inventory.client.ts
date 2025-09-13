@@ -6,18 +6,18 @@ export default defineNuxtPlugin(async () => {
 	try {
 		console.log('🔄 Inicializando sistema de inventario...');
 		
-		const { execute, isConnected } = useDatabase();
+		const { execute, isReady } = useDatabase();
 
 		// Esperar a que la base de datos esté conectada
 		const maxRetries = 10;
 		let retries = 0;
 		
-		while (!isConnected.value && retries < maxRetries) {
+		while (!isReady.value && retries < maxRetries) {
 			await new Promise(resolve => setTimeout(resolve, 500));
 			retries++;
 		}
 
-		if (!isConnected.value) {
+		if (!isReady.value) {
 			console.warn('⚠️ Base de datos no disponible, saltando inicialización de inventario');
 			return;
 		}

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { useDatabase } from "./useDatabase";
+import { mapPaymentMethodToBackend } from "./usePaymentMethods";
 
 // Tipos y validaciones
 export const TransactionTypeSchema = z.enum(["sale", "expense", "transfer", "adjustment"]);
@@ -16,7 +17,7 @@ const baseTxInput = {
 	description: z.string().optional(),
 	exchangeRate: z.number().positive().optional(),
 	cashierId: z.string().optional(),
-	paymentMethod: z.enum(["cash", "card", "transfer"]).optional()
+	paymentMethod: z.string().optional()
 };
 
 export const CreateSaleTxSchema = z.object({
@@ -71,6 +72,7 @@ export function useTransactions() {
 			}
 
 			const id = `tx_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+			const backendPaymentMethod = parsed.paymentMethod ? mapPaymentMethodToBackend(parsed.paymentMethod) : null;
 			await db.execute(
 				`INSERT INTO transactions (id, tenant_id, account_id, type, amount, currency, exchange_rate, reference, description, cashier_id, payment_method, created_at)
 				 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
@@ -85,7 +87,7 @@ export function useTransactions() {
 					parsed.reference ?? null,
 					parsed.description ?? null,
 					parsed.cashierId ?? null,
-					parsed.paymentMethod ?? null
+					backendPaymentMethod
 				]
 			);
 
@@ -107,6 +109,7 @@ export function useTransactions() {
 			}
 
 			const id = `tx_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+			const backendPaymentMethod = parsed.paymentMethod ? mapPaymentMethodToBackend(parsed.paymentMethod) : null;
 			await db.execute(
 				`INSERT INTO transactions (id, tenant_id, account_id, type, amount, currency, exchange_rate, reference, description, cashier_id, payment_method, created_at)
 				 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
@@ -121,7 +124,7 @@ export function useTransactions() {
 					parsed.reference ?? null,
 					parsed.description ?? null,
 					parsed.cashierId ?? null,
-					parsed.paymentMethod ?? null
+					backendPaymentMethod
 				]
 			);
 
