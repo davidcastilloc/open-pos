@@ -115,6 +115,7 @@ import { computed, ref, watch } from "vue";
 import { useAccounts } from "~/composables/useAccounts";
 import { useCashClosing } from "~/composables/useCashClosing";
 import { useCurrency } from "~/composables/useCurrency";
+import { getPaymentMethodIcon } from "~/composables/usePaymentMethods";
 
 // Props
 interface Props {

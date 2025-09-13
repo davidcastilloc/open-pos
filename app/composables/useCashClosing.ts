@@ -3,6 +3,7 @@ import { useAccounts } from "~/composables/useAccounts";
 import { useCashClosingDB, type CashClosingDBData } from "~/composables/useCashClosingDB";
 import { useDatabase } from "~/composables/useDatabase";
 import { useTransactions } from "~/composables/useTransactions";
+import { getPaymentMethodLabel } from "~/composables/usePaymentMethods";
 
 export interface CashClosingData {
 	id?: number
@@ -452,7 +453,7 @@ ${Object.entries(report.salesSummary.totalAmount).map(([currency, amount]) =>
 
 Métodos de Pago:
 ${Object.entries(report.salesSummary.paymentMethods).map(([method, amount]) =>
-	`- ${method}: ${amount.toLocaleString("es-VE")}`
+	`- ${getPaymentMethodLabel(method)}: ${amount.toLocaleString("es-VE")}`
 ).join("\n")}
 
 Saldos Finales:

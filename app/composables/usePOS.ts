@@ -2,6 +2,7 @@ import { computed, ref, readonly } from "vue";
 import { useConfig } from "./useConfig";
 import { useCurrency } from "./useCurrency";
 import { useDatabase } from "./useDatabase";
+import { mapPaymentMethodToBackend } from "./usePaymentMethods";
 
 export interface CartItem {
 	id: string
@@ -267,9 +268,10 @@ export function usePOS() {
 
 				// Registrar transacción contable de la venta
 				const txId = `tx_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+				const backendPaymentMethod = mapPaymentMethodToBackend(paymentMethod);
 				await db.execute(
-					`INSERT INTO transactions (id, tenant_id, account_id, type, amount, currency, exchange_rate, reference, description, cashier_id, sale_id, created_at)
-					 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
+					`INSERT INTO transactions (id, tenant_id, account_id, type, amount, currency, exchange_rate, reference, description, cashier_id, sale_id, payment_method, created_at)
+					 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
 					[
 						txId,
 						"default",
@@ -281,7 +283,8 @@ export function usePOS() {
 						saleId,
 						`Venta POS ${saleId}`,
 						cashierId.value,
-						saleId
+						saleId,
+						backendPaymentMethod
 					]
 				);
 

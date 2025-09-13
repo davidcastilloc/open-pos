@@ -229,6 +229,7 @@
 	import { computed, onMounted, ref } from "vue";
 	import { useCashClosing } from "~/composables/useCashClosing";
 	import { useCurrency } from "~/composables/useCurrency";
+	import { getPaymentMethodIcon, getPaymentMethodLabel } from "~/composables/usePaymentMethods";
 
 	// Composables
 	const {
@@ -275,23 +276,8 @@
 		});
 	};
 
-	const getPaymentMethodIcon = (method: string) => {
-		const icons: Record<string, string> = {
-			cash: "i-heroicons-banknotes",
-			card: "i-heroicons-credit-card",
-			transfer: "i-heroicons-arrow-path"
-		};
-		return icons[method] || "i-heroicons-question-mark-circle";
-	};
-
-	const getPaymentMethodName = (method: string) => {
-		const names: Record<string, string> = {
-			cash: "Efectivo",
-			card: "Tarjeta",
-			transfer: "Transferencia"
-		};
-		return names[method] || method;
-	};
+	// Usar las funciones del helper
+	const getPaymentMethodName = getPaymentMethodLabel;
 
 	const goBack = () => {
 		navigateTo("/");

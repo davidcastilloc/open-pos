@@ -426,6 +426,7 @@
 	import { useCashClosing } from "~/composables/useCashClosing";
 	import { usePOS } from "~/composables/usePOS";
 	import { useProducts } from "~/composables/useProducts";
+	import { PAYMENT_METHOD_OPTIONS } from "~/composables/usePaymentMethods";
 
 	// Composables
 	const {
@@ -471,7 +472,7 @@
 	const discountInput = ref("");
 	const showPaymentModal = ref(false);
 	const showExpenseModal = ref(false);
-	const selectedPaymentMethod = ref({ label: "Efectivo", value: "cash" });
+	const selectedPaymentMethod = ref({ label: "Efectivo", value: "cash" as const });
 	const selectedPaymentAccount = ref<{ label: string, value: string } | undefined>(undefined);
 
 	// Cargar cuentas de pago usando el composable useAccounts
@@ -496,13 +497,7 @@
 		{ label: "Euros (EUR)", value: "EUR" }
 	];
 
-	const paymentMethods = [
-		{ label: "Efectivo", value: "cash" },
-		{ label: "Tarjeta de Débito", value: "debit_card" },
-		{ label: "Tarjeta de Crédito", value: "credit_card" },
-		{ label: "Transferencia", value: "transfer" },
-		{ label: "Pago Móvil", value: "mobile_payment" }
-	];
+	const paymentMethods = PAYMENT_METHOD_OPTIONS;
 
 	// Configuración de paginación
 	const itemsPerPage = 20;
@@ -627,7 +622,7 @@
 			await loadProducts(currentPage.value, filters);
 
 			showPaymentModal.value = false;
-			selectedPaymentMethod.value = { label: "Efectivo", value: "cash" };
+			selectedPaymentMethod.value = { label: "Efectivo", value: "cash" as const };
 			selectedPaymentAccount.value = undefined;
 			discountInput.value = ""; // Limpiar descuento después de la venta
 			// TODO: Mostrar mensaje de éxito
