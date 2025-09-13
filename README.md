@@ -1,5 +1,3 @@
-![logo](./public/logo.png){ width=150 }
-
 # POS System
 
 Un sistema POS abierto para terminales de punto de venta y otros dispositivos.
@@ -26,6 +24,8 @@ Construido con [Nuxt 4](https://nuxt.com) y [Tauri 2](https://v2.tauri.app).
 - [Nuxt UI 3](https://ui.nuxt.com)
 - [Zod](https://zod.dev)
 - [TypeScript](https://www.typescriptlang.org)
+- [Drizzle ORM + SQLite](https://orm.drizzle.team)
+- [Tailwind CSS](https://tailwindcss.com)
 - ESLint con [@antfu/eslint-config](https://github.com/antfu/eslint-config)
 - Auto imports (también para APIs de Tauri)
 
@@ -52,7 +52,7 @@ Construido con [Nuxt 4](https://nuxt.com) y [Tauri 2](https://v2.tauri.app).
 
 ### 💰 **Sistema Multi-Moneda**
 - **Conversión automática** entre BS, USD, EUR
-- **Tasas de cambio** en tiempo real
+- **Tasas de cambio** con actualización manual (integración preparada BCV/DolarToday)
 - **Formateo local** según estándares venezolanos
 - **Histórico de tasas** de cambio
 
@@ -69,7 +69,7 @@ Construido con [Nuxt 4](https://nuxt.com) y [Tauri 2](https://v2.tauri.app).
 
 ### 🏠 **Dashboard Principal** (`/`)
 - Estado del sistema y base de datos
-- Tasas de cambio en tiempo real
+- Tasas de cambio con actualización manual
 - Acciones rápidas y navegación
 
 ### 🏪 **Punto de Venta** (`/pos`)
@@ -149,6 +149,14 @@ pnpm tauri:build
 
 ---
 
+## 🎨 Guías de UI
+
+- Uso de Nuxt UI v3 con modales: `v-model:open` + `<template #content>` + `UCard`.
+- Sin colores explícitos en clases Tailwind: usar solo clases estructurales; colores semánticos únicamente en componentes de Nuxt UI (`color="primary|secondary|success|warning|error|info|neutral"`).
+- Detalles completos en `docs/ui-guidelines.md`.
+
+---
+
 ## 🧭 Documentación
 
 - Documentación ampliada en `docs/README.md`:
@@ -156,12 +164,14 @@ pnpm tauri:build
   - Base de datos y migraciones
   - Integración Tauri y plugins
   - Gestión de productos e inventario
+  - Guías de UI y reglas de colores (`docs/ui-guidelines.md`)
   - Testing y calidad
   - Versionado y releases
   - Variables de entorno y scripts
 
 Documentos relacionados en la raíz:
 - `ESTADO-ACTUAL-PROYECTO.md`, `ROADMAP-TAREAS-DESARROLLO.md`
+- `RESUMEN-EJECUTIVO-v1.9.0.md`
 - `INTERFAZ-POS-COMPLETADA.md`, `GESTION-PRODUCTOS-COMPLETADA.md`
 - `CRUD-PRODUCTOS-COMPLETADO.md` - Documentación detallada del CRUD de productos
 - `BASE-DE-DATOS-INICIALIZADA.md`, `SEMANTIC-RELEASE-FIX.md`

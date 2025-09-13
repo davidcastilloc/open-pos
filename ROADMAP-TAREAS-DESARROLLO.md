@@ -418,3 +418,34 @@
 ---
 
 *Este roadmap se actualizará semanalmente conforme avance el desarrollo y se reciban feedback de usuarios y stakeholders.*
+
+---
+
+## 🔭 **Siguientes Fases Priorizadas (post v1.11.0)**
+
+> Detalle en `docs/kanban-siguientes-fases.md`. Mantener reglas UI (sin colores explícitos; modales con `v-model:open` + `#content` + `UCard`).
+
+### 🥇 Cerrar MVP (Alta prioridad)
+1. Devoluciones (parciales/totales con trazabilidad)
+   - Áreas: `app/composables/useTransactions.ts`, `app/pages/pos.vue`, `app/database/schema/`
+2. Tickets/Facturas (impresión básica + exportación)
+   - Áreas: `app/pages/pos.vue`, `app/components/`, `src-tauri/`
+3. Exportación CSV (ventas del día, productos)
+   - Áreas: `app/pages/cash-closing.vue`, `app/pages/products.vue`
+4. Tasas automáticas BCV/DolarToday + histórico
+   - Áreas: `app/composables/useCurrency.ts`, `app/plugins/currency.client.ts`, `app/database/`
+5. Auditoría de cierre (estado `audited`)
+   - Áreas: `app/pages/cash-closing.vue`, `app/composables/useCashClosing.ts`
+
+### 🥈 SaaS Core (Media prioridad)
+1. Autenticación y roles (RBAC básico)
+2. Sincronización básica (cola local + API)
+3. Dashboard KPIs básicos
+4. API pública mínima
+5. Multi-sucursal básico
+
+### 🥉 Premium/Enterprise (Baja prioridad)
+1. Analítica avanzada e IA
+2. Integraciones (facturación, e‑commerce, contabilidad)
+3. Seguridad/compliance avanzado
+4. Fidelización y marketing
