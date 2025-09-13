@@ -2,8 +2,8 @@ export default defineNuxtPlugin({
 	name: "ui-colors",
 	setup() {
 		// Configuración de colores para el tema del POS
-		const primaryColor = "green";
-		const neutralColor = "zinc";
+		const _primaryColor = "green";
+		const _neutralColor = "zinc";
 
 		// Inyectar CSS personalizado para los colores del tema
 		if (import.meta.client) {

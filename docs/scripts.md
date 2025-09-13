@@ -25,5 +25,3 @@ pnpm test:semantic-release
 - `scripts/sync-production-branch.sh` — sincroniza rama `production`
 - `scripts/update-version.ts` — actualiza `public/version.json`
 - `scripts/db-utils.js`, `scripts/simple-db.js` — utilidades de BD
-
-

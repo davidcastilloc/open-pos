@@ -274,8 +274,8 @@
 										<UButton
 											variant="ghost"
 											size="sm"
-											@click="editProduct(product)"
 											title="Editar producto"
+											@click="editProduct(product)"
 										>
 											<UIcon name="i-heroicons-pencil" />
 										</UButton>
@@ -283,8 +283,8 @@
 											variant="ghost"
 											size="sm"
 											:color="product.isActive ? 'warning' : 'success'"
-											@click="handleToggleStatus(product)"
 											:title="product.isActive ? 'Desactivar producto' : 'Activar producto'"
+											@click="handleToggleStatus(product)"
 										>
 											<UIcon :name="product.isActive ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'" />
 										</UButton>
@@ -292,8 +292,8 @@
 											variant="ghost"
 											size="sm"
 											color="error"
-											@click="handleDeleteProduct(product)"
 											title="Eliminar producto"
+											@click="handleDeleteProduct(product)"
 										>
 											<UIcon name="i-heroicons-trash" />
 										</UButton>
@@ -455,13 +455,13 @@
 	const showOutOfStock = ref(false);
 	const itemsPerPage = ref({ label: "20", value: 20 });
 	const showCreateModal = ref(false);
-		const showDeleteModal = ref(false);
-		const showToggleModal = ref(false);
-		const editingProduct = ref<any>(null);
-		const productToDelete = ref<any>(null);
-		const productToToggle = ref<any>(null);
-		const isDeleting = ref(false);
-		const isToggling = ref(false);
+	const showDeleteModal = ref(false);
+	const showToggleModal = ref(false);
+	const editingProduct = ref<any>(null);
+	const productToDelete = ref<any>(null);
+	const productToToggle = ref<any>(null);
+	const isDeleting = ref(false);
+	const isToggling = ref(false);
 
 	// Opciones para selects
 	const categoryOptions = computed(() => [
@@ -483,7 +483,7 @@
 	];
 
 	// Computed properties
-	const currentCurrency = ref("BS");
+	// const currentCurrency = ref("BS");
 
 	const productsWithStock = computed(() => {
 		return products.value.filter((p) => p.stock > 0).length;
@@ -665,5 +665,4 @@
 	watch(itemsPerPage, () => {
 		loadProducts(1, {});
 	});
-
 </script>

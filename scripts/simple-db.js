@@ -10,7 +10,7 @@ const param = process.argv[3];
 
 switch (command) {
 	case "tables":
-	case "ls":
+	case "ls": {
 		console.log("📋 Tablas disponibles:");
 		const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE '__%'").all();
 		tables.forEach((table, index) => {
@@ -18,8 +18,8 @@ switch (command) {
 			console.log(`  ${index + 1}. ${table.name} (${count.count} registros)`);
 		});
 		break;
-
-	case "show":
+	}
+	case "show": {
 		if (!param) {
 			console.log("❌ Especifica el nombre de la tabla: node scripts/simple-db.js show <tabla>");
 			break;
@@ -32,12 +32,12 @@ switch (command) {
 			} else {
 				console.table(data);
 			}
-		} catch (error) {
-			console.log(`❌ Error: ${error.message}`);
+		} catch (e) {
+			console.log(`❌ Error: ${e.message}`);
 		}
 		break;
-
-	case "test":
+	}
+	case "test": {
 		console.log("🧪 Insertando datos de prueba...");
 
 		// Productos de prueba
@@ -65,8 +65,8 @@ switch (command) {
 		}
 		console.log("✅ Datos de prueba insertados");
 		break;
-
-	case "clear":
+	}
+	case "clear": {
 		if (!param) {
 			console.log("❌ Especifica el nombre de la tabla: node scripts/simple-db.js clear <tabla>");
 			break;
@@ -75,8 +75,8 @@ switch (command) {
 		const result = db.prepare(`DELETE FROM ${param}`).run();
 		console.log(`✅ ${result.changes} registros eliminados`);
 		break;
-
-	case "sql":
+	}
+	case "sql": {
 		if (!param) {
 			console.log("❌ Especifica el SQL: node scripts/simple-db.js sql \"SELECT * FROM products\"");
 			break;
@@ -85,12 +85,12 @@ switch (command) {
 		try {
 			const result = db.prepare(param).all();
 			console.table(result);
-		} catch (error) {
-			console.log(`❌ Error: ${error.message}`);
+		} catch (e) {
+			console.log(`❌ Error: ${e.message}`);
 		}
 		break;
-
-	default:
+	}
+	default: {
 		console.log("\n📖 Comandos disponibles:");
 		console.log("  tables, ls          - Mostrar todas las tablas");
 		console.log("  show <tabla>        - Mostrar contenido de una tabla");
@@ -104,6 +104,7 @@ switch (command) {
 		console.log("  node scripts/simple-db.js test");
 		console.log("  node scripts/simple-db.js clear products");
 		break;
+	}
 }
 
 db.close();

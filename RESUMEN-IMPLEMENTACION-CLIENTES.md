@@ -91,12 +91,12 @@ CREATE TABLE customer_sales (
 ```typescript
 // Validación robusta con Zod
 export const CustomerSchema = z.object({
-    id: z.string().uuid(),
-    tenantId: z.string().default("default"),
-    name: z.string().min(1).max(100),
-    email: z.string().email().optional(),
-    phone: z.string().optional(),
-    // ... más campos
+	id: z.string().uuid(),
+	tenantId: z.string().default("default"),
+	name: z.string().min(1).max(100),
+	email: z.string().email().optional(),
+	phone: z.string().optional()
+	// ... más campos
 });
 ```
 
@@ -104,24 +104,24 @@ export const CustomerSchema = z.object({
 ```typescript
 // Funcionalidades principales
 export const useCustomers = () => {
-    return {
-        // CRUD
-        createCustomer,
-        getCustomers,
-        getCustomer,
-        updateCustomer,
-        deleteCustomer,
-        
-        // Búsqueda y estadísticas
-        searchCustomers,
-        getCustomerStats,
-        getCustomerSales,
-        
-        // Estado reactivo
-        customers,
-        loading,
-        error
-    };
+	return {
+		// CRUD
+		createCustomer,
+		getCustomers,
+		getCustomer,
+		updateCustomer,
+		deleteCustomer,
+
+		// Búsqueda y estadísticas
+		searchCustomers,
+		getCustomerStats,
+		getCustomerSales,
+
+		// Estado reactivo
+		customers,
+		loading,
+		error
+	};
 };
 ```
 

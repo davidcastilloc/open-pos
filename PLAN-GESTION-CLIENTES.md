@@ -61,25 +61,25 @@ CREATE TABLE customer_sales (
 ```typescript
 // app/schemas/customer.ts
 export const CustomerSchema = z.object({
-    id: z.string().uuid(),
-    tenantId: z.string().default('default'),
-    name: z.string().min(1).max(100),
-    email: z.string().email().optional(),
-    phone: z.string().optional(),
-    address: z.string().optional(),
-    documentType: z.enum(['cedula', 'rif', 'passport']).optional(),
-    documentNumber: z.string().optional(),
-    birthDate: z.date().optional(),
-    notes: z.string().optional(),
-    isActive: z.boolean().default(true),
-    createdAt: z.date(),
-    updatedAt: z.date()
+	id: z.string().uuid(),
+	tenantId: z.string().default("default"),
+	name: z.string().min(1).max(100),
+	email: z.string().email().optional(),
+	phone: z.string().optional(),
+	address: z.string().optional(),
+	documentType: z.enum(["cedula", "rif", "passport"]).optional(),
+	documentNumber: z.string().optional(),
+	birthDate: z.date().optional(),
+	notes: z.string().optional(),
+	isActive: z.boolean().default(true),
+	createdAt: z.date(),
+	updatedAt: z.date()
 });
 
 export const CreateCustomerSchema = CustomerSchema.omit({
-    id: true,
-    createdAt: true,
-    updatedAt: true
+	id: true,
+	createdAt: true,
+	updatedAt: true
 });
 
 export const UpdateCustomerSchema = CreateCustomerSchema.partial();
@@ -90,19 +90,19 @@ export const UpdateCustomerSchema = CreateCustomerSchema.partial();
 // app/composables/useCustomers.ts
 export const useCustomers = () => {
     const { db } = useDatabase();
-    
+
     // CRUD operations
     const createCustomer = async (data: CreateCustomerInput) => { ... };
     const getCustomers = async () => { ... };
     const getCustomer = async (id: string) => { ... };
     const updateCustomer = async (id: string, data: UpdateCustomerInput) => { ... };
     const deleteCustomer = async (id: string) => { ... };
-    
+
     // Business logic
     const getCustomerSales = async (customerId: string) => { ... };
     const getCustomerStats = async (customerId: string) => { ... };
     const searchCustomers = async (query: string) => { ... };
-    
+
     return {
         createCustomer,
         getCustomers,

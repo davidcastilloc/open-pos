@@ -49,6 +49,11 @@
 						<UIcon name="i-heroicons-plus-circle" />
 						Insertar Datos
 					</UButton>
+
+					<UButton :loading="drizzleTestLoading" size="sm" @click="testDrizzleProxy">
+						<UIcon name="i-heroicons-bug-ant" />
+						Probar Drizzle (db.query)
+					</UButton>
 				</div>
 
 				<!-- Resultados de las pruebas -->
@@ -115,7 +120,7 @@
 						<UBadge
 							v-for="currency in getCurrencyConfig.supportedCurrencies"
 							:key="currency"
-							:color="currency === getCurrencyConfig.defaultCurrency ? 'primary' : 'gray'"
+							:color="currency === getCurrencyConfig.defaultCurrency ? 'primary' : 'neutral'"
 						>
 							{{ currency }}
 						</UBadge>
@@ -238,7 +243,7 @@
 						IVA:
 					</h3>
 					<div class="flex items-center gap-2">
-						<UBadge :color="getTaxConfig.iva.isActive ? 'green' : 'red'">
+						<UBadge :color="getTaxConfig.iva.isActive ? 'success' : 'error'">
 							{{ (getTaxConfig.iva.rate * 100).toFixed(1) }}%
 						</UBadge>
 						<span class="text-sm opacity-75">{{ getTaxConfig.iva.description }}</span>
@@ -250,7 +255,7 @@
 						ISLR:
 					</h3>
 					<div class="flex items-center gap-2">
-						<UBadge :color="getTaxConfig.islr.isActive ? 'green' : 'red'">
+						<UBadge :color="getTaxConfig.islr.isActive ? 'success' : 'error'">
 							{{ (getTaxConfig.islr.rate * 100).toFixed(1) }}%
 						</UBadge>
 						<span class="text-sm opacity-75">{{ getTaxConfig.islr.description }}</span>
@@ -263,7 +268,7 @@
 
 <script setup lang="ts">
 // Composables
-	const { isReady, isLoading, error, query, execute } = useDatabase();
+	const { isReady, isLoading, error, query, execute, orm } = useDatabase();
 	const { getCurrencyConfig, getTaxConfig } = useConfig();
 	const {
 		currentRates,
@@ -279,6 +284,7 @@
 	const dbTestLoading = ref(false);
 	const tableTestLoading = ref(false);
 	const insertTestLoading = ref(false);
+	const drizzleTestLoading = ref(false);
 	const dbTestResults = ref("");
 
 	// Información de la base de datos
@@ -342,16 +348,17 @@
 		dbTestResults.value = "";
 
 		try {
-			const tables = await query(`
+			const tables = await query<{ name: string }>(`
       SELECT name FROM sqlite_master 
       WHERE type='table' AND name NOT LIKE 'sqlite_%'
       ORDER BY name
     `);
 
-			const tableCounts = [];
+			const tableCounts: string[] = [];
 			for (const table of tables) {
-				const count = await query(`SELECT COUNT(*) as count FROM ${table.name}`);
-				tableCounts.push(`${table.name}: ${count[0].count} registros`);
+				const countRows = await query<{ count: number }>(`SELECT COUNT(*) as count FROM ${table.name}`);
+				const cnt = (countRows && countRows.length > 0 && typeof countRows[0]?.count === "number") ? countRows[0].count : 0;
+				tableCounts.push(`${table.name}: ${cnt} registros`);
 			}
 
 			dbTestResults.value = `📊 Tablas encontradas (${tables.length}):\n${tableCounts.join("\n")}`;
@@ -386,26 +393,44 @@
 		}
 	};
 
+	// Función para probar drizzle proxy usando db.query
+	const testDrizzleProxy = async () => {
+		drizzleTestLoading.value = true;
+		dbTestResults.value = "";
+
+		try {
+			const db = await orm();
+			console.log("🔍 Drizzle db.query OK", db);
+			// Consulta simple usando el query builder de Drizzle
+			const rows = await db.query.products.findMany({ limit: 5 });
+			dbTestResults.value = `✅ Drizzle db.query OK (top 5 products):\n${JSON.stringify(rows, null, 2)}`;
+		} catch (err) {
+			dbTestResults.value = `❌ Error Drizzle db.query: ${err}`;
+		} finally {
+			drizzleTestLoading.value = false;
+		}
+	};
+
 	// Función para cargar información de la base de datos
 	const loadDatabaseInfo = async () => {
 		if (!isReady.value) return;
 
 		try {
 			// Cargar tablas reales
-			const tables = await query(`
+			const tables = await query<{ name: string }>(`
       SELECT name FROM sqlite_master 
       WHERE type='table' AND name NOT LIKE 'sqlite_%'
       ORDER BY name
     `);
-			systemTables.value = tables.map((t) => t.name);
+			systemTables.value = tables.map((t: { name: string }) => t.name);
 
 			// Cargar configuración real
-			const configs = await query(`
+			const configs = await query<{ key: string, value: string }>(`
       SELECT key, value FROM system_config 
       WHERE tenant_id = 'default' AND category = 'general'
       ORDER BY key
     `);
-			defaultConfigs.value = configs.map((c) => ({ key: c.key, value: c.value }));
+			defaultConfigs.value = configs.map((c: { key: string, value: string }) => ({ key: c.key, value: c.value }));
 		} catch (err) {
 			console.error("Error cargando información de la base de datos:", err);
 		}
@@ -422,5 +447,4 @@
 			loadDatabaseInfo();
 		}
 	});
-
 </script>

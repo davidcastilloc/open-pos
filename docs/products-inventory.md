@@ -60,5 +60,3 @@ Donde `quantity` ya incorpora el signo según el tipo de movimiento.
 
 - Tabla de movimientos (ver `app/database/schema/inventory.ts` si aplica) o consolidado en ventas.
 - Actualización de `stock` en `products` bajo transacción.
-
-

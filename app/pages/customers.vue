@@ -5,16 +5,18 @@
 			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div class="flex justify-between items-center py-6">
 					<div>
-						<h1 class="text-2xl font-bold text-gray-900">Gestión de Clientes</h1>
+						<h1 class="text-2xl font-bold text-gray-900">
+							Gestión de Clientes
+						</h1>
 						<p class="mt-1 text-sm text-gray-500">
 							Administra la información de tus clientes
 						</p>
 					</div>
 					<UButton
-						@click="openCreateModal"
 						icon="i-heroicons-plus"
 						color="primary"
 						size="lg"
+						@click="openCreateModal"
 					>
 						Nuevo Cliente
 					</UButton>
@@ -32,8 +34,12 @@
 							<UIcon name="i-heroicons-users" class="h-8 w-8 text-blue-600" />
 						</div>
 						<div class="ml-4">
-							<p class="text-sm font-medium text-gray-500">Total Clientes</p>
-							<p class="text-2xl font-semibold text-gray-900">{{ totalCustomers }}</p>
+							<p class="text-sm font-medium text-gray-500">
+								Total Clientes
+							</p>
+							<p class="text-2xl font-semibold text-gray-900">
+								{{ totalCustomers }}
+							</p>
 						</div>
 					</div>
 				</UCard>
@@ -44,8 +50,12 @@
 							<UIcon name="i-heroicons-user-check" class="h-8 w-8 text-green-600" />
 						</div>
 						<div class="ml-4">
-							<p class="text-sm font-medium text-gray-500">Clientes Activos</p>
-							<p class="text-2xl font-semibold text-gray-900">{{ activeCustomers.length }}</p>
+							<p class="text-sm font-medium text-gray-500">
+								Clientes Activos
+							</p>
+							<p class="text-2xl font-semibold text-gray-900">
+								{{ activeCustomers.length }}
+							</p>
 						</div>
 					</div>
 				</UCard>
@@ -56,8 +66,12 @@
 							<UIcon name="i-heroicons-user-minus" class="h-8 w-8 text-gray-600" />
 						</div>
 						<div class="ml-4">
-							<p class="text-sm font-medium text-gray-500">Clientes Inactivos</p>
-							<p class="text-2xl font-semibold text-gray-900">{{ inactiveCustomers.length }}</p>
+							<p class="text-sm font-medium text-gray-500">
+								Clientes Inactivos
+							</p>
+							<p class="text-2xl font-semibold text-gray-900">
+								{{ inactiveCustomers.length }}
+							</p>
 						</div>
 					</div>
 				</UCard>
@@ -68,8 +82,12 @@
 							<UIcon name="i-heroicons-magnifying-glass" class="h-8 w-8 text-purple-600" />
 						</div>
 						<div class="ml-4">
-							<p class="text-sm font-medium text-gray-500">Búsquedas</p>
-							<p class="text-2xl font-semibold text-gray-900">{{ searchResults.length }}</p>
+							<p class="text-sm font-medium text-gray-500">
+								Búsquedas
+							</p>
+							<p class="text-2xl font-semibold text-gray-900">
+								{{ searchResults.length }}
+							</p>
 						</div>
 					</div>
 				</UCard>
@@ -94,9 +112,9 @@
 							@change="handleFilter"
 						/>
 						<UButton
-							@click="clearFilters"
 							variant="outline"
 							icon="i-heroicons-x-mark"
+							@click="clearFilters"
 						>
 							Limpiar
 						</UButton>
@@ -112,16 +130,20 @@
 
 				<div v-else-if="error" class="text-center py-8">
 					<UIcon name="i-heroicons-exclamation-triangle" class="h-12 w-12 text-red-500 mx-auto mb-4" />
-					<p class="text-red-600">{{ error }}</p>
-					<UButton @click="loadCustomers" class="mt-4" color="red" variant="outline">
+					<p class="text-red-600">
+						{{ error }}
+					</p>
+					<UButton class="mt-4" color="red" variant="outline" @click="loadCustomers">
 						Reintentar
 					</UButton>
 				</div>
 
 				<div v-else-if="displayedCustomers.length === 0" class="text-center py-8">
 					<UIcon name="i-heroicons-users" class="h-12 w-12 text-gray-400 mx-auto mb-4" />
-					<p class="text-gray-500">No se encontraron clientes</p>
-					<UButton @click="openCreateModal" class="mt-4" color="primary">
+					<p class="text-gray-500">
+						No se encontraron clientes
+					</p>
+					<UButton class="mt-4" color="primary" @click="openCreateModal">
 						Crear Primer Cliente
 					</UButton>
 				</div>
@@ -188,8 +210,12 @@
 									</td>
 									<td class="px-6 py-4 whitespace-nowrap">
 										<div v-if="customer.documentType && customer.documentNumber" class="text-sm text-gray-900">
-											<div class="font-medium">{{ getDocumentTypeLabel(customer.documentType) }}</div>
-											<div class="text-gray-500">{{ customer.documentNumber }}</div>
+											<div class="font-medium">
+												{{ getDocumentTypeLabel(customer.documentType) }}
+											</div>
+											<div class="text-gray-500">
+												{{ customer.documentNumber }}
+											</div>
 										</div>
 										<div v-else class="text-sm text-gray-400">
 											Sin documento
@@ -209,29 +235,29 @@
 									<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
 										<div class="flex justify-end gap-2">
 											<UButton
-												@click="viewCustomer(customer)"
 												icon="i-heroicons-eye"
 												size="sm"
 												variant="ghost"
 												color="blue"
+												@click="viewCustomer(customer)"
 											>
 												Ver
 											</UButton>
 											<UButton
-												@click="editCustomer(customer)"
 												icon="i-heroicons-pencil"
 												size="sm"
 												variant="ghost"
 												color="yellow"
+												@click="editCustomer(customer)"
 											>
 												Editar
 											</UButton>
 											<UButton
-												@click="deleteCustomer(customer)"
 												icon="i-heroicons-trash"
 												size="sm"
 												variant="ghost"
-												color="red"
+												color="error"
+												@click="requestDeleteCustomer(customer)"
 											>
 												Eliminar
 											</UButton>
@@ -254,10 +280,10 @@
 							{{ isEditing ? 'Editar Cliente' : 'Nuevo Cliente' }}
 						</h3>
 						<UButton
-							@click="closeModal"
 							icon="i-heroicons-x-mark"
 							variant="ghost"
 							color="gray"
+							@click="closeModal"
 						/>
 					</div>
 				</template>
@@ -265,8 +291,8 @@
 				<UForm
 					:schema="customerSchema"
 					:state="formState"
-					@submit="handleSubmit"
 					class="space-y-4"
+					@submit="handleSubmit"
 				>
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<UFormGroup label="Nombre *" name="name">
@@ -315,7 +341,7 @@
 
 					<template #footer>
 						<div class="flex justify-end gap-3">
-							<UButton @click="closeModal" variant="outline">
+							<UButton variant="outline" @click="closeModal">
 								Cancelar
 							</UButton>
 							<UButton type="submit" :loading="loading" color="primary">
@@ -332,12 +358,14 @@
 			<UCard>
 				<template #header>
 					<div class="flex items-center justify-between">
-						<h3 class="text-lg font-semibold">Detalles del Cliente</h3>
+						<h3 class="text-lg font-semibold">
+							Detalles del Cliente
+						</h3>
 						<UButton
-							@click="closeViewModal"
 							icon="i-heroicons-x-mark"
 							variant="ghost"
 							color="gray"
+							@click="closeViewModal"
 						/>
 					</div>
 				</template>
@@ -351,7 +379,9 @@
 							</div>
 						</div>
 						<div class="flex-1">
-							<h4 class="text-xl font-semibold text-gray-900">{{ selectedCustomer.name }}</h4>
+							<h4 class="text-xl font-semibold text-gray-900">
+								{{ selectedCustomer.name }}
+							</h4>
 							<p class="text-sm text-gray-500">
 								Registrado el {{ formatDate(selectedCustomer.createdAt) }}
 							</p>
@@ -368,7 +398,9 @@
 					<!-- Contact Info -->
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 						<div>
-							<h5 class="text-sm font-medium text-gray-900 mb-3">Información de Contacto</h5>
+							<h5 class="text-sm font-medium text-gray-900 mb-3">
+								Información de Contacto
+							</h5>
 							<div class="space-y-2">
 								<div v-if="selectedCustomer.email" class="flex items-center">
 									<UIcon name="i-heroicons-envelope" class="h-4 w-4 text-gray-400 mr-2" />
@@ -386,7 +418,9 @@
 						</div>
 
 						<div>
-							<h5 class="text-sm font-medium text-gray-900 mb-3">Documento</h5>
+							<h5 class="text-sm font-medium text-gray-900 mb-3">
+								Documento
+							</h5>
 							<div v-if="selectedCustomer.documentType && selectedCustomer.documentNumber" class="space-y-2">
 								<div class="text-sm text-gray-600">
 									<span class="font-medium">{{ getDocumentTypeLabel(selectedCustomer.documentType) }}:</span>
@@ -405,7 +439,9 @@
 
 					<!-- Notes -->
 					<div v-if="selectedCustomer.notes">
-						<h5 class="text-sm font-medium text-gray-900 mb-3">Notas</h5>
+						<h5 class="text-sm font-medium text-gray-900 mb-3">
+							Notas
+						</h5>
 						<p class="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
 							{{ selectedCustomer.notes }}
 						</p>
@@ -414,11 +450,43 @@
 
 				<template #footer>
 					<div class="flex justify-end gap-3">
-						<UButton @click="closeViewModal" variant="outline">
+						<UButton variant="outline" @click="closeViewModal">
 							Cerrar
 						</UButton>
-						<UButton @click="editCustomer(selectedCustomer)" color="primary">
+						<UButton color="primary" @click="editCustomer(selectedCustomer)">
 							Editar Cliente
+						</UButton>
+					</div>
+				</template>
+			</UCard>
+		</UModal>
+
+		<!-- Delete Confirm Modal -->
+		<UModal v-model="isDeleteModalOpen" :ui="{ width: 'sm:max-w-md' }">
+			<UCard>
+				<template #header>
+					<h3 class="text-lg font-semibold">
+						Confirmar Eliminación
+					</h3>
+				</template>
+				<div class="space-y-4">
+					<p>¿Estás seguro de que quieres eliminar este cliente?</p>
+					<div v-if="customerToDelete" class="rounded-lg p-4 border">
+						<h4 class="font-medium">
+							{{ customerToDelete.name }}
+						</h4>
+						<p class="text-sm opacity-75">
+							Esta acción no se puede deshacer.
+						</p>
+					</div>
+				</div>
+				<template #footer>
+					<div class="flex gap-3 justify-end">
+						<UButton variant="outline" @click="isDeleteModalOpen = false">
+							Cancelar
+						</UButton>
+						<UButton color="error" :loading="loading" @click="confirmDeleteCustomer">
+							Eliminar
 						</UButton>
 					</div>
 				</template>
@@ -428,121 +496,44 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
-import { useCustomers } from "~/composables/useCustomers";
-import { CreateCustomerSchema, UpdateCustomerSchema } from "~/schemas/customer";
-import type { Customer, CreateCustomerInput, UpdateCustomerInput } from "~/schemas/customer";
+	import type { CreateCustomerInput, Customer, UpdateCustomerInput } from "~/schemas/customer";
+	import { computed, onMounted, ref } from "vue";
+	import { useCustomers } from "~/composables/useCustomers";
+	import { CreateCustomerSchema, UpdateCustomerSchema } from "~/schemas/customer";
 
-// Meta
-useHead({
-	title: "Gestión de Clientes - POS Venezuela"
-});
+	// Meta
+	useHead({
+		title: "Gestión de Clientes - POS Venezuela"
+	});
 
-// Composables
-const {
-	customers,
-	loading,
-	error,
-	activeCustomers,
-	inactiveCustomers,
-	totalCustomers,
-	createCustomer,
-	getCustomers,
-	updateCustomer,
-	deleteCustomer: deleteCustomerComposable,
-	searchCustomers
-} = useCustomers();
+	// Composables
+	const {
+		customers,
+		loading,
+		error,
+		activeCustomers,
+		inactiveCustomers,
+		totalCustomers,
+		createCustomer,
+		getCustomers,
+		updateCustomer,
+		deleteCustomer: deleteCustomerComposable,
+		searchCustomers
+	} = useCustomers();
 
-// State
-const searchQuery = ref("");
-const statusFilter = ref("all");
-const searchResults = ref<Customer[]>([]);
-const isModalOpen = ref(false);
-const isViewModalOpen = ref(false);
-const isEditing = ref(false);
-const selectedCustomer = ref<Customer | null>(null);
+	// State
+	const searchQuery = ref("");
+	const statusFilter = ref("all");
+	const searchResults = ref<Customer[]>([]);
+	const isModalOpen = ref(false);
+	const isViewModalOpen = ref(false);
+	const isDeleteModalOpen = ref(false);
+	const isEditing = ref(false);
+	const selectedCustomer = ref<Customer | null>(null);
+	const customerToDelete = ref<Customer | null>(null);
 
-// Form state
-const formState = ref<CreateCustomerInput | UpdateCustomerInput>({
-	name: "",
-	email: "",
-	phone: "",
-	address: "",
-	documentType: undefined,
-	documentNumber: "",
-	birthDate: "",
-	notes: "",
-	isActive: true
-});
-
-// Options
-const statusOptions = [
-	{ label: "Todos", value: "all" },
-	{ label: "Activos", value: "active" },
-	{ label: "Inactivos", value: "inactive" }
-];
-
-const documentTypeOptions = [
-	{ label: "Cédula", value: "cedula" },
-	{ label: "RIF", value: "rif" },
-	{ label: "Pasaporte", value: "passport" }
-];
-
-// Schema for validation
-const customerSchema = isEditing.value ? UpdateCustomerSchema : CreateCustomerSchema;
-
-// Computed
-const displayedCustomers = computed(() => {
-	if (searchQuery.value) {
-		return searchResults.value;
-	}
-	
-	if (statusFilter.value === "active") {
-		return activeCustomers.value;
-	} else if (statusFilter.value === "inactive") {
-		return inactiveCustomers.value;
-	}
-	
-	return customers.value;
-});
-
-// Methods
-const loadCustomers = async () => {
-	try {
-		await getCustomers(false); // Load all customers (active and inactive)
-	} catch (err) {
-		console.error("Error loading customers:", err);
-	}
-};
-
-const handleSearch = async () => {
-	if (!searchQuery.value.trim()) {
-		searchResults.value = [];
-		return;
-	}
-
-	try {
-		searchResults.value = await searchCustomers(searchQuery.value, statusFilter.value !== "inactive");
-	} catch (err) {
-		console.error("Error searching customers:", err);
-	}
-};
-
-const handleFilter = () => {
-	if (searchQuery.value) {
-		handleSearch();
-	}
-};
-
-const clearFilters = () => {
-	searchQuery.value = "";
-	statusFilter.value = "all";
-	searchResults.value = [];
-};
-
-const openCreateModal = () => {
-	isEditing.value = false;
-	formState.value = {
+	// Form state
+	const formState = ref<CreateCustomerInput | UpdateCustomerInput>({
 		name: "",
 		email: "",
 		phone: "",
@@ -552,93 +543,179 @@ const openCreateModal = () => {
 		birthDate: "",
 		notes: "",
 		isActive: true
-	};
-	isModalOpen.value = true;
-};
+	});
 
-const editCustomer = (customer: Customer) => {
-	isEditing.value = true;
-	formState.value = {
-		id: customer.id,
-		name: customer.name,
-		email: customer.email || "",
-		phone: customer.phone || "",
-		address: customer.address || "",
-		documentType: customer.documentType || undefined,
-		documentNumber: customer.documentNumber || "",
-		birthDate: customer.birthDate || "",
-		notes: customer.notes || "",
-		isActive: customer.isActive
-	};
-	isModalOpen.value = true;
-};
+	// Options
+	const statusOptions = [
+		{ label: "Todos", value: "all" },
+		{ label: "Activos", value: "active" },
+		{ label: "Inactivos", value: "inactive" }
+	];
 
-const viewCustomer = (customer: Customer) => {
-	selectedCustomer.value = customer;
-	isViewModalOpen.value = true;
-};
+	const documentTypeOptions = [
+		{ label: "Cédula", value: "cedula" },
+		{ label: "RIF", value: "rif" },
+		{ label: "Pasaporte", value: "passport" }
+	];
 
-const deleteCustomer = async (customer: Customer) => {
-	if (confirm(`¿Estás seguro de que quieres eliminar al cliente "${customer.name}"?`)) {
+	// Schema for validation
+	const customerSchema = isEditing.value ? UpdateCustomerSchema : CreateCustomerSchema;
+
+	// Computed
+	const displayedCustomers = computed(() => {
+		if (searchQuery.value) {
+			return searchResults.value;
+		}
+
+		if (statusFilter.value === "active") {
+			return activeCustomers.value;
+		} else if (statusFilter.value === "inactive") {
+			return inactiveCustomers.value;
+		}
+
+		return customers.value;
+	});
+
+	// Methods
+	const loadCustomers = async () => {
 		try {
-			await deleteCustomerComposable(customer.id);
+			await getCustomers(false); // Load all customers (active and inactive)
+		} catch (err) {
+			console.error("Error loading customers:", err);
+		}
+	};
+
+	const handleSearch = async () => {
+		if (!searchQuery.value.trim()) {
+			searchResults.value = [];
+			return;
+		}
+
+		try {
+			searchResults.value = await searchCustomers(searchQuery.value, statusFilter.value !== "inactive");
+		} catch (err) {
+			console.error("Error searching customers:", err);
+		}
+	};
+
+	const handleFilter = () => {
+		if (searchQuery.value) {
+			handleSearch();
+		}
+	};
+
+	const clearFilters = () => {
+		searchQuery.value = "";
+		statusFilter.value = "all";
+		searchResults.value = [];
+	};
+
+	const openCreateModal = () => {
+		isEditing.value = false;
+		formState.value = {
+			name: "",
+			email: "",
+			phone: "",
+			address: "",
+			documentType: undefined,
+			documentNumber: "",
+			birthDate: "",
+			notes: "",
+			isActive: true
+		};
+		isModalOpen.value = true;
+	};
+
+	const editCustomer = (customer: Customer) => {
+		isEditing.value = true;
+		formState.value = {
+			id: customer.id,
+			name: customer.name,
+			email: customer.email || "",
+			phone: customer.phone || "",
+			address: customer.address || "",
+			documentType: customer.documentType || undefined,
+			documentNumber: customer.documentNumber || "",
+			birthDate: customer.birthDate || "",
+			notes: customer.notes || "",
+			isActive: customer.isActive
+		};
+		isModalOpen.value = true;
+	};
+
+	const viewCustomer = (customer: Customer) => {
+		selectedCustomer.value = customer;
+		isViewModalOpen.value = true;
+	};
+
+	const requestDeleteCustomer = (customer: Customer) => {
+		customerToDelete.value = customer;
+		isDeleteModalOpen.value = true;
+	};
+
+	const confirmDeleteCustomer = async () => {
+		if (!customerToDelete.value) return;
+		try {
+			await deleteCustomerComposable(customerToDelete.value.id);
 			await loadCustomers();
 		} catch (err) {
 			console.error("Error deleting customer:", err);
+		} finally {
+			isDeleteModalOpen.value = false;
+			customerToDelete.value = null;
 		}
-	}
-};
-
-const handleSubmit = async () => {
-	try {
-		if (isEditing.value) {
-			await updateCustomer((formState.value as UpdateCustomerInput).id!, formState.value as UpdateCustomerInput);
-		} else {
-			await createCustomer(formState.value as CreateCustomerInput);
-		}
-		
-		closeModal();
-		await loadCustomers();
-	} catch (err) {
-		console.error("Error saving customer:", err);
-	}
-};
-
-const closeModal = () => {
-	isModalOpen.value = false;
-	formState.value = {
-		name: "",
-		email: "",
-		phone: "",
-		address: "",
-		documentType: undefined,
-		documentNumber: "",
-		birthDate: "",
-		notes: "",
-		isActive: true
 	};
-};
 
-const closeViewModal = () => {
-	isViewModalOpen.value = false;
-	selectedCustomer.value = null;
-};
+	const closeModal = () => {
+		isModalOpen.value = false;
+		formState.value = {
+			name: "",
+			email: "",
+			phone: "",
+			address: "",
+			documentType: undefined,
+			documentNumber: "",
+			birthDate: "",
+			notes: "",
+			isActive: true
+		};
+	};
 
-const getDocumentTypeLabel = (type: string) => {
-	const option = documentTypeOptions.find(opt => opt.value === type);
-	return option ? option.label : type;
-};
+	const handleSubmit = async () => {
+		try {
+			if (isEditing.value) {
+				await updateCustomer((formState.value as UpdateCustomerInput).id!, formState.value as UpdateCustomerInput);
+			} else {
+				await createCustomer(formState.value as CreateCustomerInput);
+			}
 
-const formatDate = (dateString: string) => {
-	return new Date(dateString).toLocaleDateString("es-VE", {
-		year: "numeric",
-		month: "long",
-		day: "numeric"
+			closeModal();
+			await loadCustomers();
+		} catch (err) {
+			console.error("Error saving customer:", err);
+		}
+	};
+
+	const closeViewModal = () => {
+		isViewModalOpen.value = false;
+		selectedCustomer.value = null;
+	};
+
+	const getDocumentTypeLabel = (type: string) => {
+		const option = documentTypeOptions.find((opt) => opt.value === type);
+		return option ? option.label : type;
+	};
+
+	const formatDate = (dateString: string) => {
+		return new Date(dateString).toLocaleDateString("es-VE", {
+			year: "numeric",
+			month: "long",
+			day: "numeric"
+		});
+	};
+
+	// Lifecycle
+	onMounted(() => {
+		loadCustomers();
 	});
-};
-
-// Lifecycle
-onMounted(() => {
-	loadCustomers();
-});
 </script>

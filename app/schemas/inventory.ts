@@ -7,47 +7,47 @@ export const movementTypes = ["entry", "exit", "adjustment", "transfer", "sale",
 export const inventoryMovementSchema = z.object({
 	productId: z.string()
 		.min(1, "El ID del producto es requerido"),
-	
+
 	movementType: z.enum(movementTypes, {
 		errorMap: () => ({ message: "Tipo de movimiento inválido" })
 	}),
-	
+
 	quantity: z.number()
 		.min(-99999, "La cantidad no puede ser menor a -99,999")
 		.max(99999, "La cantidad no puede ser mayor a 99,999")
 		.int("La cantidad debe ser un número entero")
-		.refine(val => val !== 0, "La cantidad no puede ser cero"),
-	
+		.refine((val) => val !== 0, "La cantidad no puede ser cero"),
+
 	previousStock: z.number()
 		.min(0, "El stock previo debe ser mayor o igual a 0")
 		.int("El stock previo debe ser un número entero"),
-	
+
 	newStock: z.number()
 		.min(0, "El nuevo stock debe ser mayor or igual a 0")
 		.int("El nuevo stock debe ser un número entero"),
-	
+
 	unitCost: z.number()
 		.min(0, "El costo unitario debe ser mayor o igual a 0")
 		.max(999999.99, "El costo unitario no puede exceder 999,999.99")
 		.optional(),
-	
+
 	totalCost: z.number()
 		.min(0, "El costo total debe ser mayor o igual a 0")
 		.max(9999999.99, "El costo total no puede exceder 9,999,999.99")
 		.optional(),
-	
+
 	reason: z.string()
 		.min(1, "La razón del movimiento es requerida")
 		.max(500, "La razón no puede exceder 500 caracteres"),
-	
+
 	referenceDocument: z.string()
 		.max(100, "El documento de referencia no puede exceder 100 caracteres")
 		.optional(),
-	
+
 	notes: z.string()
 		.max(1000, "Las notas no pueden exceder 1,000 caracteres")
 		.optional(),
-	
+
 	createdBy: z.string()
 		.min(1, "El usuario que creó el movimiento es requerido")
 		.max(100, "El usuario no puede exceder 100 caracteres")
@@ -62,7 +62,7 @@ export const inventoryAdjustmentSchema = z.object({
 	reason: z.string()
 		.min(1, "La razón del ajuste es requerida")
 		.max(500, "La razón no puede exceder 500 caracteres"),
-	
+
 	adjustments: z.array(z.object({
 		productId: z.string().min(1),
 		currentStock: z.number().int().min(0),
@@ -71,7 +71,7 @@ export const inventoryAdjustmentSchema = z.object({
 		unitCost: z.number().min(0).optional(),
 		notes: z.string().max(500).optional()
 	})).min(1, "Debe incluir al menos un ajuste"),
-	
+
 	createdBy: z.string()
 		.min(1, "El usuario es requerido")
 		.default("system")

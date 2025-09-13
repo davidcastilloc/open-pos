@@ -20,5 +20,3 @@ npx semantic-release --dry-run
 ## Convención de commits
 
 Sigue Conventional Commits: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `build`, `ci`.
-
-

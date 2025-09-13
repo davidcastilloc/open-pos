@@ -1,27 +1,62 @@
 {
-  "version": "7",
-  "dialect": "sqlite",
-  "entries": [
-    {
-      "idx": 0,
-      "version": "6",
-      "when": 1757592945094,
-      "tag": "0000_loving_lady_deathstrike",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1757609782245,
-      "tag": "0001_round_squadron_supreme",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1757699019831,
-      "tag": "0002_add_cash_closing_tables",
-      "breakpoints": true
-    }
-  ]
+	"version": "7",
+	"dialect": "sqlite",
+	"entries": [
+		{
+			"idx": 0,
+			"version": "6",
+			"when": 1757592945094,
+			"tag": "0000_loving_lady_deathstrike",
+			"breakpoints": true
+		},
+		{
+			"idx": 1,
+			"version": "6",
+			"when": 1757609782245,
+			"tag": "0001_round_squadron_supreme",
+			"breakpoints": true
+		},
+		{
+			"idx": 2,
+			"version": "6",
+			"when": 1757699019831,
+			"tag": "0002_add_cash_closing_tables",
+			"breakpoints": true
+		},
+		{
+			"idx": 3,
+			"version": "6",
+			"when": 1757609782246,
+			"tag": "0002_inventory_movements",
+			"breakpoints": true
+		},
+		{
+			"idx": 4,
+			"version": "6",
+			"when": 1757609782247,
+			"tag": "0003_add_payment_method_to_transactions",
+			"breakpoints": true
+		},
+		{
+			"idx": 5,
+			"version": "6",
+			"when": 1757609782248,
+			"tag": "0003_add_tx_fields",
+			"breakpoints": true
+		},
+		{
+			"idx": 6,
+			"version": "6",
+			"when": 1757609782249,
+			"tag": "0004_add_customers_tables",
+			"breakpoints": true
+		},
+		{
+			"idx": 7,
+			"version": "6",
+			"when": 1757756802618,
+			"tag": "0007_lucky_nova",
+			"breakpoints": true
+		}
+	]
 }

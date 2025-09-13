@@ -28,9 +28,9 @@ function executeSQL(sql, params = []) {
 		} else {
 			return stmt.run(...params);
 		}
-	} catch (error) {
-		log(`❌ Error ejecutando SQL: ${error.message}`, "red");
-		throw error;
+	} catch (err) {
+		log(`❌ Error ejecutando SQL: ${err.message}`, "red");
+		throw err;
 	}
 }
 
@@ -186,8 +186,8 @@ function showStats() {
 		try {
 			const count = executeSQL(`SELECT COUNT(*) as count FROM ${stat.table}`)[0];
 			log(`  ${stat.label}: ${count.count}`, "blue");
-		} catch (error) {
-			log(`  ${stat.label}: Error`, "red");
+		} catch (err) {
+			log(`  ${stat.label}: Error: ${err instanceof Error ? err.message : String(err)}`, "red");
 		}
 	});
 }

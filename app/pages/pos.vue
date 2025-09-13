@@ -630,6 +630,9 @@
 
 	// Opciones de clientes
 	const customerOptions = computed(() => {
+		if (!customers.value || !Array.isArray(customers.value)) {
+			return [];
+		}
 		return customers.value.map((customer) => ({
 			label: customer.name,
 			value: customer.id

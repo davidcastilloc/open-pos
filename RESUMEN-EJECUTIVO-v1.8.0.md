@@ -2,9 +2,9 @@
 
 ## 🎯 **Estado del Proyecto**
 
-**Versión:** 1.8.0  
-**Fecha:** 12 de enero de 2025  
-**Progreso:** 91.7% completado (11/12 tareas)  
+**Versión:** 1.8.0
+**Fecha:** 12 de enero de 2025
+**Progreso:** 91.7% completado (11/12 tareas)
 **Estado:** ✅ **Sistema POS Completo y Funcional con Gestión de Clientes**
 
 ---

@@ -57,28 +57,28 @@ export const cashClosings = sqliteTable("cash_closings", {
 	startTime: text("start_time").notNull(),
 	endTime: text("end_time").notNull(),
 	shiftDuration: text("shift_duration").notNull(), // HH:MM:SS
-	
+
 	// Balances
 	initialBalances: text("initial_balances").notNull(), // JSON string
 	finalBalances: text("final_balances").notNull(), // JSON string
 	balanceDifferences: text("balance_differences").notNull(), // JSON string
-	
+
 	// Resumen de ventas
 	totalTransactions: integer("total_transactions").notNull().default(0),
 	salesByCurrency: text("sales_by_currency").notNull(), // JSON string
 	salesByPaymentMethod: text("sales_by_payment_method").notNull(), // JSON string
 	totalSalesAmount: real("total_sales_amount").notNull().default(0),
-	
+
 	// Gastos y movimientos
 	expenses: text("expenses").notNull().default("{}"), // JSON string
 	adjustments: text("adjustments").notNull().default("{}"), // JSON string
-	
+
 	// Observaciones y estado
 	observations: text("observations"),
 	status: text("status").notNull().default("closed"), // 'closed', 'audited', 'approved'
 	auditedBy: text("audited_by"),
 	auditedAt: text("audited_at"),
-	
+
 	// Metadatos
 	createdAt: text("created_at").notNull().$defaultFn(() => new Date().toISOString()),
 	updatedAt: text("updated_at").notNull().$defaultFn(() => new Date().toISOString())

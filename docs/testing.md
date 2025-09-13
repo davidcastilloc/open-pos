@@ -21,5 +21,3 @@ pnpm lint       # estilo y reglas
 - Pruebas para lógica crítica: ventas, inventario, totales, conversión de moneda.
 - Aislar composables y validar con entradas de Zod válidas/ inválidas.
 - Evitar mocks innecesarios; usar funciones puras cuando sea posible.
-
-

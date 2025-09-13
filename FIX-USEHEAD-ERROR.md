@@ -65,9 +65,9 @@ Si necesitas establecer meta tags para páginas que usan el layout `pos`, hazlo 
 ```vue
 <!-- En pages/pos.vue o cualquier página que use el layout -->
 <script setup lang="ts">
-useHead({
-  title: 'POS - Punto de Venta'
-})
+	useHead({
+		title: "POS - Punto de Venta"
+	});
 </script>
 ```
 

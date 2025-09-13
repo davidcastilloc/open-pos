@@ -15,7 +15,7 @@
 		"generate": "nuxt generate",
 		"preinstall": "npx only-allow pnpm",
 		"postinstall": "nuxt prepare",
-		"lint": "eslint . --fix",
+		"lint": "eslint . --ext .js,.jsx,.ts,.tsx,.vue --fix",
 		"verify:usehead": "bash scripts/verify-usehead.sh",
 		"type-check": "nuxt typecheck",
 		"test": "vitest",
@@ -28,10 +28,11 @@
 		"tauri:dev": "tauri dev",
 		"tauri:build": "tauri build",
 		"tauri:build:debug": "tauri build --debug",
-		"test:semantic-release": "node scripts/test-semantic-release.js"
+		"test:semantic-release": "node scripts/test-semantic-release.js",
+		"prepare": "husky"
 	},
 	"dependencies": {
-		"@nuxt/ui": "^3.2.0",
+		"@nuxt/ui": "^3.3.3",
 		"@paralleldrive/cuid2": "^2.2.2",
 		"@pinia/nuxt": "^0.5.1",
 		"@tauri-apps/api": "^2.6.0",
@@ -71,6 +72,7 @@
 		"conventional-changelog-writer": "^6.0.0",
 		"drizzle-kit": "^0.31.4",
 		"eslint": "^9.31.0",
+		"husky": "^9.1.7",
 		"jsdom": "^26.1.0",
 		"nuxt-svgo": "^4.2.4",
 		"semantic-release": "^24.0.0",

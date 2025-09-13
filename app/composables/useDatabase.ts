@@ -1,6 +1,5 @@
-import Database from "@tauri-apps/plugin-sql";
 import { computed } from "vue";
-import { initDatabase } from "~/database/connection";
+import { getDatabase, getSqlite, initDatabase } from "~/database/connection";
 
 export function useDatabase() {
 	const isInitialized = useState("database.isInitialized", () => false);
@@ -34,8 +33,8 @@ export function useDatabase() {
 	const query = async <T>(sql: string, params: any[] = []): Promise<T[]> => {
 		try {
 			console.log("🔍 Ejecutando query:", { sql, params });
-			const sqlite = await Database.load("sqlite:pos.db");
-			const rows = await sqlite.select(sql, params);
+			const sqlite = await getSqlite();
+			const rows = await sqlite.select(sql, params) as unknown as T[];
 			await sqlite.close();
 			console.log("✅ Query ejecutado exitosamente, filas:", rows.length);
 			return rows as T[];
@@ -49,7 +48,8 @@ export function useDatabase() {
 	const execute = async (sql: string, params: any[] = []): Promise<any> => {
 		try {
 			console.log("🔧 Ejecutando comando:", { sql, params });
-			const sqlite = await Database.load("sqlite:pos.db");
+			const sqlite = await getSqlite();
+			console.log("🔍 Base de datos cargada:", "sqlite:pos.db");
 			const result = await sqlite.execute(sql, params);
 			await sqlite.close();
 			console.log("✅ Comando ejecutado exitosamente");
@@ -70,8 +70,8 @@ export function useDatabase() {
 	const get = async <T>(sql: string, params: any[] = []): Promise<T | undefined> => {
 		try {
 			console.log("🔍 Obteniendo fila:", { sql, params });
-			const sqlite = await Database.load("sqlite:pos.db");
-			const rows = await sqlite.select(sql, params);
+			const sqlite = await getSqlite();
+			const rows = await sqlite.select(sql, params) as unknown as T[];
 			await sqlite.close();
 			console.log("✅ Fila obtenida exitosamente");
 			return (rows as any[])[0] as T | undefined;
@@ -84,7 +84,7 @@ export function useDatabase() {
 	// Transacción
 	const transaction = async <T>(callback: (db: any) => Promise<T>): Promise<T> => {
 		console.log("🔄 Iniciando transacción");
-		const sqlite = await Database.load("sqlite:pos.db");
+		const sqlite = await getSqlite();
 		try {
 			await sqlite.execute("BEGIN TRANSACTION");
 			const result = await callback(sqlite);
@@ -116,6 +116,8 @@ export function useDatabase() {
 		query,
 		execute,
 		get,
-		transaction
+		transaction,
+		// Instancia tipada de drizzle para usos avanzados
+		orm: getDatabase
 	};
 }

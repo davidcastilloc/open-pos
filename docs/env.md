@@ -30,5 +30,3 @@ Ejemplo en `env.example`. Copia a `.env` y ajusta.
 - `BACKUP_INTERVAL`, `AUTO_BACKUP`
 
 Usa `useRuntimeConfig` en Nuxt para exponer/ocultar valores adecuadamente.
-
-

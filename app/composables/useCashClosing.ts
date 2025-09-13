@@ -1,9 +1,9 @@
-import { computed, ref, readonly } from "vue";
+import type { CashClosingDBData } from "~/composables/useCashClosingDB";
+import { computed, readonly, ref } from "vue";
 import { useAccounts } from "~/composables/useAccounts";
-import { useCashClosingDB, type CashClosingDBData } from "~/composables/useCashClosingDB";
-import { useDatabase } from "~/composables/useDatabase";
-import { useTransactions } from "~/composables/useTransactions";
+import { useCashClosingDB } from "~/composables/useCashClosingDB";
 import { getPaymentMethodLabel } from "~/composables/usePaymentMethods";
+import { useTransactions } from "~/composables/useTransactions";
 
 export interface CashClosingData {
 	id?: number
@@ -45,7 +45,6 @@ const globalState = {
 };
 
 export function useCashClosing() {
-	const database = useDatabase();
 	const { getTotalBalanceByCurrency } = useAccounts();
 	const transactions = useTransactions();
 	const cashClosingDB = useCashClosingDB();
@@ -227,7 +226,7 @@ export function useCashClosing() {
 				// Intentar recargar la sesión desde la base de datos
 				console.log("⚠️ startTime no definido, intentando recargar sesión...");
 				await initializeCashSession();
-				
+
 				if (!currentSession.value || !currentSession.value.startTime) {
 					// Fallback: usar fecha actual como inicio de sesión
 					console.log("⚠️ Usando fecha actual como fallback para startTime");
@@ -241,20 +240,20 @@ export function useCashClosing() {
 
 			// Generar datos del cierre
 			const endTime = new Date();
-			
+
 			// Debug: Verificar startTime
 			console.log("currentSession.value.startTime:", currentSession.value.startTime);
 			console.log("Tipo de startTime:", typeof currentSession.value.startTime);
-			
+
 			// Función para parsear fecha de manera segura
 			const parseDate = (dateValue: any): Date => {
 				if (dateValue instanceof Date) {
 					return dateValue;
 				}
-				if (typeof dateValue === 'string' && dateValue.trim() !== '') {
+				if (typeof dateValue === "string" && dateValue.trim() !== "") {
 					const parsed = new Date(dateValue);
-					if (isNaN(parsed.getTime())) {
-						throw new Error(`Fecha inválida: ${dateValue}`);
+					if (Number.isNaN(parsed.getTime())) {
+						throw new TypeError(`Fecha inválida: ${dateValue}`);
 					}
 					return parsed;
 				}
@@ -263,20 +262,20 @@ export function useCashClosing() {
 				}
 				throw new Error(`Tipo de fecha no soportado: ${typeof dateValue}`);
 			};
-			
+
 			const startTime = parseDate(currentSession.value.startTime);
-			
+
 			// Validar que las fechas sean válidas
-			if (isNaN(startTime.getTime())) {
-				throw new Error(`Fecha de inicio inválida: ${currentSession.value.startTime}`);
+			if (Number.isNaN(startTime.getTime())) {
+				throw new TypeError(`Fecha de inicio inválida: ${currentSession.value.startTime}`);
 			}
-			if (isNaN(endTime.getTime())) {
-				throw new Error("Fecha de fin inválida");
+			if (Number.isNaN(endTime.getTime())) {
+				throw new TypeError("Fecha de fin inválida");
 			}
-			
+
 			console.log("startTime válida:", startTime.toISOString());
 			console.log("endTime válida:", endTime.toISOString());
-			
+
 			const salesSummary = getSalesSummary();
 			const paymentMethods = getPaymentMethodsSummary();
 
@@ -362,10 +361,10 @@ export function useCashClosing() {
 		});
 	};
 
-	const calculateBalanceDifferences = (
+	function calculateBalanceDifferences(
 		initial: Record<string, number>,
 		final: Record<string, number>
-	): Record<string, number> => {
+	): Record<string, number> {
 		const differences: Record<string, number> = {};
 		const allCurrencies = new Set([...Object.keys(initial), ...Object.keys(final)]);
 
@@ -376,9 +375,9 @@ export function useCashClosing() {
 		}
 
 		return differences;
-	};
+	}
 
-	const initializeCashSession = async (): Promise<void> => {
+	async function initializeCashSession(): Promise<void> {
 		try {
 			const activeSession = await cashClosingDB.getActiveCashSession();
 			if (activeSession) {
@@ -395,14 +394,14 @@ export function useCashClosing() {
 					createdAt: activeSession.created_at,
 					updatedAt: activeSession.updated_at
 				};
-				
+
 				// Validar que startTime esté definido
 				if (!validatedSession.startTime) {
 					console.error("❌ Sesión sin startTime:", validatedSession);
 					isCashSessionOpen.value = false;
 					return;
 				}
-				
+
 				currentSession.value = validatedSession;
 				shiftStartTime.value = new Date(validatedSession.startTime);
 				isCashSessionOpen.value = true;
@@ -416,7 +415,34 @@ export function useCashClosing() {
 			console.error("Error initializing cash session:", error);
 			isCashSessionOpen.value = false;
 		}
-	};
+	}
+
+	async function closeCashSession(): Promise<void> {
+		try {
+			if (!currentSession.value) {
+				console.warn("No hay sesión activa para cerrar");
+				return;
+			}
+
+			// Cerrar sesión en base de datos
+			const success = await cashClosingDB.closeCashSession(currentSession.value.id);
+
+			if (success) {
+				// Actualizar estado local
+				isCashSessionOpen.value = false;
+				shiftStartTime.value = null;
+				currentShift.value = null;
+				currentSession.value = null;
+
+				console.log("✅ Sesión de caja cerrada exitosamente");
+			} else {
+				throw new Error("No se pudo cerrar la sesión en la base de datos");
+			}
+		} catch (error) {
+			console.error("Error closing cash session:", error);
+			throw error;
+		}
+	}
 
 	const generateReport = async (): Promise<string> => {
 		try {
@@ -575,33 +601,6 @@ Generado el: ${new Date().toLocaleString("es-VE")}
 			await refreshTodayTransactions();
 		} catch (error) {
 			console.error("Error opening cash session:", error);
-			throw error;
-		}
-	};
-
-	const closeCashSession = async (): Promise<void> => {
-		try {
-			if (!currentSession.value) {
-				console.warn("No hay sesión activa para cerrar");
-				return;
-			}
-
-			// Cerrar sesión en base de datos
-			const success = await cashClosingDB.closeCashSession(currentSession.value.id);
-
-			if (success) {
-				// Actualizar estado local
-				isCashSessionOpen.value = false;
-				shiftStartTime.value = null;
-				currentShift.value = null;
-				currentSession.value = null;
-
-				console.log("✅ Sesión de caja cerrada exitosamente");
-			} else {
-				throw new Error("No se pudo cerrar la sesión en la base de datos");
-			}
-		} catch (error) {
-			console.error("Error closing cash session:", error);
 			throw error;
 		}
 	};

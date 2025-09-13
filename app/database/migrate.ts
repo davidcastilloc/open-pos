@@ -2,10 +2,10 @@ import { useDatabase } from "~/composables/useDatabase";
 
 export async function runMigrations() {
 	const { execute, query } = useDatabase();
-	
+
 	try {
 		console.log("🔄 Ejecutando migraciones de Drizzle...");
-		
+
 		// Ejecutar la migración generada por Drizzle
 		await execute(`
 			CREATE TABLE IF NOT EXISTS cash_sessions (
@@ -21,17 +21,17 @@ export async function runMigrations() {
 				updated_at TEXT NOT NULL
 			)
 		`);
-		
+
 		// Verificar si cash_closings existe y tiene la estructura antigua
 		const tableInfo = await query<any>("PRAGMA table_info(cash_closings)");
-		
+
 		if (tableInfo.length > 0) {
 			// Verificar si tiene session_id
-			const hasSessionId = tableInfo.some((col: any) => col.name === 'session_id');
-			
+			const hasSessionId = tableInfo.some((col: any) => col.name === "session_id");
+
 			if (!hasSessionId) {
 				console.log("🔄 Migrando tabla cash_closings...");
-				
+
 				// Crear tabla temporal con nueva estructura
 				await execute(`
 					CREATE TABLE __new_cash_closings (
@@ -60,7 +60,7 @@ export async function runMigrations() {
 						updated_at TEXT NOT NULL
 					)
 				`);
-				
+
 				// Migrar datos existentes
 				await execute(`
 					INSERT INTO __new_cash_closings (
@@ -97,11 +97,11 @@ export async function runMigrations() {
 						COALESCE(updated_at, closed_at, datetime('now')) as updated_at
 					FROM cash_closings
 				`);
-				
+
 				// Reemplazar tabla antigua
 				await execute("DROP TABLE cash_closings");
 				await execute("ALTER TABLE __new_cash_closings RENAME TO cash_closings");
-				
+
 				console.log("✅ Tabla cash_closings migrada exitosamente");
 			} else {
 				console.log("✅ Tabla cash_closings ya tiene la estructura correcta");
@@ -135,10 +135,10 @@ export async function runMigrations() {
 					updated_at TEXT NOT NULL
 				)
 			`);
-			
+
 			console.log("✅ Tabla cash_closings creada exitosamente");
 		}
-		
+
 		// Crear tabla cash_reports si no existe
 		await execute(`
 			CREATE TABLE IF NOT EXISTS cash_reports (
@@ -156,9 +156,8 @@ export async function runMigrations() {
 				FOREIGN KEY (session_id) REFERENCES cash_sessions(id)
 			)
 		`);
-		
+
 		console.log("✅ Migraciones ejecutadas exitosamente");
-		
 	} catch (error) {
 		console.error("❌ Error ejecutando migraciones:", error);
 		// No lanzar el error para evitar que falle la inicialización

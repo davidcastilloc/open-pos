@@ -2,10 +2,17 @@ import Database from "@tauri-apps/plugin-sql";
 import { drizzle } from "drizzle-orm/sqlite-proxy";
 import * as schema from "./schema";
 
-let db: ReturnType<typeof drizzle> | null = null;
+export type AppDb = ReturnType<typeof drizzle<typeof schema>>;
+
+let db: AppDb | null = null;
+
+// Obtener una conexión SQLite del plugin (centralizado)
+export async function getSqlite() {
+	return await Database.load("sqlite:pos.db");
+}
 
 // Función para obtener la instancia de la base de datos
-export async function getDatabase() {
+export async function getDatabase(): Promise<AppDb> {
 	if (!db) {
 		await initDatabase();
 	}
@@ -49,17 +56,17 @@ export async function initDatabase() {
 			{ schema, logger: true }
 		);
 
-		// Crear tablas si no existen
+		// Crear tablas si no existen (ignorar errores idempotentes)
 		try {
 			await createTables();
-		} catch (error) {
+		} catch {
 			console.log("⚠️ Algunas tablas ya existen, continuando...");
 		}
 
-		// Insertar datos por defecto
+		// Insertar datos por defecto (ignorar errores idempotentes)
 		try {
 			await insertDefaultData();
-		} catch (error) {
+		} catch {
 			console.log("⚠️ Algunos datos por defecto ya existen, continuando...");
 		}
 
@@ -123,7 +130,23 @@ async function createTables() {
 			loyalty_points INTEGER NOT NULL DEFAULT 0,
 			is_active INTEGER NOT NULL DEFAULT 1,
 			created_at TEXT NOT NULL DEFAULT (datetime('now')),
-			updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+			updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+			document_type TEXT,
+			document_number TEXT,
+			birth_date TEXT,
+			notes TEXT
+		)`,
+
+		// Tabla de ventas de clientes (para historial)
+		`CREATE TABLE IF NOT EXISTS customer_sales (
+			id TEXT PRIMARY KEY,
+			customer_id TEXT NOT NULL,
+			sale_id TEXT NOT NULL,
+			total_amount REAL NOT NULL,
+			currency TEXT NOT NULL,
+			created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+			FOREIGN KEY (customer_id) REFERENCES customers(id),
+			FOREIGN KEY (sale_id) REFERENCES sales(id)
 		)`,
 
 		// Tabla de ventas
@@ -337,6 +360,9 @@ async function createTables() {
 	// Verificar columnas e índices de transactions
 	await ensureTransactionsColumns();
 
+	// Verificar columnas adicionales de customers
+	await ensureCustomersColumns();
+
 	console.log("✅ Tablas creadas correctamente");
 }
 
@@ -400,35 +426,35 @@ async function ensureCurrencyColumn() {
 
 // Asegurar columnas e índices de transactions (cashier_id, sale_id, payment_method, índices)
 async function ensureTransactionsColumns() {
-  try {
-    const sqlite = await Database.load("sqlite:pos.db");
+	try {
+		const sqlite = await Database.load("sqlite:pos.db");
 
-    // Columnas
-    const txCols = await sqlite.select("PRAGMA table_info(transactions)") as any[];
-    const hasCashier = txCols.some((c: any) => c.name === "cashier_id");
-    const hasSaleId = txCols.some((c: any) => c.name === "sale_id");
-    const hasPaymentMethod = txCols.some((c: any) => c.name === "payment_method");
-    if (!hasCashier) {
-      await sqlite.execute("ALTER TABLE transactions ADD COLUMN cashier_id TEXT");
-    }
-    if (!hasSaleId) {
-      await sqlite.execute("ALTER TABLE transactions ADD COLUMN sale_id TEXT");
-    }
-    if (!hasPaymentMethod) {
-      await sqlite.execute("ALTER TABLE transactions ADD COLUMN payment_method TEXT");
-    }
+		// Columnas
+		const txCols = await sqlite.select("PRAGMA table_info(transactions)") as any[];
+		const hasCashier = txCols.some((c: any) => c.name === "cashier_id");
+		const hasSaleId = txCols.some((c: any) => c.name === "sale_id");
+		const hasPaymentMethod = txCols.some((c: any) => c.name === "payment_method");
+		if (!hasCashier) {
+			await sqlite.execute("ALTER TABLE transactions ADD COLUMN cashier_id TEXT");
+		}
+		if (!hasSaleId) {
+			await sqlite.execute("ALTER TABLE transactions ADD COLUMN sale_id TEXT");
+		}
+		if (!hasPaymentMethod) {
+			await sqlite.execute("ALTER TABLE transactions ADD COLUMN payment_method TEXT");
+		}
 
-    // Índices
-    await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_transactions_account_id ON transactions(account_id)");
-    await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON transactions(created_at)");
-    await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_transactions_type ON transactions(type)");
-    await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_transactions_sale_id ON transactions(sale_id)");
-    await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_transactions_payment_method ON transactions(payment_method)");
+		// Índices
+		await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_transactions_account_id ON transactions(account_id)");
+		await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON transactions(created_at)");
+		await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_transactions_type ON transactions(type)");
+		await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_transactions_sale_id ON transactions(sale_id)");
+		await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_transactions_payment_method ON transactions(payment_method)");
 
-    await sqlite.close();
-  } catch (error) {
-    console.error("❌ Error asegurando columnas/índices de transactions:", error);
-  }
+		await sqlite.close();
+	} catch (error) {
+		console.error("❌ Error asegurando columnas/índices de transactions:", error);
+	}
 }
 
 // Función para insertar datos por defecto
@@ -543,6 +569,44 @@ async function insertDefaultCategories() {
 	}
 
 	console.log("✅ Categorías por defecto insertadas");
+}
+
+// Función para asegurar columnas adicionales de customers
+async function ensureCustomersColumns() {
+	try {
+		const sqlite = await Database.load("sqlite:pos.db");
+
+		// Verificar columnas adicionales
+		const customerCols = await sqlite.select("PRAGMA table_info(customers)") as any[];
+		const hasDocumentType = customerCols.some((c: any) => c.name === "document_type");
+		const hasDocumentNumber = customerCols.some((c: any) => c.name === "document_number");
+		const hasBirthDate = customerCols.some((c: any) => c.name === "birth_date");
+		const hasNotes = customerCols.some((c: any) => c.name === "notes");
+
+		if (!hasDocumentType) {
+			await sqlite.execute("ALTER TABLE customers ADD COLUMN document_type TEXT");
+		}
+		if (!hasDocumentNumber) {
+			await sqlite.execute("ALTER TABLE customers ADD COLUMN document_number TEXT");
+		}
+		if (!hasBirthDate) {
+			await sqlite.execute("ALTER TABLE customers ADD COLUMN birth_date TEXT");
+		}
+		if (!hasNotes) {
+			await sqlite.execute("ALTER TABLE customers ADD COLUMN notes TEXT");
+		}
+
+		// Crear índices si no existen
+		await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_customers_name ON customers(name)");
+		await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_customers_email ON customers(email)");
+		await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_customers_phone ON customers(phone)");
+		await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_customers_document_number ON customers(document_number)");
+
+		await sqlite.close();
+		console.log("✅ Columnas adicionales de customers verificadas");
+	} catch (error) {
+		console.error("❌ Error verificando columnas de customers:", error);
+	}
 }
 
 // Función para cerrar la base de datos

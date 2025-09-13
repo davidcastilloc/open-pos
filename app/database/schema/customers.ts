@@ -1,5 +1,5 @@
-import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
+import { integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 // Tabla de clientes
 export const customers = sqliteTable("customers", {
@@ -9,13 +9,14 @@ export const customers = sqliteTable("customers", {
 	email: text("email"),
 	phone: text("phone"),
 	address: text("address"),
+	loyaltyPoints: integer("loyalty_points").notNull().default(0),
+	isActive: integer("is_active", { mode: "boolean" }).default(true),
+	createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
+	updatedAt: text("updated_at").default(sql`CURRENT_TIMESTAMP`),
 	documentType: text("document_type"), // 'cedula', 'rif', 'passport'
 	documentNumber: text("document_number"),
 	birthDate: text("birth_date"), // ISO date string
-	notes: text("notes"),
-	isActive: integer("is_active", { mode: "boolean" }).default(true),
-	createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
-	updatedAt: text("updated_at").default(sql`CURRENT_TIMESTAMP`)
+	notes: text("notes")
 });
 
 // Tabla de ventas de clientes (para historial)

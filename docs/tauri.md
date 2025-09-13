@@ -34,10 +34,9 @@ Requisitos de Rust por SO: ver `https://v2.tauri.app/start/prerequisites`.
 
 ```ts
 // app/composables/useReadFile.ts
-import { readTextFile } from '@tauri-apps/plugin-fs'
+import { readTextFile } from "@tauri-apps/plugin-fs";
+
 export async function useReadFile(path: string) {
-  return await readTextFile(path)
+	return await readTextFile(path);
 }
 ```
-
-

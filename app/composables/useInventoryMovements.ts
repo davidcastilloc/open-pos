@@ -1,28 +1,55 @@
+import type {
+	InventoryAdjustment,
+	InventoryMovement,
+	InventoryStats,
+	MovementFilters
+} from "~/schemas/inventory";
 import { computed, ref } from "vue";
-import { useDatabase } from "./useDatabase";
-import type { 
-	InventoryMovement, 
-	InventoryAdjustment, 
-	MovementFilters,
-	InventoryStats
-} from "~/schemas/inventory";
-import { 
-	validateInventoryMovement, 
-	validateInventoryAdjustment,
+import {
+	MOVEMENT_TYPE_LABELS,
 	movementTypes,
-	MOVEMENT_TYPE_LABELS
+	validateInventoryAdjustment,
+	validateInventoryMovement
 } from "~/schemas/inventory";
+import { useDatabase } from "./useDatabase";
 
 export interface InventoryMovementRecord extends InventoryMovement {
-	id: string;
-	productName: string;
-	productSku: string;
-	tenantId: string;
-	createdAt: string;
+	id: string
+	productName: string
+	productSku: string
+	tenantId: string
+	createdAt: string
 }
 
 export function useInventoryMovements() {
 	const { query, execute, transaction } = useDatabase();
+
+	// Actualizar costo promedio del producto (dentro de transacción)
+	const updateAverageCostInTransaction = async (db: any, productId: string, newUnitCost: number, quantity: number) => {
+		try {
+			const productResult = await db.select(
+				"SELECT cost, stock FROM products WHERE id = ? AND tenant_id = ?",
+				[productId, "default"]
+			);
+
+			if (productResult.length === 0) return;
+
+			const currentCost = productResult[0].cost || 0;
+			const currentStock = productResult[0].stock || 0;
+
+			// Calcular costo promedio ponderado
+			const totalCostValue = (currentCost * currentStock) + (newUnitCost * quantity);
+			const totalQuantity = currentStock + quantity;
+			const averageCost = totalQuantity > 0 ? totalCostValue / totalQuantity : newUnitCost;
+
+			await db.execute(
+				"UPDATE products SET cost = ? WHERE id = ? AND tenant_id = ?",
+				[averageCost, productId, "default"]
+			);
+		} catch (err) {
+			console.error("Error updating average cost:", err);
+		}
+	};
 
 	// Estado
 	const movements = ref<InventoryMovementRecord[]>([]);
@@ -110,39 +137,10 @@ export function useInventoryMovements() {
 
 			console.log(`✅ Movimiento registrado: ${movementData.movementType} - ${movementData.quantity} unidades`);
 			return result;
-
 		} catch (err) {
 			error.value = err instanceof Error ? err.message : "Error al registrar movimiento";
 			console.error("Error recording movement:", err);
 			throw err;
-		}
-	};
-
-	// Actualizar costo promedio del producto (dentro de transacción)
-	const updateAverageCostInTransaction = async (db: any, productId: string, newUnitCost: number, quantity: number) => {
-		try {
-			const productResult = await db.select(
-				"SELECT cost, stock FROM products WHERE id = ? AND tenant_id = ?",
-				[productId, "default"]
-			);
-
-			if (productResult.length === 0) return;
-
-			const currentCost = productResult[0].cost || 0;
-			const currentStock = productResult[0].stock || 0;
-			
-			// Calcular costo promedio ponderado
-			const totalCostValue = (currentCost * currentStock) + (newUnitCost * quantity);
-			const totalQuantity = currentStock + quantity;
-			const averageCost = totalQuantity > 0 ? totalCostValue / totalQuantity : newUnitCost;
-
-			await db.execute(
-				"UPDATE products SET cost = ? WHERE id = ? AND tenant_id = ?",
-				[averageCost, productId, "default"]
-			);
-
-		} catch (err) {
-			console.error("Error updating average cost:", err);
 		}
 	};
 
@@ -158,7 +156,7 @@ export function useInventoryMovements() {
 
 			const currentCost = productResult[0].cost || 0;
 			const currentStock = productResult[0].stock || 0;
-			
+
 			// Calcular costo promedio ponderado
 			const totalCostValue = (currentCost * currentStock) + (newUnitCost * quantity);
 			const totalQuantity = currentStock + quantity;
@@ -168,7 +166,6 @@ export function useInventoryMovements() {
 				"UPDATE products SET cost = ? WHERE id = ? AND tenant_id = ?",
 				[averageCost, productId, "default"]
 			);
-
 		} catch (err) {
 			console.error("Error updating average cost:", err);
 		}
@@ -246,10 +243,9 @@ export function useInventoryMovements() {
 					}
 				}
 			});
-			
+
 			console.log(`✅ Ajuste de inventario completado: ${movementIds.length} productos ajustados`);
 			return { adjustmentId, movementIds };
-
 		} catch (err) {
 			error.value = err instanceof Error ? err.message : "Error al realizar ajuste";
 			console.error("Error performing inventory adjustment:", err);
@@ -345,7 +341,6 @@ export function useInventoryMovements() {
 			}));
 
 			console.log(`✅ Movimientos cargados: ${movements.value.length}`);
-
 		} catch (err) {
 			error.value = "Error al cargar movimientos";
 			console.error("Error loading movements:", err);
@@ -393,7 +388,7 @@ export function useInventoryMovements() {
 			`, ["default"]);
 
 			const basicData = basicStats[0] || {};
-			
+
 			stats.value = {
 				totalProducts: basicData.total_products || 0,
 				totalStock: basicData.total_stock || 0,
@@ -410,7 +405,6 @@ export function useInventoryMovements() {
 			};
 
 			console.log("✅ Estadísticas de inventario cargadas");
-
 		} catch (err) {
 			console.error("Error loading inventory stats:", err);
 		}
@@ -447,7 +441,6 @@ export function useInventoryMovements() {
 				tenantId: "default",
 				createdAt: row.created_at
 			}));
-
 		} catch (err) {
 			console.error("Error getting product movement history:", err);
 			return [];
@@ -472,11 +465,11 @@ export function useInventoryMovements() {
 	});
 
 	// Helpers para la UI
-	const getMovementTypeLabel = (type: string) => {
-		return MOVEMENT_TYPE_LABELS[type as keyof typeof MOVEMENT_TYPE_LABELS] || type;
+	const getMovementTypeLabel = (_type: string) => {
+		return MOVEMENT_TYPE_LABELS[_type as keyof typeof MOVEMENT_TYPE_LABELS] || _type;
 	};
 
-	const formatMovementQuantity = (quantity: number, type: string) => {
+	const formatMovementQuantity = (quantity: number, _type: string) => {
 		const sign = quantity > 0 ? "+" : "";
 		return `${sign}${quantity}`;
 	};

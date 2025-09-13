@@ -1,5 +1,4 @@
-import { computed, ref, readonly } from "vue";
-import { useConfig } from "./useConfig";
+import { computed, readonly, ref } from "vue";
 import { useCurrency } from "./useCurrency";
 import { useDatabase } from "./useDatabase";
 import { mapPaymentMethodToBackend } from "./usePaymentMethods";
@@ -31,9 +30,9 @@ export interface Sale {
 }
 
 export function usePOS() {
-	const { query, execute, transaction } = useDatabase();
+	const { query, transaction } = useDatabase();
 	const { convertAmount, formatCurrency } = useCurrency();
-	const { getCurrencyConfig } = useConfig();
+	// const { getCurrencyConfig } = useConfig();
 
 	// Estado del carrito
 	const cart = ref<CartItem[]>([]);

@@ -1,4 +1,4 @@
-import { computed, ref, readonly } from "vue";
+import { computed, readonly, ref } from "vue";
 import { useDatabase } from "./useDatabase";
 
 export interface Account {
@@ -18,7 +18,7 @@ export interface Account {
 }
 
 export function useAccounts() {
-	const { query, get, execute, transaction } = useDatabase();
+	const { query, execute } = useDatabase();
 	const accounts = ref<Account[]>([]);
 	const isLoading = ref(false);
 	const error = ref<string | null>(null);

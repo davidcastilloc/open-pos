@@ -5,7 +5,7 @@ export default defineConfig({
 	out: "./src-tauri/database/migrations",
 	dialect: "sqlite",
 	dbCredentials: {
-		url: "./src-tauri/pos.db"
+		url: "./src-tauri/database/pos.db"
 	},
 	verbose: true,
 	strict: true

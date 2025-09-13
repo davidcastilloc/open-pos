@@ -37,14 +37,14 @@
 #### **Nuevos Composables**
 ```typescript
 // useInventoryMovements.ts
-- trackMovement(productId, type, quantity, reason)
+-trackMovement(productId, type, quantity, reason)
 - getMovementHistory(productId, filters)
 - performInventoryAdjustment(adjustments)
 
 // useInventoryCosting.ts
 - updateAverageCost(productId, newCost, quantity)
 - calculateInventoryValue()
-- getCostHistory(productId)
+- getCostHistory(productId);
 ```
 
 #### **Nueva Base de Datos**
@@ -106,12 +106,12 @@ CREATE TABLE inventory_movements (
 #### **Schema Actualizado**
 ```typescript
 export const categorySchema = z.object({
-  // ... campos existentes
-  parentId: z.string().nullable(),
-  level: z.number().min(0).max(10),
-  path: z.string(), // "/electronics/smartphones/android"
-  childrenCount: z.number().default(0),
-  isLeaf: z.boolean().default(true)
+	// ... campos existentes
+	parentId: z.string().nullable(),
+	level: z.number().min(0).max(10),
+	path: z.string(), // "/electronics/smartphones/android"
+	childrenCount: z.number().default(0),
+	isLeaf: z.boolean().default(true)
 });
 ```
 
