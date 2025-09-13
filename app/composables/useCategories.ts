@@ -36,7 +36,7 @@ export function useCategories() {
 				["default"]
 			);
 
-			categories.value = results.map((row: any) => ({
+			categories.value = results.rows.map((row: any) => ({
 				id: row.id,
 				tenantId: row.tenant_id,
 				name: row.name,
@@ -153,11 +153,11 @@ export function useCategories() {
 				[id, "default"]
 			);
 
-			if (results.length === 0) {
+			if (results.rows.length === 0) {
 				return null;
 			}
 
-			const row = results[0];
+			const row = results.rows[0];
 			return {
 				id: row.id,
 				tenantId: row.tenant_id,

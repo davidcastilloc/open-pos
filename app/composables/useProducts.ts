@@ -119,7 +119,7 @@ export function useProducts() {
 			// Contar total de items
 			const countSql = sql.replace("SELECT p.*, c.name as category_name", "SELECT COUNT(*) as total");
 			const countResult = await query<any>(countSql, params);
-			totalItems.value = countResult[0]?.total || 0;
+			totalItems.value = countResult.rows[0]?.total || 0;
 			console.log("🔍 Total de items encontrados:", totalItems.value);
 
 			// Aplicar paginación
@@ -131,11 +131,11 @@ export function useProducts() {
 			console.log("📝 SQL final:", sql);
 			console.log("📝 Parámetros:", params);
 			const results = await query<any>(sql, params);
-			console.log("🔍 Resultados de la consulta:", results.length, "filas");
-			console.log("🔍 Primer resultado:", results[0]);
+			console.log("🔍 Resultados de la consulta:", results.rows.length, "filas");
+			console.log("🔍 Primer resultado:", results.rows[0]);
 
 			// Mantener precios en su moneda original
-			const productsWithOriginalPrices = results.map((row: any) => {
+			const productsWithOriginalPrices = results.rows.map((row: any) => {
 				console.log("🔍 Procesando fila:", { id: row.id, name: row.name, is_active: row.is_active });
 				return {
 					id: row.id,
@@ -192,7 +192,7 @@ export function useProducts() {
 				["default"]
 			);
 
-			categories.value = results.map((row: any) => ({
+			categories.value = results.rows.map((row: any) => ({
 				id: row.id,
 				name: row.name
 			}));
@@ -211,11 +211,11 @@ export function useProducts() {
 				[barcode]
 			);
 
-			if (results.length === 0) {
+			if (results.rows.length === 0) {
 				return null;
 			}
 
-			const row = results[0];
+			const row = results.rows[0];
 
 			return {
 				id: row.id,
@@ -249,11 +249,11 @@ export function useProducts() {
 				[sku]
 			);
 
-			if (results.length === 0) {
+			if (results.rows.length === 0) {
 				return null;
 			}
 
-			const row = results[0];
+			const row = results.rows[0];
 
 			return {
 				id: row.id,

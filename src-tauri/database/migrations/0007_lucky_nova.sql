@@ -7,5 +7,6 @@ CREATE TABLE `customer_sales` (
 	`created_at` text DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (`customer_id`) REFERENCES `customers`(`id`) ON UPDATE no action ON DELETE no action
 );
+
 --> statement-breakpoint
 ALTER TABLE `transactions` ADD `payment_method` text;

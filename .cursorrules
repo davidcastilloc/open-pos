@@ -1,0 +1,348 @@
+# Reglas del Sistema de Colores y Componentes UI
+
+## Principio Fundamental: Sin Colores Explícitos
+
+### REGLA PRINCIPAL
+**NUNCA usar colores explícitos en clases CSS como text-gray-900, bg-white, text-red-600, bg-blue-50, etc. Dejar que Tailwind CSS elija automáticamente los colores correctos según el tema.**
+
+### Colores de Emergencia Permitidos
+**SOLO usar estos colores para indicar estados críticos del sistema:**
+- `text-error` - Para errores reales (errores de conexión, errores de API, stock sin existencias)
+- `text-warning` - Para advertencias (tasas de cambio no cargadas, stock bajo)
+- `text-success` - Para estados exitosos (conexión establecida, datos cargados, stock normal)
+
+### Colores Permitidos SOLO en Componentes UI
+**SOLO usar estos colores del sistema de Nuxt UI para componentes específicos (UButton, UBadge, UAlert):**
+- `"primary"` - Color principal de la aplicación
+- `"secondary"` - Color secundario de la aplicación
+- `"success"` - Para estados exitosos
+- `"warning"` - Para advertencias
+- `"error"` - Para errores
+- `"info"` - Para información
+- `"neutral"` - Para elementos neutros
+
+## Reglas de Implementación de Modales Nuxt UI v3
+
+### REGLA CRÍTICA: Sintaxis Correcta de Modales
+**SIEMPRE usar la sintaxis correcta de Nuxt UI v3 para modales:**
+
+#### ✅ SINTAXIS CORRECTA
+```vue
+<UModal v-model:open="isModalOpen">
+  <template #content>
+    <UCard>
+      <template #header>
+        <h3 class="text-lg font-semibold">Título del Modal</h3>
+      </template>
+      
+      <!-- Contenido del modal aquí -->
+      
+      <template #footer>
+        <div class="flex justify-end gap-3">
+          <UButton variant="outline" @click="isModalOpen = false">
+            Cancelar
+          </UButton>
+          <UButton color="primary" @click="handleSubmit">
+            Confirmar
+          </UButton>
+        </div>
+      </template>
+    </UCard>
+  </template>
+</UModal>
+```
+
+#### ❌ SINTAXIS INCORRECTA (NUNCA USAR)
+```vue
+<!-- ❌ INCORRECTO: v-model en lugar de v-model:open -->
+<UModal v-model="isModalOpen">
+
+<!-- ❌ INCORRECTO: Sin template #content -->
+<UModal v-model:open="isModalOpen">
+  <UCard>
+    <!-- contenido directamente -->
+  </UCard>
+</UModal>
+
+<!-- ❌ INCORRECTO: Slots anidados complejos -->
+<UModal v-model:open="isModalOpen">
+  <template #content>
+    <template #header>
+      <!-- NO hacer esto -->
+    </template>
+  </template>
+</UModal>
+```
+
+### Reglas Específicas de Modales
+
+1. **Control de Visibilidad**: SIEMPRE usar `v-model:open="variable"`
+2. **Estructura de Contenido**: SIEMPRE envolver el contenido en `<template #content>`
+3. **UCard Interno**: SIEMPRE usar UCard dentro del template #content
+4. **Slots de UCard**: Usar `#header`, `#footer` directamente en UCard, NO anidados
+5. **Sin Propiedades UI**: NO usar `:ui="{ width: 'sm:max-w-2xl' }"` en UModal
+
+### Ejemplos de Implementación Correcta
+
+#### Modal de Formulario
+```vue
+<UModal v-model:open="showFormModal">
+  <template #content>
+    <UCard>
+      <template #header>
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold">Nuevo Elemento</h3>
+          <UButton
+            icon="i-heroicons-x-mark"
+            variant="ghost"
+            color="neutral"
+            @click="showFormModal = false"
+          />
+        </div>
+      </template>
+
+      <UForm :schema="formSchema" :state="formState" @submit="handleSubmit">
+        <UFormGroup label="Nombre *" name="name">
+          <UInput v-model="formState.name" placeholder="Nombre completo" />
+        </UFormGroup>
+        
+        <UFormGroup label="Email" name="email">
+          <UInput v-model="formState.email" type="email" placeholder="email@ejemplo.com" />
+        </UFormGroup>
+      </UForm>
+
+      <template #footer>
+        <div class="flex justify-end gap-3">
+          <UButton variant="outline" @click="showFormModal = false">
+            Cancelar
+          </UButton>
+          <UButton type="submit" color="primary" @click="handleSubmit">
+            Guardar
+          </UButton>
+        </div>
+      </template>
+    </UCard>
+  </template>
+</UModal>
+```
+
+#### Modal de Confirmación
+```vue
+<UModal v-model:open="showConfirmModal">
+  <template #content>
+    <UCard>
+      <template #header>
+        <h3 class="text-lg font-semibold">Confirmar Acción</h3>
+      </template>
+      
+      <div class="space-y-4">
+        <p>¿Estás seguro de que quieres realizar esta acción?</p>
+        <div class="rounded-lg border p-4">
+          <h4 class="font-medium">Elemento a eliminar</h4>
+          <p class="opacity-75">Esta acción no se puede deshacer.</p>
+        </div>
+      </div>
+      
+      <template #footer>
+        <div class="flex gap-3 justify-end">
+          <UButton variant="outline" @click="showConfirmModal = false">
+            Cancelar
+          </UButton>
+          <UButton color="error" @click="confirmAction">
+            Confirmar
+          </UButton>
+        </div>
+      </template>
+    </UCard>
+  </template>
+</UModal>
+```
+
+### Verificación de Modales
+
+Antes de implementar cualquier modal, verificar:
+1. ✅ ¿Usa `v-model:open` en lugar de `v-model`?
+2. ✅ ¿Tiene `<template #content>` envolviendo el contenido?
+3. ✅ ¿Usa UCard dentro del template #content?
+4. ✅ ¿Los slots #header y #footer están en UCard, no anidados?
+5. ✅ ¿NO usa propiedades `:ui` en UModal?
+
+### Justificación del Sistema de Colores
+- **Consistencia**: Mantiene un sistema de colores coherente en toda la aplicación
+- **Temas**: Permite cambiar temas fácilmente sin romper el diseño
+- **Accesibilidad**: Los colores del sistema están optimizados para contraste
+- **Mantenimiento**: Facilita la actualización del esquema de colores
+
+### Ejemplos CORRECTOS de Colores
+
+#### Componentes de Nuxt UI (SOLO aquí se permite especificar color)
+```vue
+<!-- ✅ Correcto: Solo en componentes UI específicos -->
+<UBadge color="primary">Activo</UBadge>
+<UButton color="success">Confirmar</UButton>
+<UAlert color="error" title="Error" description="Operación fallida" />
+```
+
+#### Elementos HTML normales (SIN colores explícitos)
+```vue
+<!-- ✅ Correcto: Sin colores explícitos, Tailwind elige automáticamente -->
+<div class="p-4 rounded-lg border">
+	<h3 class="font-medium mb-2">Título</h3>
+	<p class="text-sm opacity-75">Descripción del contenido</p>
+	<span class="font-bold">Precio</span>
+</div>
+
+<!-- ✅ Correcto: Usar solo clases estructurales -->
+<div class="space-y-2">
+	<div class="flex justify-between">
+		<span class="opacity-75">Subtotal:</span>
+		<span class="font-semibold">$100</span>
+	</div>
+</div>
+
+<!-- ✅ Correcto: Colores de emergencia solo para estados críticos -->
+<div v-if="error" class="text-error">Error de conexión</div>
+<div v-if="warning" class="text-warning">Stock bajo</div>
+<div v-if="success" class="text-success">Operación exitosa</div>
+```
+
+### Ejemplos INCORRECTOS de Colores
+
+#### ❌ NO hacer esto
+```vue
+<!-- ❌ Incorrecto: Colores explícitos en elementos HTML -->
+<div class="bg-white text-gray-900 p-4">
+<h3 class="text-gray-900 font-medium">Título</h3>
+<p class="text-gray-500 text-sm">Descripción</p>
+<span class="text-red-600">Error</span>
+
+<!-- ❌ Incorrecto: Fondos hardcodeados -->
+<div class="bg-gray-50 rounded-lg p-4">
+<div class="bg-blue-100 border border-blue-200">
+
+<!-- ❌ Incorrecto: Colores fijos en componentes UI -->
+<UBadge color="red">Error</UBadge>
+<UButton color="green">Guardar</UButton>
+```
+
+### Clases de Tailwind CSS Permitidas
+
+**SOLO usar clases estructurales y de diseño, NUNCA colores:**
+
+```vue
+<!-- ✅ Correcto: Solo clases estructurales -->
+<div class="p-4 rounded-lg border shadow-sm">
+<div class="space-y-2 text-sm">
+<div class="flex justify-between items-center">
+<div class="font-medium">
+
+<!-- ✅ Correcto: Opacidades para jerarquía visual -->
+<div class="opacity-75">Texto secundario</div>
+<div class="opacity-50">Texto terciario</div>
+<div class="opacity-25">Elementos deshabilitados</div>
+
+<!-- ✅ Correcto: Fondos sin colores hardcodeados -->
+<div class="rounded-lg border p-4">
+<div class="shadow-sm border">
+<div class="hover:opacity-75">
+
+<!-- ❌ Incorrecto: Cualquier color explícito -->
+<div class="bg-primary-500 text-primary-50">
+<div class="bg-success-100 text-success-800">
+<div class="text-gray-900 bg-white">
+<div class="border-warning-300">
+<div class="bg-gray-50">
+```
+
+### Alternativas a Colores Explícitos
+
+**Para texto:**
+- `opacity-75` en lugar de `text-gray-500` (texto secundario)
+- `opacity-50` en lugar de `text-gray-400` (texto terciario)
+- `opacity-25` en lugar de `text-gray-300` (elementos deshabilitados)
+- `font-medium` o `font-semibold` para destacar texto
+- `text-error`, `text-warning`, `text-success` solo para estados críticos
+
+**Para fondos:**
+- `border` en lugar de `bg-gray-50`
+- `rounded-lg border` en lugar de `bg-white rounded-lg`
+- `shadow-sm` para elementos elevados
+- `hover:opacity-75` en lugar de `hover:bg-gray-50`
+
+**Para bordes:**
+- `border` sin color específico
+- `border-dashed` para bordes punteados
+- `border-2` para bordes más gruesos
+
+### Recordatorios Críticos
+
+- **NUNCA** usar colores explícitos en clases CSS (`text-*`, `bg-*` con colores)
+- **SOLO** usar colores semánticos en componentes UI específicos (UButton, UBadge, UAlert)
+- **SIEMPRE** usar `v-model:open` para modales de Nuxt UI v3
+- **SIEMPRE** envolver contenido de modales en `<template #content>`
+- **SIEMPRE** usar UCard dentro del template #content de modales
+- **SIEMPRE** dejar que Tailwind elija automáticamente los colores según el tema
+- **VERIFICAR** que el diseño funcione en modo claro y oscuro sin colores explícitos
+- **MANTENER** consistencia usando solo clases estructurales
+
+### Migración de Código Existente
+
+Al encontrar código con problemas, corregirlo:
+
+#### Modales
+```vue
+<!-- ❌ Antes: Sintaxis incorrecta -->
+<UModal v-model="isOpen" :ui="{ width: 'sm:max-w-2xl' }">
+  <UCard>
+    <!-- contenido -->
+  </UCard>
+</UModal>
+
+<!-- ✅ Después: Sintaxis correcta -->
+<UModal v-model:open="isOpen">
+  <template #content>
+    <UCard>
+      <!-- contenido -->
+    </UCard>
+  </template>
+</UModal>
+```
+
+#### Colores
+```vue
+<!-- ❌ Antes -->
+<div class="bg-white text-gray-900 border-gray-200">
+	<h3 class="text-gray-900 font-medium">Título</h3>
+	<p class="text-gray-500">Descripción</p>
+	<span class="text-red-600">Error</span>
+</div>
+
+<!-- ✅ Después -->
+<div class="rounded-lg border">
+	<h3 class="font-medium">Título</h3>
+	<p class="opacity-75">Descripción</p>
+	<span class="text-error">Error</span>
+</div>
+```
+
+### Configuración de Colores Personalizados
+
+Si necesitas colores personalizados, configúralos en `app.config.ts`:
+
+```typescript
+export default defineAppConfig({
+	ui: {
+		primary: "blue",
+		secondary: "gray"
+	}
+});
+```
+
+### Verificación Final
+
+Antes de usar cualquier color o modal, preguntarse:
+1. ¿Es un color del sistema de Nuxt UI?
+2. ¿Mantiene la consistencia con el resto de la aplicación?
+3. ¿Funcionará correctamente con diferentes temas?
+4. ¿Usa la sintaxis correcta de modales de Nuxt UI v3?
+5. ¿Está envuelto en `<template #content>`?

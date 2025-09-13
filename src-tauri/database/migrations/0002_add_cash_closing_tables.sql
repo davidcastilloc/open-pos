@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS `cash_sessions` (
 	`created_at` text NOT NULL,
 	`updated_at` text NOT NULL
 );
+
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS `inventory_movements` (
 	`id` text PRIMARY KEY NOT NULL,
@@ -28,6 +29,7 @@ CREATE TABLE IF NOT EXISTS `inventory_movements` (
 	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	`updated_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
+
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS `inventory_stats` (
 	`id` text PRIMARY KEY NOT NULL,

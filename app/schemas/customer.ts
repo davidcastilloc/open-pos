@@ -2,7 +2,7 @@ import { z } from "zod";
 
 // Esquema base para cliente
 export const CustomerSchema = z.object({
-	id: z.string().uuid(),
+	id: z.string(),
 	tenantId: z.string().default("default"),
 	name: z.string().min(1, "El nombre es requerido").max(100, "El nombre es muy largo"),
 	email: z.string().email("Email inválido").optional().or(z.literal("")),
@@ -26,7 +26,7 @@ export const CreateCustomerSchema = CustomerSchema.omit({
 
 // Esquema para actualizar cliente (todos los campos opcionales excepto id)
 export const UpdateCustomerSchema = CreateCustomerSchema.partial().extend({
-	id: z.string().uuid()
+	id: z.string()
 });
 
 // Esquema para búsqueda de clientes
@@ -37,7 +37,7 @@ export const SearchCustomerSchema = z.object({
 
 // Esquema para estadísticas de cliente
 export const CustomerStatsSchema = z.object({
-	customerId: z.string().uuid(),
+	customerId: z.string(),
 	totalSales: z.number().default(0),
 	totalAmount: z.number().default(0),
 	averageTicket: z.number().default(0),
