@@ -15,7 +15,8 @@ const baseTxInput = {
 	reference: z.string().optional(),
 	description: z.string().optional(),
 	exchangeRate: z.number().positive().optional(),
-	cashierId: z.string().optional()
+	cashierId: z.string().optional(),
+	paymentMethod: z.enum(["cash", "card", "transfer"]).optional()
 };
 
 export const CreateSaleTxSchema = z.object({
@@ -40,6 +41,8 @@ export interface TransactionRecord {
 	exchangeRate?: number | null
 	reference?: string | null
 	description?: string | null
+	cashier_id?: string | null
+	payment_method?: string | null
 	createdAt: string
 }
 
@@ -69,8 +72,8 @@ export function useTransactions() {
 
 			const id = `tx_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 			await db.execute(
-				`INSERT INTO transactions (id, tenant_id, account_id, type, amount, currency, exchange_rate, reference, description, created_at)
-				 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
+				`INSERT INTO transactions (id, tenant_id, account_id, type, amount, currency, exchange_rate, reference, description, cashier_id, payment_method, created_at)
+				 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
 				[
 					id,
 					"default",
@@ -80,7 +83,9 @@ export function useTransactions() {
 					parsed.currency,
 					parsed.exchangeRate ?? null,
 					parsed.reference ?? null,
-					parsed.description ?? null
+					parsed.description ?? null,
+					parsed.cashierId ?? null,
+					parsed.paymentMethod ?? null
 				]
 			);
 
@@ -103,8 +108,8 @@ export function useTransactions() {
 
 			const id = `tx_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 			await db.execute(
-				`INSERT INTO transactions (id, tenant_id, account_id, type, amount, currency, exchange_rate, reference, description, created_at)
-				 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
+				`INSERT INTO transactions (id, tenant_id, account_id, type, amount, currency, exchange_rate, reference, description, cashier_id, payment_method, created_at)
+				 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
 				[
 					id,
 					"default",
@@ -114,7 +119,9 @@ export function useTransactions() {
 					parsed.currency,
 					parsed.exchangeRate ?? null,
 					parsed.reference ?? null,
-					parsed.description ?? null
+					parsed.description ?? null,
+					parsed.cashierId ?? null,
+					parsed.paymentMethod ?? null
 				]
 			);
 
@@ -145,10 +152,66 @@ export function useTransactions() {
 		return rows;
 	};
 
+	// Listar transacciones por rango de fechas opcionalmente filtradas por cajero y tipo
+	const listByDateRange = async (params: { from?: string; to?: string; types?: TransactionType[]; cashierId?: string }) => {
+		const clauses: string[] = [];
+		const values: any[] = [];
+		if (params.from) {
+			clauses.push("created_at >= ?");
+			values.push(params.from);
+		}
+		if (params.to) {
+			clauses.push("created_at <= ?");
+			values.push(params.to);
+		}
+		if (params.types && params.types.length > 0) {
+			clauses.push(`type IN (${params.types.map(() => "?").join(", ")})`);
+			values.push(...params.types);
+		}
+		if (params.cashierId) {
+			clauses.push("cashier_id = ?");
+			values.push(params.cashierId);
+		}
+		const where = clauses.length > 0 ? `WHERE ${clauses.join(" AND ")}` : "";
+		const sql = `SELECT * FROM transactions ${where} ORDER BY created_at ASC`;
+		const rows = await query<TransactionRecord>(sql, values);
+		return rows;
+	};
+
+	// Listar transacciones de "hoy" según zona local
+	const listToday = async (params?: { cashierId?: string }) => {
+		const clauses: string[] = ["date(created_at, 'localtime') = date('now', 'localtime')"];
+		const values: any[] = [];
+		if (params?.cashierId) {
+			clauses.push("cashier_id = ?");
+			values.push(params.cashierId);
+		}
+		const sql = `SELECT * FROM transactions WHERE ${clauses.join(" AND ")} ORDER BY created_at ASC`;
+		return await query<TransactionRecord>(sql, values);
+	};
+
+	// Listar ventas de "hoy"
+	const listTodaySales = async (params?: { cashierId?: string }) => {
+		const clauses: string[] = [
+			"date(created_at, 'localtime') = date('now', 'localtime')",
+			"type = 'sale'"
+		];
+		const values: any[] = [];
+		if (params?.cashierId) {
+			clauses.push("cashier_id = ?");
+			values.push(params.cashierId);
+		}
+		const sql = `SELECT * FROM transactions WHERE ${clauses.join(" AND ")} ORDER BY created_at ASC`;
+		return await query<TransactionRecord>(sql, values);
+	};
+
 	return {
 		createSaleTx,
 		createExpenseTx,
-		listByAccount
+		listByAccount,
+		listByDateRange,
+		listToday,
+		listTodaySales
 	};
 }
 

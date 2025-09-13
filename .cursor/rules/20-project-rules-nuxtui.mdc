@@ -1,0 +1,143 @@
+---
+id: pos-system-nuxt4-vue-rule
+title: "POS System — Nuxt 4 / Vue SFC (Reglas MDC)"
+description: Reglas para proyectos POS System (Nuxt 4 + TypeScript + @nuxt/ui). Aplica únicamente sobre archivos Nuxt/Vue (.vue y directorios composables/pages).
+alwaysApply: false
+author: "David Castillo"
+version: 1.0.1
+fileGlobs:
+  - "**/*.vue"
+  - "composables/**/*.ts"
+  - "pages/**/*.vue"
+excludeGlobs:
+  - "node_modules/**"
+  - ".nuxt/**"
+  - "dist/**"
+docsIndex:
+  - "@NuxtUi"
+
+tags:
+  - nuxt4
+  - vue
+  - typescript
+  - zod
+  - tauri
+  - eslint
+---
+rules:
+  - id: script-setup-lang-ts
+    level: error
+    message: "Usar `<script setup lang=\"ts\">` en todos los SFC (.vue)."
+    appliesTo: "*.vue"
+    pattern: (?s)"<script(?:(?!setup).)*>"
+    mustMatch: (?s)"<script[^>]*setup[^>]*lang=(?:\"|')ts(?:\"|')"
+    references:
+      - "@NuxtUi"
+
+  - id: ban-options-api
+    level: error
+    message: "Evita Options API (`export default { ... }`). Migrar a Composition API + `<script setup>`."
+    appliesTo: "*.vue"
+    pattern: "export\\s+default\\s*\\{"
+    references:
+      - "@NuxtUi"
+
+  - id: enforce-pascalcase-filenames
+    level: warning
+    message: "Los archivos de componentes deben usar PascalCase (Ej: MyComponent.vue)."
+    appliesTo: "*.vue"
+    fileNamePattern: "^[A-Z][A-Za-z0-9]+\\.vue$"
+    references:
+      - "@NuxtUi"
+
+  - id: composables-location-name
+    level: error
+    message: "Los composables deben estar en `composables/` y llamarse `useX`."
+    appliesTo: "composables/**/*.ts"
+    pattern: "export\\s+function\\s+(?!use)[A-Za-z0-9_]+\\s*\\("
+    references:
+      - "@NuxtUi"
+
+  - id: defineprops-definemits-typed
+    level: error
+    message: "Definir props y emits con tipado explícito (`defineProps<T>()` y `defineEmits<T>()`)."
+    appliesTo: "*.vue"
+    pattern: "defineProps\\s*\\(|defineEmits\\s*\\("
+    negativePattern: "defineProps\\s*\\(\\s*\\)|defineEmits\\s*\\(\\s*\\)"
+    references:
+      - "@NuxtUi"
+
+  - id: avoid-any
+    level: error
+    message: "Prohibido usar `any`. Reemplazar por tipos concretos o `unknown` temporalmente."
+    appliesTo: "*.vue, **/*.ts"
+    pattern: "(:|as)\\s*any\\b"
+    references:
+      - "@NuxtUi"
+
+  - id: enforce-zod-validation
+    level: error
+    message: "Validar formularios/entradas externas con Zod (`z.object(...)`)."
+    appliesTo: "*.vue"
+    pattern: "(v-model|@submit|@submit.prevent|onSubmit|handleSubmit)"
+    negativePattern: "from\\s+['\"]zod['\"]|z\\.object\\("
+    references:
+      - "@NuxtUi"
+
+  - id: tauri-apis-encapsulate
+    level: warning
+    message: "No importar `@tauri-apps/*` directamente en componentes. Encapsular en composables (ej: composables/tauri/useFs.ts)."
+    appliesTo: "*.vue"
+    pattern: "from\\s+['\"]@tauri-apps/[^'\"]+['\"]"
+    references:
+      - "@NuxtUi"
+
+  - id: nuxt-auto-imports
+    level: info
+    message: "Aprovechar auto-imports de Nuxt: no importar `ref`, `reactive`, `useState`, `useRouter`, etc."
+    appliesTo: "*.vue"
+    pattern: "import\\s+\\{[^}]*\\b(ref|reactive|useState|useRouter|useFetch)\\b[^}]*\\}\\s+from\\s+['\"]vue|nuxt['\"]"
+    references:
+      - "@NuxtUi"
+
+  - id: prefer-useFetch-in-pages
+    level: warning
+    message: "En páginas y componentes SSR-prefiere `useFetch`. Usa `$fetch` sólo en handlers/eventos o llamadas puntuales del cliente."
+    appliesTo: "pages/**, components/**"
+    pattern: "\\$fetch\\s*\\("
+    references:
+      - "@NuxtUi"
+
+  - id: useAsyncData-options-recommendation
+    level: info
+    message: "Cuando uses `useAsyncData` considera `lazy: true` y `server: false` si aplica."
+    appliesTo: "*.vue"
+    pattern: "useAsyncData\\s*\\("
+    negativePattern: "lazy\\s*:\\s*true|server\\s*:\\s*false"
+    references:
+      - "@NuxtUi"
+
+  - id: prefer-nuxtimage-nuxtpicture
+    level: info
+    message: "Usar `<NuxtImage>` / `<NuxtPicture>` para optimización de imágenes; Nuxt Icons para iconos."
+    appliesTo: "*.vue"
+    pattern: "<img\\b"
+    negativePattern: "<NuxtImage|<NuxtPicture"
+    references:
+      - "@NuxtUi"
+
+  - id: eslint-antfu
+    level: info
+    message: "Seguir `@antfu/eslint-config` y la convención de imports (grupos) y scripts (`pnpm lint`)."
+    appliesTo: "package.json, .eslintrc*"
+    pattern: "\"@antfu/eslint-config\""
+    references:
+      - "@NuxtUi"
+
+  - id: vitest-required-for-critical
+    level: info
+    message: "Agregar tests unitarios (Vitest) para funciones críticas (pagos, auth, stores)."
+    appliesTo: "tests/**, composables/**"
+    references:
+      - "@NuxtUi"
+---

@@ -109,10 +109,6 @@ cd pos-system
 # Instalar dependencias
 pnpm install
 
-<<<<<<< Current (Your changes)
-# inicia la app en modo desarrollo
-pnpm run tauri:dev
-=======
 # Variables de entorno (opcional)
 cp env.example .env
 
@@ -157,6 +153,14 @@ Documentos relacionados en la raíz:
 - `INTERFAZ-POS-COMPLETADA.md`, `GESTION-PRODUCTOS-COMPLETADA.md`
 - `CRUD-PRODUCTOS-COMPLETADO.md` - Documentación detallada del CRUD de productos
 - `BASE-DE-DATOS-INICIALIZADA.md`, `SEMANTIC-RELEASE-FIX.md`
+
+---
+
+## 🧾 Cierre de Caja (Resumen)
+
+- Abrir caja desde el layout del POS con el botón “Abrir Caja”.
+- Página `cash-closing`: generar reporte y terminar turno.
+- Documentación completa en `docs/cash-closing.md`.
 
 ---
 

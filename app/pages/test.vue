@@ -423,8 +423,4 @@
 		}
 	});
 
-	// Meta de la página
-	useHead({
-		title: "Prueba del Sistema POS"
-	});
 </script>

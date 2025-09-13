@@ -233,8 +233,4 @@
 		await fetchCurrentRates();
 	};
 
-	// Meta de la página
-	useHead({
-		title: "POS Venezuela - Inicio"
-	});
 </script>
