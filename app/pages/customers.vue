@@ -133,7 +133,7 @@
 					<p class="text-red-600">
 						{{ error }}
 					</p>
-					<UButton class="mt-4" color="red" variant="outline" @click="loadCustomers">
+					<UButton class="mt-4" color="error" variant="outline" @click="loadCustomers">
 						Reintentar
 					</UButton>
 				</div>
@@ -223,14 +223,14 @@
 									</td>
 									<td class="px-6 py-4 whitespace-nowrap">
 										<UBadge
-											:color="customer.isActive ? 'green' : 'gray'"
+											:color="customer.isActive ? 'success' : 'neutral'"
 											variant="subtle"
 										>
 											{{ customer.isActive ? 'Activo' : 'Inactivo' }}
 										</UBadge>
 									</td>
 									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-										{{ formatDate(customer.createdAt) }}
+										{{ formatDate(customer.createdAt || '') }}
 									</td>
 									<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
 										<div class="flex justify-end gap-2">
@@ -238,7 +238,7 @@
 												icon="i-heroicons-eye"
 												size="sm"
 												variant="ghost"
-												color="blue"
+												color="primary"
 												@click="viewCustomer(customer)"
 											>
 												Ver
@@ -247,7 +247,7 @@
 												icon="i-heroicons-pencil"
 												size="sm"
 												variant="ghost"
-												color="yellow"
+												color="warning"
 												@click="editCustomer(customer)"
 											>
 												Editar
@@ -272,225 +272,231 @@
 		</div>
 
 		<!-- Create/Edit Modal -->
-		<UModal v-model="isModalOpen" :ui="{ width: 'sm:max-w-2xl' }">
-			<UCard>
-				<template #header>
-					<div class="flex items-center justify-between">
-						<h3 class="text-lg font-semibold">
-							{{ isEditing ? 'Editar Cliente' : 'Nuevo Cliente' }}
-						</h3>
-						<UButton
-							icon="i-heroicons-x-mark"
-							variant="ghost"
-							color="gray"
-							@click="closeModal"
-						/>
-					</div>
-				</template>
-
-				<UForm
-					:schema="customerSchema"
-					:state="formState"
-					class="space-y-4"
-					@submit="handleSubmit"
-				>
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-						<UFormGroup label="Nombre *" name="name">
-							<UInput v-model="formState.name" placeholder="Nombre completo" />
-						</UFormGroup>
-
-						<UFormGroup label="Email" name="email">
-							<UInput v-model="formState.email" type="email" placeholder="email@ejemplo.com" />
-						</UFormGroup>
-
-						<UFormGroup label="Teléfono" name="phone">
-							<UInput v-model="formState.phone" placeholder="+58 412 123 4567" />
-						</UFormGroup>
-
-						<UFormGroup label="Tipo de Documento" name="documentType">
-							<USelect
-								v-model="formState.documentType"
-								:options="documentTypeOptions"
-								placeholder="Seleccionar tipo"
+		<UModal v-model:open="isModalOpen">
+			<template #content>
+				<UCard>
+					<template #header>
+						<div class="flex items-center justify-between">
+							<h3 class="text-lg font-semibold">
+								{{ isEditing ? 'Editar Cliente' : 'Nuevo Cliente' }}
+							</h3>
+							<UButton
+								icon="i-heroicons-x-mark"
+								variant="ghost"
+								color="neutral"
+								@click="closeModal"
 							/>
-						</UFormGroup>
-
-						<UFormGroup label="Número de Documento" name="documentNumber">
-							<UInput v-model="formState.documentNumber" placeholder="V-12345678" />
-						</UFormGroup>
-
-						<UFormGroup label="Fecha de Nacimiento" name="birthDate">
-							<UInput v-model="formState.birthDate" type="date" />
-						</UFormGroup>
-					</div>
-
-					<UFormGroup label="Dirección" name="address">
-						<UTextarea v-model="formState.address" placeholder="Dirección completa" />
-					</UFormGroup>
-
-					<UFormGroup label="Notas" name="notes">
-						<UTextarea v-model="formState.notes" placeholder="Notas adicionales sobre el cliente" />
-					</UFormGroup>
-
-					<UFormGroup label="Estado" name="isActive">
-						<UToggle v-model="formState.isActive" />
-						<span class="ml-2 text-sm text-gray-500">
-							{{ formState.isActive ? 'Cliente activo' : 'Cliente inactivo' }}
-						</span>
-					</UFormGroup>
-
-					<template #footer>
-						<div class="flex justify-end gap-3">
-							<UButton variant="outline" @click="closeModal">
-								Cancelar
-							</UButton>
-							<UButton type="submit" :loading="loading" color="primary">
-								{{ isEditing ? 'Actualizar' : 'Crear' }} Cliente
-							</UButton>
 						</div>
 					</template>
-				</UForm>
-			</UCard>
+
+					<UForm
+						:schema="customerSchema"
+						:state="formState"
+						class="space-y-4"
+						@submit="handleSubmit"
+					>
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<UFormGroup label="Nombre *" name="name">
+								<UInput v-model="formState.name" placeholder="Nombre completo" />
+							</UFormGroup>
+
+							<UFormGroup label="Email" name="email">
+								<UInput v-model="formState.email" type="email" placeholder="email@ejemplo.com" />
+							</UFormGroup>
+
+							<UFormGroup label="Teléfono" name="phone">
+								<UInput v-model="formState.phone" placeholder="+58 412 123 4567" />
+							</UFormGroup>
+
+							<UFormGroup label="Tipo de Documento" name="documentType">
+								<USelect
+									v-model="formState.documentType"
+									:options="documentTypeOptions"
+									placeholder="Seleccionar tipo"
+								/>
+							</UFormGroup>
+
+							<UFormGroup label="Número de Documento" name="documentNumber">
+								<UInput v-model="formState.documentNumber" placeholder="V-12345678" />
+							</UFormGroup>
+
+							<UFormGroup label="Fecha de Nacimiento" name="birthDate">
+								<UInput v-model="formState.birthDate" type="date" />
+							</UFormGroup>
+						</div>
+
+						<UFormGroup label="Dirección" name="address">
+							<UTextarea v-model="formState.address" placeholder="Dirección completa" />
+						</UFormGroup>
+
+						<UFormGroup label="Notas" name="notes">
+							<UTextarea v-model="formState.notes" placeholder="Notas adicionales sobre el cliente" />
+						</UFormGroup>
+
+						<UFormGroup label="Estado" name="isActive">
+							<UToggle v-model="formState.isActive" />
+							<span class="ml-2 text-sm text-gray-500">
+								{{ formState.isActive ? 'Cliente activo' : 'Cliente inactivo' }}
+							</span>
+						</UFormGroup>
+
+						<template #footer>
+							<div class="flex justify-end gap-3">
+								<UButton variant="outline" @click="closeModal">
+									Cancelar
+								</UButton>
+								<UButton type="submit" :loading="loading" color="primary">
+									{{ isEditing ? 'Actualizar' : 'Crear' }} Cliente
+								</UButton>
+							</div>
+						</template>
+					</UForm>
+				</UCard>
+			</template>
 		</UModal>
 
 		<!-- View Modal -->
-		<UModal v-model="isViewModalOpen" :ui="{ width: 'sm:max-w-2xl' }">
-			<UCard>
-				<template #header>
-					<div class="flex items-center justify-between">
-						<h3 class="text-lg font-semibold">
-							Detalles del Cliente
-						</h3>
-						<UButton
-							icon="i-heroicons-x-mark"
-							variant="ghost"
-							color="gray"
-							@click="closeViewModal"
-						/>
-					</div>
-				</template>
+		<UModal v-model:open="isViewModalOpen">
+			<template #content>
+				<UCard>
+					<template #header>
+						<div class="flex items-center justify-between">
+							<h3 class="text-lg font-semibold">
+								Detalles del Cliente
+							</h3>
+							<UButton
+								icon="i-heroicons-x-mark"
+								variant="ghost"
+								color="neutral"
+								@click="closeViewModal"
+							/>
+						</div>
+					</template>
 
-				<div v-if="selectedCustomer" class="space-y-6">
-					<!-- Basic Info -->
-					<div class="flex items-start space-x-4">
-						<div class="flex-shrink-0">
-							<div class="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center">
-								<UIcon name="i-heroicons-user" class="h-8 w-8 text-blue-600" />
+					<div v-if="selectedCustomer" class="space-y-6">
+						<!-- Basic Info -->
+						<div class="flex items-start space-x-4">
+							<div class="flex-shrink-0">
+								<div class="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center">
+									<UIcon name="i-heroicons-user" class="h-8 w-8 text-blue-600" />
+								</div>
+							</div>
+							<div class="flex-1">
+								<h4 class="text-xl font-semibold text-gray-900">
+									{{ selectedCustomer.name }}
+								</h4>
+								<p class="text-sm text-gray-500">
+									Registrado el {{ formatDate(selectedCustomer.createdAt) }}
+								</p>
+								<UBadge
+									:color="selectedCustomer.isActive ? 'success' : 'neutral'"
+									variant="subtle"
+									class="mt-2"
+								>
+									{{ selectedCustomer.isActive ? 'Activo' : 'Inactivo' }}
+								</UBadge>
 							</div>
 						</div>
-						<div class="flex-1">
-							<h4 class="text-xl font-semibold text-gray-900">
-								{{ selectedCustomer.name }}
-							</h4>
-							<p class="text-sm text-gray-500">
-								Registrado el {{ formatDate(selectedCustomer.createdAt) }}
+
+						<!-- Contact Info -->
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+							<div>
+								<h5 class="text-sm font-medium text-gray-900 mb-3">
+									Información de Contacto
+								</h5>
+								<div class="space-y-2">
+									<div v-if="selectedCustomer.email" class="flex items-center">
+										<UIcon name="i-heroicons-envelope" class="h-4 w-4 text-gray-400 mr-2" />
+										<span class="text-sm text-gray-600">{{ selectedCustomer.email }}</span>
+									</div>
+									<div v-if="selectedCustomer.phone" class="flex items-center">
+										<UIcon name="i-heroicons-phone" class="h-4 w-4 text-gray-400 mr-2" />
+										<span class="text-sm text-gray-600">{{ selectedCustomer.phone }}</span>
+									</div>
+									<div v-if="selectedCustomer.address" class="flex items-center">
+										<UIcon name="i-heroicons-map-pin" class="h-4 w-4 text-gray-400 mr-2" />
+										<span class="text-sm text-gray-600">{{ selectedCustomer.address }}</span>
+									</div>
+								</div>
+							</div>
+
+							<div>
+								<h5 class="text-sm font-medium text-gray-900 mb-3">
+									Documento
+								</h5>
+								<div v-if="selectedCustomer.documentType && selectedCustomer.documentNumber" class="space-y-2">
+									<div class="text-sm text-gray-600">
+										<span class="font-medium">{{ getDocumentTypeLabel(selectedCustomer.documentType) }}:</span>
+										{{ selectedCustomer.documentNumber }}
+									</div>
+									<div v-if="selectedCustomer.birthDate" class="text-sm text-gray-600">
+										<span class="font-medium">Fecha de Nacimiento:</span>
+										{{ formatDate(selectedCustomer.birthDate) }}
+									</div>
+								</div>
+								<div v-else class="text-sm text-gray-400">
+									Sin información de documento
+								</div>
+							</div>
+						</div>
+
+						<!-- Notes -->
+						<div v-if="selectedCustomer.notes">
+							<h5 class="text-sm font-medium text-gray-900 mb-3">
+								Notas
+							</h5>
+							<p class="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+								{{ selectedCustomer.notes }}
 							</p>
-							<UBadge
-								:color="selectedCustomer.isActive ? 'green' : 'gray'"
-								variant="subtle"
-								class="mt-2"
-							>
-								{{ selectedCustomer.isActive ? 'Activo' : 'Inactivo' }}
-							</UBadge>
 						</div>
 					</div>
 
-					<!-- Contact Info -->
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-						<div>
-							<h5 class="text-sm font-medium text-gray-900 mb-3">
-								Información de Contacto
-							</h5>
-							<div class="space-y-2">
-								<div v-if="selectedCustomer.email" class="flex items-center">
-									<UIcon name="i-heroicons-envelope" class="h-4 w-4 text-gray-400 mr-2" />
-									<span class="text-sm text-gray-600">{{ selectedCustomer.email }}</span>
-								</div>
-								<div v-if="selectedCustomer.phone" class="flex items-center">
-									<UIcon name="i-heroicons-phone" class="h-4 w-4 text-gray-400 mr-2" />
-									<span class="text-sm text-gray-600">{{ selectedCustomer.phone }}</span>
-								</div>
-								<div v-if="selectedCustomer.address" class="flex items-center">
-									<UIcon name="i-heroicons-map-pin" class="h-4 w-4 text-gray-400 mr-2" />
-									<span class="text-sm text-gray-600">{{ selectedCustomer.address }}</span>
-								</div>
-							</div>
+					<template #footer>
+						<div class="flex justify-end gap-3">
+							<UButton variant="outline" @click="closeViewModal">
+								Cerrar
+							</UButton>
+							<UButton color="primary" @click="editCustomer(selectedCustomer!)">
+								Editar Cliente
+							</UButton>
 						</div>
-
-						<div>
-							<h5 class="text-sm font-medium text-gray-900 mb-3">
-								Documento
-							</h5>
-							<div v-if="selectedCustomer.documentType && selectedCustomer.documentNumber" class="space-y-2">
-								<div class="text-sm text-gray-600">
-									<span class="font-medium">{{ getDocumentTypeLabel(selectedCustomer.documentType) }}:</span>
-									{{ selectedCustomer.documentNumber }}
-								</div>
-								<div v-if="selectedCustomer.birthDate" class="text-sm text-gray-600">
-									<span class="font-medium">Fecha de Nacimiento:</span>
-									{{ formatDate(selectedCustomer.birthDate) }}
-								</div>
-							</div>
-							<div v-else class="text-sm text-gray-400">
-								Sin información de documento
-							</div>
-						</div>
-					</div>
-
-					<!-- Notes -->
-					<div v-if="selectedCustomer.notes">
-						<h5 class="text-sm font-medium text-gray-900 mb-3">
-							Notas
-						</h5>
-						<p class="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-							{{ selectedCustomer.notes }}
-						</p>
-					</div>
-				</div>
-
-				<template #footer>
-					<div class="flex justify-end gap-3">
-						<UButton variant="outline" @click="closeViewModal">
-							Cerrar
-						</UButton>
-						<UButton color="primary" @click="editCustomer(selectedCustomer)">
-							Editar Cliente
-						</UButton>
-					</div>
-				</template>
-			</UCard>
+					</template>
+				</UCard>
+			</template>
 		</UModal>
 
 		<!-- Delete Confirm Modal -->
-		<UModal v-model="isDeleteModalOpen" :ui="{ width: 'sm:max-w-md' }">
-			<UCard>
-				<template #header>
-					<h3 class="text-lg font-semibold">
-						Confirmar Eliminación
-					</h3>
-				</template>
-				<div class="space-y-4">
-					<p>¿Estás seguro de que quieres eliminar este cliente?</p>
-					<div v-if="customerToDelete" class="rounded-lg p-4 border">
-						<h4 class="font-medium">
-							{{ customerToDelete.name }}
-						</h4>
-						<p class="text-sm opacity-75">
-							Esta acción no se puede deshacer.
-						</p>
+		<UModal v-model:open="isDeleteModalOpen">
+			<template #content>
+				<UCard>
+					<template #header>
+						<h3 class="text-lg font-semibold">
+							Confirmar Eliminación
+						</h3>
+					</template>
+					<div class="space-y-4">
+						<p>¿Estás seguro de que quieres eliminar este cliente?</p>
+						<div v-if="customerToDelete" class="rounded-lg p-4 border">
+							<h4 class="font-medium">
+								{{ customerToDelete.name }}
+							</h4>
+							<p class="text-sm opacity-75">
+								Esta acción no se puede deshacer.
+							</p>
+						</div>
 					</div>
-				</div>
-				<template #footer>
-					<div class="flex gap-3 justify-end">
-						<UButton variant="outline" @click="isDeleteModalOpen = false">
-							Cancelar
-						</UButton>
-						<UButton color="error" :loading="loading" @click="confirmDeleteCustomer">
-							Eliminar
-						</UButton>
-					</div>
-				</template>
-			</UCard>
+					<template #footer>
+						<div class="flex gap-3 justify-end">
+							<UButton variant="outline" @click="isDeleteModalOpen = false">
+								Cancelar
+							</UButton>
+							<UButton color="error" :loading="loading" @click="confirmDeleteCustomer">
+								Eliminar
+							</UButton>
+						</div>
+					</template>
+				</UCard>
+			</template>
 		</UModal>
 	</div>
 </template>
@@ -537,7 +543,8 @@
 		documentNumber: "",
 		birthDate: "",
 		notes: "",
-		isActive: true
+		isActive: true,
+		tenantId: "default"
 	});
 
 	// Options
@@ -585,13 +592,29 @@
 			searchResults.value = [];
 			return;
 		}
-
 		try {
-			searchResults.value = await searchCustomers(searchQuery.value, statusFilter.value !== "inactive");
+			const results = await searchCustomers(
+				searchQuery.value,
+				statusFilter.value !== "inactive"
+			);
+
+			// Normalizar los resultados para asegurar que isActive nunca sea null
+			searchResults.value = results.map((c: any) => ({
+				...c,
+				isActive: c.isActive === null ? false : c.isActive,
+				createdAt: c.createdAt ?? undefined,
+				updatedAt: c.updatedAt ?? undefined,
+				email: c.email ?? undefined,
+				phone: c.phone ?? undefined,
+				address: c.address ?? undefined,
+				documentType: c.documentType ?? undefined,
+				documentNumber: c.documentNumber ?? undefined,
+				birthDate: c.birthDate ?? undefined,
+				notes: c.notes ?? undefined
+			}));
 		} catch (err) {
-			console.error("Error searching customers:", err);
+			console.error("Error buscando clientes:", err);
 		}
-	};
 
 	const handleFilter = () => {
 		if (searchQuery.value) {
@@ -616,7 +639,8 @@
 			documentNumber: "",
 			birthDate: "",
 			notes: "",
-			isActive: true
+			isActive: true,
+			tenantId: "default"
 		};
 		isModalOpen.value = true;
 	};
@@ -672,7 +696,8 @@
 			documentNumber: "",
 			birthDate: "",
 			notes: "",
-			isActive: true
+			isActive: true,
+			tenantId: "default"
 		};
 	};
 

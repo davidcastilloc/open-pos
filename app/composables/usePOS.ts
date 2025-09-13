@@ -55,11 +55,11 @@ export function usePOS() {
 				[productId]
 			);
 
-			if (!product || product.length === 0) {
+			if (!product || product.rows.length === 0) {
 				throw new Error("Producto no encontrado");
 			}
 
-			const productData = product[0];
+			const productData = product.rows[0];
 
 			// Verificar stock
 			if (productData.stock < quantity) {

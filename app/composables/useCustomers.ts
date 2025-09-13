@@ -20,14 +20,20 @@ export const useCustomers = () => {
 		error.value = null;
 
 		try {
+			console.log("🔍 Iniciando consulta de clientes, activeOnly:", activeOnly);
 			const query = activeOnly
 				? "SELECT * FROM customers WHERE is_active = 1 ORDER BY name ASC"
 				: "SELECT * FROM customers ORDER BY name ASC";
 
+			console.log("📝 Query SQL:", query);
 			const result = await execute(query);
+			console.log("📊 Resultado crudo:", result);
 			customers.value = result.rows as Customer[];
+			console.log("🔍 Resultado de la consulta de customers:", customers.value);
+			console.log("📈 Total de clientes cargados:", customers.value.length);
 			return customers.value;
 		} catch (err) {
+			console.error("❌ Error en getCustomers:", err);
 			error.value = err instanceof Error ? err.message : "Error al obtener clientes";
 			throw err;
 		} finally {

@@ -301,186 +301,209 @@
 			</div>
 
 			<!-- Modal de pago -->
-			<UModal
-				v-model:open="showPaymentModal"
-				title="Procesar Pago"
-				description="Confirma los detalles de la venta y selecciona el método de pago"
-			>
-				<template #body>
-					<div class="space-y-4">
-						<!-- Resumen de la venta -->
-						<div class="rounded-lg p-4 border">
-							<h4 class="font-medium mb-2">
-								Resumen de la venta
-							</h4>
-							<div class="space-y-1 text-sm">
-								<div class="flex justify-between">
-									<span>Items:</span>
-									<span>{{ cart.length }}</span>
+			<UModal v-model:open="showPaymentModal">
+				<template #content>
+					<UCard>
+						<template #header>
+							<h3 class="text-lg font-semibold">
+								Procesar Pago
+							</h3>
+							<p class="text-sm text-gray-500">
+								Confirma los detalles de la venta y selecciona el método de pago
+							</p>
+						</template>
+
+						<div class="space-y-4">
+							<!-- Resumen de la venta -->
+							<div class="rounded-lg p-4 border">
+								<h4 class="font-medium mb-2">
+									Resumen de la venta
+								</h4>
+								<div class="space-y-1 text-sm">
+									<div class="flex justify-between">
+										<span>Items:</span>
+										<span>{{ cart.length }}</span>
+									</div>
+									<div class="flex justify-between">
+										<span>Subtotal:</span>
+										<span>{{ formatPrice(subtotal, currentCurrency) }}</span>
+									</div>
+									<div class="flex justify-between">
+										<span>Total:</span>
+										<span class="font-bold">{{ formatPrice(total, currentCurrency) }}</span>
+									</div>
 								</div>
-								<div class="flex justify-between">
-									<span>Subtotal:</span>
-									<span>{{ formatPrice(subtotal, currentCurrency) }}</span>
+							</div>
+
+							<!-- Cliente (opcional) -->
+							<div>
+								<label class="block text-sm font-medium mb-2">
+									Cliente (opcional)
+								</label>
+								<div class="flex gap-2">
+									<USelectMenu
+										v-model="selectedCustomer"
+										:items="customerOptions"
+										placeholder="Seleccionar cliente"
+										searchable
+										class="flex-1"
+									/>
+									<UButton
+										icon="i-heroicons-plus"
+										variant="outline"
+										size="sm"
+										@click="showCustomerModal = true"
+									>
+										Nuevo
+									</UButton>
 								</div>
-								<div class="flex justify-between">
-									<span>Total:</span>
-									<span class="font-bold">{{ formatPrice(total, currentCurrency) }}</span>
-								</div>
+							</div>
+
+							<!-- Método de pago -->
+							<div class="mt-4">
+								<label class="block text-sm font-medium mb-2">
+									Método de pago
+								</label>
+								<USelectMenu
+									v-model="selectedPaymentMethod"
+									:items="paymentMethods"
+									placeholder="Seleccionar método"
+								/>
+							</div>
+							<!-- Cuenta de pago -->
+							<div class="mt-4">
+								<label class="block text-sm font-medium mb-2">
+									Cuenta de pago
+								</label>
+								<USelectMenu
+									v-model="selectedPaymentAccount"
+									:items="paymentAccounts"
+									placeholder="Seleccionar cuenta"
+								/>
 							</div>
 						</div>
 
-						<!-- Cliente (opcional) -->
-						<div>
-							<label class="block text-sm font-medium mb-2">
-								Cliente (opcional)
-							</label>
-							<div class="flex gap-2">
-								<USelectMenu
-									v-model="selectedCustomer"
-									:items="customerOptions"
-									placeholder="Seleccionar cliente"
-									searchable
-									class="flex-1"
-								/>
+						<template #footer>
+							<div class="flex space-x-3">
 								<UButton
-									icon="i-heroicons-plus"
 									variant="outline"
-									size="sm"
-									@click="showCustomerModal = true"
+									class="flex-1"
+									@click="showPaymentModal = false"
 								>
-									Nuevo
+									Cancelar
+								</UButton>
+								<UButton
+									:loading="isProcessing"
+									:disabled="!selectedPaymentAccount?.value"
+									color="primary"
+									class="flex-1"
+									@click="processPayment"
+								>
+									Confirmar Pago
 								</UButton>
 							</div>
-						</div>
-
-						<!-- Método de pago -->
-						<div class="mt-4">
-							<label class="block text-sm font-medium mb-2">
-								Método de pago
-							</label>
-							<USelectMenu
-								v-model="selectedPaymentMethod"
-								:items="paymentMethods"
-								placeholder="Seleccionar método"
-							/>
-						</div>
-						<!-- Cuenta de pago -->
-						<div class="mt-4">
-							<label class="block text-sm font-medium mb-2">
-								Cuenta de pago
-							</label>
-							<USelectMenu
-								v-model="selectedPaymentAccount"
-								:items="paymentAccounts"
-								placeholder="Seleccionar cuenta"
-							/>
-						</div>
-					</div>
-				</template>
-
-				<template #footer>
-					<div class="flex space-x-3">
-						<UButton
-							variant="outline"
-							class="flex-1"
-							@click="showPaymentModal = false"
-						>
-							Cancelar
-						</UButton>
-						<UButton
-							:loading="isProcessing"
-							:disabled="!selectedPaymentAccount?.value"
-							color="primary"
-							class="flex-1"
-							@click="processPayment"
-						>
-							Confirmar Pago
-						</UButton>
-					</div>
+						</template>
+					</UCard>
 				</template>
 			</UModal>
 			<!-- Modal de egreso -->
-			<UModal
-				v-model:open="showExpenseModal"
-				title="Registrar egreso"
-				description="Registra un gasto desde una cuenta de caja"
-			>
-				<template #body>
-					<div class="space-y-4">
-						<div>
-							<label class="block text-sm font-medium mb-2">Cuenta</label>
-							<USelectMenu
-								v-model="expenseForm.accountId"
-								:items="paymentAccounts"
-								placeholder="Seleccionar cuenta"
-							/>
+			<UModal v-model:open="showExpenseModal">
+				<template #content>
+					<UCard>
+						<template #header>
+							<h3 class="text-lg font-semibold">
+								Registrar egreso
+							</h3>
+							<p class="text-sm text-gray-500">
+								Registra un gasto desde una cuenta de caja
+							</p>
+						</template>
+
+						<div class="space-y-4">
+							<div>
+								<label class="block text-sm font-medium mb-2">Cuenta</label>
+								<USelectMenu
+									v-model="expenseForm.accountId"
+									:items="paymentAccounts"
+									placeholder="Seleccionar cuenta"
+								/>
+							</div>
+							<div>
+								<label class="block text-sm font-medium mb-2">Monto</label>
+								<UInput v-model="expenseForm.amount" type="number" step="0.01" min="0" placeholder="0.00" />
+							</div>
+							<div>
+								<label class="block text-sm font-medium mb-2">Moneda</label>
+								<USelectMenu
+									v-model="expenseForm.currency"
+									:items="currencyOptions"
+								/>
+							</div>
+							<div>
+								<label class="block text-sm font-medium mb-2">Descripción</label>
+								<UTextarea v-model="expenseForm.description" placeholder="Motivo del egreso" />
+							</div>
 						</div>
-						<div>
-							<label class="block text-sm font-medium mb-2">Monto</label>
-							<UInput v-model="expenseForm.amount" type="number" step="0.01" min="0" placeholder="0.00" />
-						</div>
-						<div>
-							<label class="block text-sm font-medium mb-2">Moneda</label>
-							<USelectMenu
-								v-model="expenseForm.currency"
-								:items="currencyOptions"
-							/>
-						</div>
-						<div>
-							<label class="block text-sm font-medium mb-2">Descripción</label>
-							<UTextarea v-model="expenseForm.description" placeholder="Motivo del egreso" />
-						</div>
-					</div>
-				</template>
-				<template #footer>
-					<div class="flex space-x-3">
-						<UButton variant="outline" class="flex-1" @click="showExpenseModal = false">
-							Cancelar
-						</UButton>
-						<UButton color="primary" class="flex-1" @click="saveExpense">
-							Guardar egreso
-						</UButton>
-					</div>
+
+						<template #footer>
+							<div class="flex space-x-3">
+								<UButton variant="outline" class="flex-1" @click="showExpenseModal = false">
+									Cancelar
+								</UButton>
+								<UButton color="primary" class="flex-1" @click="saveExpense">
+									Guardar egreso
+								</UButton>
+							</div>
+						</template>
+					</UCard>
 				</template>
 			</UModal>
 
 			<!-- Modal para crear cliente rápido -->
-			<UModal v-model:open="showCustomerModal" title="Nuevo Cliente">
-				<template #body>
-					<div class="space-y-4">
-						<UFormGroup label="Nombre *" name="name">
-							<UInput v-model="quickCustomerForm.name" placeholder="Nombre completo" />
-						</UFormGroup>
+			<UModal v-model:open="showCustomerModal">
+				<template #content>
+					<UCard>
+						<template #header>
+							<h3 class="text-lg font-semibold">
+								Nuevo Cliente
+							</h3>
+						</template>
 
-						<UFormGroup label="Email" name="email">
-							<UInput v-model="quickCustomerForm.email" type="email" placeholder="email@ejemplo.com" />
-						</UFormGroup>
+						<div class="space-y-4">
+							<UFormGroup label="Nombre *" name="name">
+								<UInput v-model="quickCustomerForm.name" placeholder="Nombre completo" />
+							</UFormGroup>
 
-						<UFormGroup label="Teléfono" name="phone">
-							<UInput v-model="quickCustomerForm.phone" placeholder="+58 412 123 4567" />
-						</UFormGroup>
-					</div>
-				</template>
+							<UFormGroup label="Email" name="email">
+								<UInput v-model="quickCustomerForm.email" type="email" placeholder="email@ejemplo.com" />
+							</UFormGroup>
 
-				<template #footer>
-					<div class="flex space-x-3">
-						<UButton
-							variant="outline"
-							class="flex-1"
-							@click="showCustomerModal = false"
-						>
-							Cancelar
-						</UButton>
-						<UButton
-							:loading="isCreatingCustomer"
-							:disabled="!quickCustomerForm.name.trim()"
-							color="primary"
-							class="flex-1"
-							@click="createQuickCustomer"
-						>
-							Crear Cliente
-						</UButton>
-					</div>
+							<UFormGroup label="Teléfono" name="phone">
+								<UInput v-model="quickCustomerForm.phone" placeholder="+58 412 123 4567" />
+							</UFormGroup>
+						</div>
+
+						<template #footer>
+							<div class="flex space-x-3">
+								<UButton
+									variant="outline"
+									class="flex-1"
+									@click="showCustomerModal = false"
+								>
+									Cancelar
+								</UButton>
+								<UButton
+									:loading="isCreatingCustomer"
+									:disabled="!quickCustomerForm.name.trim()"
+									color="primary"
+									class="flex-1"
+									@click="createQuickCustomer"
+								>
+									Crear Cliente
+								</UButton>
+							</div>
+						</template>
+					</UCard>
 				</template>
 			</UModal>
 		</div>
@@ -698,7 +721,7 @@
 			await Promise.all([
 				loadAccounts(),
 				loadCategories(),
-				getCustomers(true) // Solo clientes activos
+				getCustomers(false) // Solo clientes activos
 			]);
 
 			console.log("✅ Cuentas, categorías y clientes cargados");

@@ -32,7 +32,7 @@ export function useAccounts() {
 			const sql = "SELECT * FROM accounts WHERE tenant_id = ? ORDER BY name";
 			const results = await query<any>(sql, ["default"]);
 
-			accounts.value = results.map((row: any) => ({
+			accounts.value = results.rows.map((row: any) => ({
 				id: row.id,
 				tenantId: row.tenant_id,
 				name: row.name,

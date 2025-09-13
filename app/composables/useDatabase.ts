@@ -18,6 +18,7 @@ export function useDatabase() {
 		error.value = null;
 
 		try {
+			console.log("🔧 Llamando a initDatabase...");
 			await initDatabase();
 			isInitialized.value = true;
 			console.log("✅ Base de datos inicializada correctamente");
@@ -30,14 +31,14 @@ export function useDatabase() {
 	};
 
 	// Ejecutar consulta
-	const query = async <T>(sql: string, params: any[] = []): Promise<T[]> => {
+	const query = async <T>(sql: string, params: any[] = []): Promise<{ rows: T[] }> => {
 		try {
 			console.log("🔍 Ejecutando query:", { sql, params });
 			const sqlite = await getSqlite();
 			const rows = await sqlite.select(sql, params) as unknown as T[];
 			await sqlite.close();
 			console.log("✅ Query ejecutado exitosamente, filas:", rows.length);
-			return rows as T[];
+			return { rows: rows as T[] };
 		} catch (err) {
 			console.error("❌ Error executing query:", err);
 			throw err;
@@ -45,12 +46,24 @@ export function useDatabase() {
 	};
 
 	// Ejecutar comando
-	const execute = async (sql: string, params: any[] = []): Promise<any> => {
+	const execute = async (sql: string, params: any[] = []): Promise<{ rows: any[] }> => {
 		try {
 			console.log("🔧 Ejecutando comando:", { sql, params });
 			const sqlite = await getSqlite();
 			console.log("🔍 Base de datos cargada:", "sqlite:pos.db");
-			const result = await sqlite.execute(sql, params);
+
+			// Verificar si es una consulta SELECT
+			const isSelect = sql.trim().toLowerCase().startsWith("select");
+			let result;
+
+			if (isSelect) {
+				const rows = await sqlite.select(sql, params);
+				result = { rows };
+			} else {
+				await sqlite.execute(sql, params);
+				result = { rows: [] };
+			}
+
 			await sqlite.close();
 			console.log("✅ Comando ejecutado exitosamente");
 			return result;
@@ -59,7 +72,7 @@ export function useDatabase() {
 			const message = String(err?.message || err);
 			if (message.includes("already exists") || message.includes("duplicate column name")) {
 				console.warn("⚠️ Operación idempotente:", message);
-				return null;
+				return { rows: [] };
 			}
 			console.error("❌ Error executing command:", err);
 			throw err;

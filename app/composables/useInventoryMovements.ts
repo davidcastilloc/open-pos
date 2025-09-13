@@ -321,7 +321,7 @@ export function useInventoryMovements() {
 
 			const results = await query<any>(sql, params);
 
-			movements.value = results.map((row: any) => ({
+			movements.value = results.rows.map((row: any) => ({
 				id: row.id,
 				productId: row.product_id,
 				productName: row.product_name,
@@ -423,7 +423,7 @@ export function useInventoryMovements() {
 				LIMIT ?
 			`, [productId, "default", limit]);
 
-			return results.map((row: any) => ({
+			return results.rows.map((row: any) => ({
 				id: row.id,
 				productId: row.product_id,
 				productName: row.product_name,

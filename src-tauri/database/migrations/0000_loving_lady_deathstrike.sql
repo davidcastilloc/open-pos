@@ -13,6 +13,7 @@ CREATE TABLE `accounts` (
 	`created_at` text NOT NULL,
 	`updated_at` text NOT NULL
 );
+
 --> statement-breakpoint
 CREATE TABLE `cash_closings` (
 	`id` text PRIMARY KEY NOT NULL,
@@ -30,6 +31,7 @@ CREATE TABLE `cash_closings` (
 	`created_at` text NOT NULL,
 	`closed_at` text
 );
+
 --> statement-breakpoint
 CREATE TABLE `transactions` (
 	`id` text PRIMARY KEY NOT NULL,
@@ -43,6 +45,7 @@ CREATE TABLE `transactions` (
 	`description` text,
 	`created_at` text NOT NULL
 );
+
 --> statement-breakpoint
 CREATE TABLE `exchange_rates` (
 	`id` text PRIMARY KEY NOT NULL,
@@ -54,6 +57,7 @@ CREATE TABLE `exchange_rates` (
 	`is_valid` integer DEFAULT true NOT NULL,
 	`created_at` text NOT NULL
 );
+
 --> statement-breakpoint
 CREATE TABLE `sync_queue` (
 	`id` text PRIMARY KEY NOT NULL,
@@ -67,6 +71,7 @@ CREATE TABLE `sync_queue` (
 	`created_at` text NOT NULL,
 	`updated_at` text NOT NULL
 );
+
 --> statement-breakpoint
 CREATE TABLE `system_config` (
 	`id` text PRIMARY KEY NOT NULL,
@@ -82,6 +87,7 @@ CREATE TABLE `system_config` (
 	`created_at` text NOT NULL,
 	`updated_at` text NOT NULL
 );
+
 --> statement-breakpoint
 CREATE TABLE `categories` (
 	`id` text PRIMARY KEY NOT NULL,
@@ -92,6 +98,7 @@ CREATE TABLE `categories` (
 	`created_at` text NOT NULL,
 	`updated_at` text NOT NULL
 );
+
 --> statement-breakpoint
 CREATE TABLE `products` (
 	`id` text PRIMARY KEY NOT NULL,
@@ -111,6 +118,7 @@ CREATE TABLE `products` (
 	`updated_at` text NOT NULL,
 	`synced_at` text
 );
+
 --> statement-breakpoint
 CREATE TABLE `customers` (
 	`id` text PRIMARY KEY NOT NULL,
@@ -124,6 +132,7 @@ CREATE TABLE `customers` (
 	`created_at` text NOT NULL,
 	`updated_at` text NOT NULL
 );
+
 --> statement-breakpoint
 CREATE TABLE `sale_items` (
 	`id` text PRIMARY KEY NOT NULL,
@@ -134,6 +143,7 @@ CREATE TABLE `sale_items` (
 	`total` real NOT NULL,
 	`created_at` text NOT NULL
 );
+
 --> statement-breakpoint
 CREATE TABLE `sales` (
 	`id` text PRIMARY KEY NOT NULL,
