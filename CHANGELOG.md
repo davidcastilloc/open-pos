@@ -1,3 +1,10 @@
+## <small>1.8.1 (2025-09-13)</small>
+
+* Merge pull request #19 from davidcastilloc/transaction ([e789be4dc3f1e57a604b11dab8ba05ede350b773](https://github.com/davidcastilloc/open-pos/commit/e789be4dc3f1e57a604b11dab8ba05ede350b773)), closes [#19](https://github.com/davidcastilloc/open-pos/issues/19)
+* chore: Actualizar configuración de ESLint y dependencias ([bdd312558e8c765cba18b38d0da70fad66c7040e](https://github.com/davidcastilloc/open-pos/commit/bdd312558e8c765cba18b38d0da70fad66c7040e))
+* refactor: Mejorar la consistencia del código y la legibilidad ([3cd673542239348248b7ce02e177c7f1205078a1](https://github.com/davidcastilloc/open-pos/commit/3cd673542239348248b7ce02e177c7f1205078a1))
+* fix: Resolver problemas de migraciones de base de datos ([28d7d27d508270a545eb419ee386e2b3c0348614](https://github.com/davidcastilloc/open-pos/commit/28d7d27d508270a545eb419ee386e2b3c0348614))
+
 ## 1.8.0 (2025-09-13)
 
 * Merge pull request #18 from davidcastilloc/transaction ([49b57c51bf1ae6eb0a113a151ae479b2d4da8e45](https://github.com/davidcastilloc/open-pos/commit/49b57c51bf1ae6eb0a113a151ae479b2d4da8e45)), closes [#18](https://github.com/davidcastilloc/open-pos/issues/18)
