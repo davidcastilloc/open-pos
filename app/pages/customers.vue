@@ -501,11 +501,6 @@
 	import { useCustomers } from "~/composables/useCustomers";
 	import { CreateCustomerSchema, UpdateCustomerSchema } from "~/schemas/customer";
 
-	// Meta
-	useHead({
-		title: "Gestión de Clientes - POS Venezuela"
-	});
-
 	// Composables
 	const {
 		customers,
