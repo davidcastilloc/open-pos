@@ -232,5 +232,4 @@
 	const refreshRates = async () => {
 		await fetchCurrentRates();
 	};
-
 </script>

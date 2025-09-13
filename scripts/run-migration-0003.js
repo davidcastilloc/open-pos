@@ -20,7 +20,9 @@ function run() {
 		db.prepare("CREATE INDEX IF NOT EXISTS idx_transactions_payment_method ON transactions(payment_method)").run();
 		console.log("✅ Índice idx_transactions_payment_method creado (si no existía)");
 	} finally {
-		try { db.pragma("foreign_keys = ON"); } catch {}
+		try {
+			db.pragma("foreign_keys = ON");
+		} catch {}
 		db.close();
 	}
 }

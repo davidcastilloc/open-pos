@@ -91,5 +91,3 @@ pnpm db:studio
 - Asociar transacciones diarias reales a la sesión: `cashier_id` y `sale_id`.
 - Resumen de ventas por fecha/sesión desde tablas `sales`/`transactions`.
 - Auditoría de cierres (`audited_by`, `audited_at`).
-
-

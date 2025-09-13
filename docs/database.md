@@ -99,6 +99,3 @@ Campos relevantes:
 
 Migración relacionada:
 - `0003_add_payment_method_to_transactions.sql`: agrega `payment_method` e índice `idx_transactions_payment_method`.
-
-
-

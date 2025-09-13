@@ -317,5 +317,4 @@
 		showCreateModal.value = false;
 		editingCategory.value = null;
 	};
-
 </script>

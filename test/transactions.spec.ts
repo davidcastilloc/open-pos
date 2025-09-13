@@ -1,4 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { useTransactions } from "~/composables/useTransactions";
 
 vi.mock("~/composables/useDatabase", () => {
 	const execute = vi.fn();
@@ -14,8 +16,6 @@ vi.mock("~/composables/useDatabase", () => {
 		useDatabase: () => ({ query, execute, transaction })
 	};
 });
-
-import { useTransactions } from "~/composables/useTransactions";
 
 describe("useTransactions", () => {
 	beforeEach(() => {
@@ -43,4 +43,3 @@ describe("useTransactions", () => {
 		} as any)).rejects.toBeTruthy();
 	});
 });
-

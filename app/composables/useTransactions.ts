@@ -134,8 +134,8 @@ export function useTransactions() {
 	};
 
 	// Listar transacciones por cuenta y rango de fechas opcional
-	const listByAccount = async (params: { accountId: string; from?: string; to?: string; types?: TransactionType[] }) => {
-		const clauses: string[] = ["account_id = ?"]; 
+	const listByAccount = async (params: { accountId: string, from?: string, to?: string, types?: TransactionType[] }) => {
+		const clauses: string[] = ["account_id = ?"];
 		const values: any[] = [params.accountId];
 		if (params.from) {
 			clauses.push("created_at >= ?");
@@ -156,7 +156,7 @@ export function useTransactions() {
 	};
 
 	// Listar transacciones por rango de fechas opcionalmente filtradas por cajero y tipo
-	const listByDateRange = async (params: { from?: string; to?: string; types?: TransactionType[]; cashierId?: string }) => {
+	const listByDateRange = async (params: { from?: string, to?: string, types?: TransactionType[], cashierId?: string }) => {
 		const clauses: string[] = [];
 		const values: any[] = [];
 		if (params.from) {
@@ -217,4 +217,3 @@ export function useTransactions() {
 		listTodaySales
 	};
 }
-

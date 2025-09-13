@@ -96,8 +96,8 @@
 							<UButton
 								variant="outline"
 								size="sm"
-								@click="refreshProducts"
 								:loading="isLoading"
+								@click="refreshProducts"
 							>
 								<UIcon name="i-heroicons-arrow-path" />
 								Actualizar
@@ -139,7 +139,9 @@
 							<div class="flex-1">
 								<div class="flex items-start justify-between">
 									<div class="flex-1">
-										<h4 class="font-medium text-lg">{{ product.name }}</h4>
+										<h4 class="font-medium text-lg">
+											{{ product.name }}
+										</h4>
 										<div class="flex items-center space-x-4 mt-1">
 											<span class="text-sm font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
 												{{ product.sku }}
@@ -244,18 +246,18 @@
 </template>
 
 <script setup lang="ts">
-	import { computed, onMounted, ref, watch } from "vue";
-	import { useProducts } from "~/composables/useProducts";
+	import type { Product } from "~/composables/useProducts";
+	import { computed, ref, watch } from "vue";
 	import { useCategories } from "~/composables/useCategories";
 	import { useCurrency } from "~/composables/useCurrency";
-	import type { Product } from "~/composables/useProducts";
+	import { useProducts } from "~/composables/useProducts";
 
 	// Props
 	interface Props {
-		open: boolean;
-		title?: string;
-		description?: string;
-		excludeIds?: string[];
+		open: boolean
+		title?: string
+		description?: string
+		excludeIds?: string[]
 	}
 
 	const props = withDefaults(defineProps<Props>(), {
@@ -266,9 +268,9 @@
 
 	// Emits
 	const emit = defineEmits<{
-		close: [];
-		select: [product: Product];
-		create: [productData: any];
+		close: []
+		select: [product: Product]
+		create: [productData: any]
 	}>();
 
 	// Composables
@@ -289,7 +291,7 @@
 	// Opciones para filtros
 	const categoryOptions = computed(() => [
 		{ label: "Todas las categorías", value: null },
-		...categories.value.map(cat => ({
+		...categories.value.map((cat) => ({
 			label: cat.name,
 			value: cat.id
 		}))
@@ -304,44 +306,44 @@
 
 	// Productos filtrados
 	const filteredProducts = computed(() => {
-		let filtered = products.value.filter(product => 
+		let filtered = products.value.filter((product) =>
 			!props.excludeIds.includes(product.id)
 		);
 
 		// Filtro por búsqueda
 		if (searchQuery.value) {
 			const query = searchQuery.value.toLowerCase();
-			filtered = filtered.filter(product =>
-				product.name.toLowerCase().includes(query) ||
-				product.sku.toLowerCase().includes(query) ||
-				(product.barcode && product.barcode.toLowerCase().includes(query)) ||
-				(product.description && product.description.toLowerCase().includes(query))
+			filtered = filtered.filter((product) =>
+				product.name.toLowerCase().includes(query)
+				|| product.sku.toLowerCase().includes(query)
+				|| (product.barcode && product.barcode.toLowerCase().includes(query))
+				|| (product.description && product.description.toLowerCase().includes(query))
 			);
 		}
 
 		// Filtro por categoría
 		if (selectedCategory.value) {
-			filtered = filtered.filter(product => product.categoryId === selectedCategory.value);
+			filtered = filtered.filter((product) => product.categoryId === selectedCategory.value);
 		}
 
 		// Filtro por stock
 		if (stockFilter.value) {
 			switch (stockFilter.value) {
-				case "in_stock":
-					filtered = filtered.filter(product => product.stock > 0);
-					break;
-				case "out_of_stock":
-					filtered = filtered.filter(product => product.stock === 0);
-					break;
-				case "low_stock":
-					filtered = filtered.filter(product => product.stock <= product.minStock);
-					break;
+			case "in_stock":
+				filtered = filtered.filter((product) => product.stock > 0);
+				break;
+			case "out_of_stock":
+				filtered = filtered.filter((product) => product.stock === 0);
+				break;
+			case "low_stock":
+				filtered = filtered.filter((product) => product.stock <= product.minStock);
+				break;
 			}
 		}
 
 		// Filtro por precio máximo
 		if (maxPrice.value !== null) {
-			filtered = filtered.filter(product => product.price <= maxPrice.value!);
+			filtered = filtered.filter((product) => product.price <= maxPrice.value!);
 		}
 
 		return filtered;
@@ -372,7 +374,7 @@
 
 	watch(isOpen, (newValue) => {
 		if (!newValue) {
-			emit('close');
+			emit("close");
 		}
 	});
 
@@ -409,7 +411,7 @@
 	};
 
 	const selectProduct = (product: Product) => {
-		emit('select', product);
+		emit("select", product);
 		handleClose();
 	};
 
@@ -418,7 +420,7 @@
 	};
 
 	const handleProductCreated = (productData: any) => {
-		emit('create', productData);
+		emit("create", productData);
 		showCreateProduct.value = false;
 		// Recargar productos para mostrar el nuevo
 		loadData();

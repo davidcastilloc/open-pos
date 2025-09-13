@@ -1,9 +1,10 @@
-import { computed, ref, readonly } from "vue";
+import type { CashClosingDBData } from "~/composables/useCashClosingDB";
+import { computed, readonly, ref } from "vue";
 import { useAccounts } from "~/composables/useAccounts";
-import { useCashClosingDB, type CashClosingDBData } from "~/composables/useCashClosingDB";
+import { useCashClosingDB } from "~/composables/useCashClosingDB";
 import { useDatabase } from "~/composables/useDatabase";
-import { useTransactions } from "~/composables/useTransactions";
 import { getPaymentMethodLabel } from "~/composables/usePaymentMethods";
+import { useTransactions } from "~/composables/useTransactions";
 
 export interface CashClosingData {
 	id?: number
@@ -227,7 +228,7 @@ export function useCashClosing() {
 				// Intentar recargar la sesión desde la base de datos
 				console.log("⚠️ startTime no definido, intentando recargar sesión...");
 				await initializeCashSession();
-				
+
 				if (!currentSession.value || !currentSession.value.startTime) {
 					// Fallback: usar fecha actual como inicio de sesión
 					console.log("⚠️ Usando fecha actual como fallback para startTime");
@@ -241,20 +242,20 @@ export function useCashClosing() {
 
 			// Generar datos del cierre
 			const endTime = new Date();
-			
+
 			// Debug: Verificar startTime
 			console.log("currentSession.value.startTime:", currentSession.value.startTime);
 			console.log("Tipo de startTime:", typeof currentSession.value.startTime);
-			
+
 			// Función para parsear fecha de manera segura
 			const parseDate = (dateValue: any): Date => {
 				if (dateValue instanceof Date) {
 					return dateValue;
 				}
-				if (typeof dateValue === 'string' && dateValue.trim() !== '') {
+				if (typeof dateValue === "string" && dateValue.trim() !== "") {
 					const parsed = new Date(dateValue);
 					if (isNaN(parsed.getTime())) {
-						throw new Error(`Fecha inválida: ${dateValue}`);
+						throw new TypeError(`Fecha inválida: ${dateValue}`);
 					}
 					return parsed;
 				}
@@ -263,20 +264,20 @@ export function useCashClosing() {
 				}
 				throw new Error(`Tipo de fecha no soportado: ${typeof dateValue}`);
 			};
-			
+
 			const startTime = parseDate(currentSession.value.startTime);
-			
+
 			// Validar que las fechas sean válidas
 			if (isNaN(startTime.getTime())) {
-				throw new Error(`Fecha de inicio inválida: ${currentSession.value.startTime}`);
+				throw new TypeError(`Fecha de inicio inválida: ${currentSession.value.startTime}`);
 			}
 			if (isNaN(endTime.getTime())) {
-				throw new Error("Fecha de fin inválida");
+				throw new TypeError("Fecha de fin inválida");
 			}
-			
+
 			console.log("startTime válida:", startTime.toISOString());
 			console.log("endTime válida:", endTime.toISOString());
-			
+
 			const salesSummary = getSalesSummary();
 			const paymentMethods = getPaymentMethodsSummary();
 
@@ -395,14 +396,14 @@ export function useCashClosing() {
 					createdAt: activeSession.created_at,
 					updatedAt: activeSession.updated_at
 				};
-				
+
 				// Validar que startTime esté definido
 				if (!validatedSession.startTime) {
 					console.error("❌ Sesión sin startTime:", validatedSession);
 					isCashSessionOpen.value = false;
 					return;
 				}
-				
+
 				currentSession.value = validatedSession;
 				shiftStartTime.value = new Date(validatedSession.startTime);
 				isCashSessionOpen.value = true;

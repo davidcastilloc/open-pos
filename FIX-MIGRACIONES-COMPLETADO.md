@@ -1,7 +1,7 @@
 # 🔧 Fix de Migraciones - Completado
 
-**Fecha:** 2025-01-15  
-**Problema:** Error en migraciones de base de datos - "table already exists"  
+**Fecha:** 2025-01-15
+**Problema:** Error en migraciones de base de datos - "table already exists"
 **Estado:** ✅ RESUELTO
 
 ## Problema Original
@@ -59,10 +59,10 @@ CREATE TABLE IF NOT EXISTS `inventory_movements` (
 
 ```sql
 -- Eliminadas entradas duplicadas en __drizzle_migrations
-DELETE FROM __drizzle_migrations 
-WHERE hash LIKE '%inventory_movements%' 
-   OR hash LIKE '%payment_method%' 
-   OR hash LIKE '%tx_fields%' 
+DELETE FROM __drizzle_migrations
+WHERE hash LIKE '%inventory_movements%'
+   OR hash LIKE '%payment_method%'
+   OR hash LIKE '%tx_fields%'
    OR hash LIKE '%customers%';
 ```
 

@@ -9,7 +9,9 @@
 			<div class="space-y-6">
 				<!-- Información del cajero -->
 				<div class="rounded-lg p-4 border">
-					<h3 class="font-medium mb-2">Información del Cajero</h3>
+					<h3 class="font-medium mb-2">
+						Información del Cajero
+					</h3>
 					<div class="grid grid-cols-2 gap-4 text-sm">
 						<div>
 							<span class="opacity-75">Cajero:</span>
@@ -24,7 +26,9 @@
 
 				<!-- Balances iniciales -->
 				<div>
-					<h3 class="font-medium mb-4">Balances Iniciales por Moneda</h3>
+					<h3 class="font-medium mb-4">
+						Balances Iniciales por Moneda
+					</h3>
 					<div class="space-y-4">
 						<div
 							v-for="(balance, currency) in initialBalances"
@@ -32,9 +36,9 @@
 							class="flex items-center justify-between p-3 border rounded-lg"
 						>
 							<div class="flex items-center space-x-3">
-								<UIcon 
-									:name="getCurrencyIcon(currency)" 
-									class="w-5 h-5 opacity-50" 
+								<UIcon
+									:name="getCurrencyIcon(currency)"
+									class="w-5 h-5 opacity-50"
 								/>
 								<span class="font-medium">{{ getCurrencyName(currency) }}</span>
 								<span class="text-sm opacity-50">({{ currency }})</span>
@@ -57,7 +61,9 @@
 
 				<!-- Resumen -->
 				<div class="rounded-lg p-4 border">
-					<h4 class="font-medium mb-2">Resumen de Apertura</h4>
+					<h4 class="font-medium mb-2">
+						Resumen de Apertura
+					</h4>
 					<div class="space-y-1 text-sm">
 						<div class="flex justify-between">
 							<span class="opacity-75">Total de monedas:</span>
@@ -111,133 +117,131 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
-import { useAccounts } from "~/composables/useAccounts";
-import { useCashClosing } from "~/composables/useCashClosing";
-import { useCurrency } from "~/composables/useCurrency";
-import { getPaymentMethodIcon } from "~/composables/usePaymentMethods";
+	import { computed, ref, watch } from "vue";
+	import { useAccounts } from "~/composables/useAccounts";
+	import { useCashClosing } from "~/composables/useCashClosing";
+	import { useCurrency } from "~/composables/useCurrency";
 
-// Props
-interface Props {
-	open: boolean;
-}
+	// Props
+	interface Props {
+		open: boolean
+	}
 
-const props = defineProps<Props>();
+	const props = defineProps<Props>();
 
-// Emits
-const emit = defineEmits<{
-	'update:open': [value: boolean];
-	'success': [];
-}>();
+	// Emits
+	const emit = defineEmits<{
+		"update:open": [value: boolean]
+		success: []
+	}>();
 
-// Composables
-const { getTotalBalanceByCurrency } = useAccounts();
-const { openCashSession } = useCashClosing();
-const { formatCurrency } = useCurrency();
+	// Composables
+	const { getTotalBalanceByCurrency } = useAccounts();
+	const { openCashSession } = useCashClosing();
+	const { formatCurrency } = useCurrency();
 
-// Estado local
-const isProcessing = ref(false);
-const observations = ref("");
-const initialBalances = ref<Record<string, number>>({});
+	// Estado local
+	const isProcessing = ref(false);
+	const observations = ref("");
+	const initialBalances = ref<Record<string, number>>({});
 
-// Computed
-const isOpen = computed({
-	get: () => props.open,
-	set: (value) => emit('update:open', value)
-});
-
-const cashierName = computed(() => "Administrador"); // TODO: Obtener del usuario actual
-
-const currentDate = computed(() => {
-	return new Date().toLocaleDateString('es-VE', {
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric',
-		hour: '2-digit',
-		minute: '2-digit'
+	// Computed
+	const isOpen = computed({
+		get: () => props.open,
+		set: (value) => emit("update:open", value)
 	});
-});
 
-const hasValidBalances = computed(() => {
-	return Object.values(initialBalances.value).some(balance => balance > 0);
-});
+	const cashierName = computed(() => "Administrador"); // TODO: Obtener del usuario actual
 
-// Métodos
-const getCurrencyIcon = (currency: string) => {
-	const icons: Record<string, string> = {
-		'BS': 'i-heroicons-banknotes',
-		'USD': 'i-heroicons-currency-dollar',
-		'EUR': 'i-heroicons-currency-euro'
+	const currentDate = computed(() => {
+		return new Date().toLocaleDateString("es-VE", {
+			year: "numeric",
+			month: "long",
+			day: "numeric",
+			hour: "2-digit",
+			minute: "2-digit"
+		});
+	});
+
+	const hasValidBalances = computed(() => {
+		return Object.values(initialBalances.value).some((balance) => balance > 0);
+	});
+
+	// Métodos
+	const getCurrencyIcon = (currency: string) => {
+		const icons: Record<string, string> = {
+			BS: "i-heroicons-banknotes",
+			USD: "i-heroicons-currency-dollar",
+			EUR: "i-heroicons-currency-euro"
+		};
+		return icons[currency] || "i-heroicons-currency-dollar";
 	};
-	return icons[currency] || 'i-heroicons-currency-dollar';
-};
 
-const getCurrencyName = (currency: string) => {
-	const names: Record<string, string> = {
-		'BS': 'Bolívares',
-		'USD': 'Dólares',
-		'EUR': 'Euros'
+	const getCurrencyName = (currency: string) => {
+		const names: Record<string, string> = {
+			BS: "Bolívares",
+			USD: "Dólares",
+			EUR: "Euros"
+		};
+		return names[currency] || currency;
 	};
-	return names[currency] || currency;
-};
 
-const formatTotalBalance = () => {
-	const total = Object.entries(initialBalances.value)
-		.reduce((sum, [currency, amount]) => sum + amount, 0);
-	return formatCurrency(total, 'BS'); // Mostrar en BS como referencia
-};
+	const formatTotalBalance = () => {
+		const total = Object.entries(initialBalances.value)
+			.reduce((sum, [currency, amount]) => sum + amount, 0);
+		return formatCurrency(total, "BS"); // Mostrar en BS como referencia
+	};
 
-const loadCurrentBalances = () => {
-	// Cargar balances actuales como valores iniciales
-	const currentBalances = getTotalBalanceByCurrency.value;
-	initialBalances.value = { ...currentBalances };
-	
-	// Asegurar que al menos BS tenga un valor
-	if (!initialBalances.value.BS) {
-		initialBalances.value.BS = 0;
-	}
-};
+	const loadCurrentBalances = () => {
+		// Cargar balances actuales como valores iniciales
+		const currentBalances = getTotalBalanceByCurrency.value;
+		initialBalances.value = { ...currentBalances };
 
-const handleOpenSession = async () => {
-	try {
-		isProcessing.value = true;
-		
-		// Filtrar balances que tengan valores válidos
-		const validBalances = Object.fromEntries(
-			Object.entries(initialBalances.value)
-				.filter(([_, amount]) => amount > 0)
-		);
-		
-		// Abrir sesión de caja
-		await openCashSession(validBalances);
-		
-		// Pequeño delay para asegurar que la base de datos se actualice
-		await new Promise(resolve => setTimeout(resolve, 100));
-		
-		// Emitir éxito
-		emit('success');
-		
-		// Cerrar modal
-		closeModal();
-		
-	} catch (error) {
-		console.error("Error abriendo sesión de caja:", error);
+		// Asegurar que al menos BS tenga un valor
+		if (!initialBalances.value.BS) {
+			initialBalances.value.BS = 0;
+		}
+	};
+
+	const handleOpenSession = async () => {
+		try {
+			isProcessing.value = true;
+
+			// Filtrar balances que tengan valores válidos
+			const validBalances = Object.fromEntries(
+				Object.entries(initialBalances.value)
+					.filter(([_, amount]) => amount > 0)
+			);
+
+			// Abrir sesión de caja
+			await openCashSession(validBalances);
+
+			// Pequeño delay para asegurar que la base de datos se actualice
+			await new Promise((resolve) => setTimeout(resolve, 100));
+
+			// Emitir éxito
+			emit("success");
+
+			// Cerrar modal
+			closeModal();
+		} catch (error) {
+			console.error("Error abriendo sesión de caja:", error);
 		// TODO: Mostrar error al usuario
-	} finally {
-		isProcessing.value = false;
-	}
-};
+		} finally {
+			isProcessing.value = false;
+		}
+	};
 
-const closeModal = () => {
-	isOpen.value = false;
-	observations.value = "";
-	loadCurrentBalances();
-};
-
-// Watchers
-watch(() => props.open, (newValue) => {
-	if (newValue) {
+	const closeModal = () => {
+		isOpen.value = false;
+		observations.value = "";
 		loadCurrentBalances();
-	}
-});
+	};
+
+	// Watchers
+	watch(() => props.open, (newValue) => {
+		if (newValue) {
+			loadCurrentBalances();
+		}
+	});
 </script>

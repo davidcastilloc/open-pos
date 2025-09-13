@@ -1,7 +1,7 @@
-import { ref, computed, readonly } from "vue";
+import type { Customer, CustomerSale, NewCustomer } from "~/database/schema";
+import type { CreateCustomerInput, CustomerStats, UpdateCustomerInput } from "~/schemas/customer";
+import { computed, readonly, ref } from "vue";
 import { useDatabase } from "./useDatabase";
-import type { Customer, NewCustomer, CustomerSale, NewCustomerSale } from "~/database/schema";
-import type { CreateCustomerInput, UpdateCustomerInput, SearchCustomerInput, CustomerStats } from "~/schemas/customer";
 
 export const useCustomers = () => {
 	const { execute } = useDatabase();
@@ -30,18 +30,19 @@ export const useCustomers = () => {
 				email: data.email || null,
 				phone: data.phone || null,
 				address: data.address || null,
+				loyaltyPoints: 0,
+				isActive: data.isActive ?? true,
+				createdAt: now,
+				updatedAt: now,
 				documentType: data.documentType || null,
 				documentNumber: data.documentNumber || null,
 				birthDate: data.birthDate || null,
-				notes: data.notes || null,
-				isActive: data.isActive ?? true,
-				createdAt: now,
-				updatedAt: now
+				notes: data.notes || null
 			};
 
 			await execute(
-				`INSERT INTO customers (id, tenant_id, name, email, phone, address, document_type, document_number, birth_date, notes, is_active, created_at, updated_at)
-				 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+				`INSERT INTO customers (id, tenant_id, name, email, phone, address, loyalty_points, is_active, created_at, updated_at, document_type, document_number, birth_date, notes)
+				 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 				[
 					newCustomer.id,
 					newCustomer.tenantId,
@@ -49,13 +50,14 @@ export const useCustomers = () => {
 					newCustomer.email,
 					newCustomer.phone,
 					newCustomer.address,
+					0, // loyalty_points default value
+					newCustomer.isActive ? 1 : 0,
+					newCustomer.createdAt,
+					newCustomer.updatedAt,
 					newCustomer.documentType,
 					newCustomer.documentNumber,
 					newCustomer.birthDate,
-					newCustomer.notes,
-					newCustomer.isActive ? 1 : 0,
-					newCustomer.createdAt,
-					newCustomer.updatedAt
+					newCustomer.notes
 				]
 			);
 
@@ -76,7 +78,7 @@ export const useCustomers = () => {
 		error.value = null;
 
 		try {
-			const query = activeOnly 
+			const query = activeOnly
 				? "SELECT * FROM customers WHERE is_active = 1 ORDER BY name ASC"
 				: "SELECT * FROM customers ORDER BY name ASC";
 
@@ -122,7 +124,7 @@ export const useCustomers = () => {
 
 		try {
 			const now = new Date().toISOString();
-			
+
 			// Construir query dinámicamente
 			const updates: string[] = [];
 			const values: any[] = [];
@@ -175,7 +177,7 @@ export const useCustomers = () => {
 
 			// Recargar lista de clientes
 			await getCustomers();
-			
+
 			// Retornar cliente actualizado
 			const updatedCustomer = await getCustomer(id);
 			if (!updatedCustomer) {
@@ -235,7 +237,7 @@ export const useCustomers = () => {
 
 			const searchTerm = `%${query}%`;
 			const result = await execute(searchQuery, [searchTerm, searchTerm, searchTerm, searchTerm]);
-			
+
 			return result.rows as Customer[];
 		} catch (err) {
 			error.value = err instanceof Error ? err.message : "Error al buscar clientes";
@@ -322,8 +324,8 @@ export const useCustomers = () => {
 	};
 
 	// Computed properties
-	const activeCustomers = computed(() => customers.value.filter(c => c.isActive));
-	const inactiveCustomers = computed(() => customers.value.filter(c => !c.isActive));
+	const activeCustomers = computed(() => customers.value.filter((c) => c.isActive));
+	const inactiveCustomers = computed(() => customers.value.filter((c) => !c.isActive));
 	const totalCustomers = computed(() => customers.value.length);
 
 	return {
@@ -331,12 +333,12 @@ export const useCustomers = () => {
 		customers: readonly(customers),
 		loading: readonly(loading),
 		error: readonly(error),
-		
+
 		// Computed
 		activeCustomers,
 		inactiveCustomers,
 		totalCustomers,
-		
+
 		// Methods
 		createCustomer,
 		getCustomers,

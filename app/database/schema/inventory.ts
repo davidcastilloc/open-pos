@@ -1,13 +1,13 @@
 import { sql } from "drizzle-orm";
-import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
+import { integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 // Tabla de movimientos de inventario
 export const inventoryMovements = sqliteTable("inventory_movements", {
 	id: text("id").primaryKey(),
 	tenantId: text("tenant_id").notNull().default("default"),
 	productId: text("product_id").notNull(),
-	movementType: text("movement_type", { 
-		enum: ["entry", "exit", "adjustment", "transfer", "sale", "return"] 
+	movementType: text("movement_type", {
+		enum: ["entry", "exit", "adjustment", "transfer", "sale", "return"]
 	}).notNull(),
 	quantity: integer("quantity").notNull(),
 	previousStock: integer("previous_stock").notNull(),

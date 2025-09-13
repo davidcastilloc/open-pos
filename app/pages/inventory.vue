@@ -181,14 +181,30 @@
 					<table class="w-full">
 						<thead>
 							<tr class="border-b">
-								<th class="text-left py-3 px-4 font-medium">Fecha</th>
-								<th class="text-left py-3 px-4 font-medium">Producto</th>
-								<th class="text-center py-3 px-4 font-medium">Tipo</th>
-								<th class="text-right py-3 px-4 font-medium">Cantidad</th>
-								<th class="text-right py-3 px-4 font-medium">Stock Anterior</th>
-								<th class="text-right py-3 px-4 font-medium">Stock Nuevo</th>
-								<th class="text-left py-3 px-4 font-medium">Razón</th>
-								<th class="text-left py-3 px-4 font-medium">Usuario</th>
+								<th class="text-left py-3 px-4 font-medium">
+									Fecha
+								</th>
+								<th class="text-left py-3 px-4 font-medium">
+									Producto
+								</th>
+								<th class="text-center py-3 px-4 font-medium">
+									Tipo
+								</th>
+								<th class="text-right py-3 px-4 font-medium">
+									Cantidad
+								</th>
+								<th class="text-right py-3 px-4 font-medium">
+									Stock Anterior
+								</th>
+								<th class="text-right py-3 px-4 font-medium">
+									Stock Nuevo
+								</th>
+								<th class="text-left py-3 px-4 font-medium">
+									Razón
+								</th>
+								<th class="text-left py-3 px-4 font-medium">
+									Usuario
+								</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -320,11 +336,11 @@
 </template>
 
 <script setup lang="ts">
-	import { computed, onMounted, ref } from "vue";
-	import { useInventoryMovements } from "~/composables/useInventoryMovements";
-	import { useCurrency } from "~/composables/useCurrency";
-	import { MOVEMENT_TYPE_LABELS, MOVEMENT_TYPE_COLORS } from "~/schemas/inventory";
 	import type { MovementFilters } from "~/schemas/inventory";
+	import { computed, onMounted, ref } from "vue";
+	import { useCurrency } from "~/composables/useCurrency";
+	import { useInventoryMovements } from "~/composables/useInventoryMovements";
+	import { MOVEMENT_TYPE_COLORS, MOVEMENT_TYPE_LABELS } from "~/schemas/inventory";
 
 	// Composables
 	const {
@@ -430,28 +446,27 @@
 
 	// Formatear números
 	const formatNumber = (number: number) => {
-		return new Intl.NumberFormat('es-VE').format(number);
+		return new Intl.NumberFormat("es-VE").format(number);
 	};
 
 	// Formatear fecha
 	const formatDate = (dateString: string) => {
 		const date = new Date(dateString);
-		return date.toLocaleDateString('es-VE', {
-			day: '2-digit',
-			month: '2-digit',
-			year: 'numeric'
+		return date.toLocaleDateString("es-VE", {
+			day: "2-digit",
+			month: "2-digit",
+			year: "numeric"
 		});
 	};
 
 	// Formatear hora
 	const formatTime = (dateString: string) => {
 		const date = new Date(dateString);
-		return date.toLocaleTimeString('es-VE', {
-			hour: '2-digit',
-			minute: '2-digit'
+		return date.toLocaleTimeString("es-VE", {
+			hour: "2-digit",
+			minute: "2-digit"
 		});
 	};
-
 
 	// Metadata para navegación
 	definePageMeta({

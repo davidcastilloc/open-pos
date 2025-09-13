@@ -1,93 +1,93 @@
-import { useDatabase } from "~/composables/useDatabase";
 import { createId } from "@paralleldrive/cuid2";
+import { useDatabase } from "~/composables/useDatabase";
 import { runMigrations } from "~/database/migrate";
 
 export interface CashSession {
-	id: string;
-	tenant_id: string;
-	cashier_id: string;
-	cashier_name: string;
-	start_time: string;
-	end_time?: string;
-	initial_balances: string; // JSON string
-	status: string;
-	created_at: string;
-	updated_at: string;
+	id: string
+	tenant_id: string
+	cashier_id: string
+	cashier_name: string
+	start_time: string
+	end_time?: string
+	initial_balances: string // JSON string
+	status: string
+	created_at: string
+	updated_at: string
 }
 
 export interface CashClosing {
-	id: string;
-	tenant_id: string;
-	session_id: string;
-	cashier_id: string;
-	cashier_name: string;
-	start_time: string;
-	end_time: string;
-	shift_duration: string;
-	initial_balances: string; // JSON string
-	final_balances: string; // JSON string
-	balance_differences: string; // JSON string
-	total_transactions: number;
-	sales_by_currency: string; // JSON string
-	sales_by_payment_method: string; // JSON string
-	total_sales_amount: number;
-	expenses: string; // JSON string
-	adjustments: string; // JSON string
-	observations?: string;
-	status: string;
-	audited_by?: string;
-	audited_at?: string;
-	created_at: string;
-	updated_at: string;
+	id: string
+	tenant_id: string
+	session_id: string
+	cashier_id: string
+	cashier_name: string
+	start_time: string
+	end_time: string
+	shift_duration: string
+	initial_balances: string // JSON string
+	final_balances: string // JSON string
+	balance_differences: string // JSON string
+	total_transactions: number
+	sales_by_currency: string // JSON string
+	sales_by_payment_method: string // JSON string
+	total_sales_amount: number
+	expenses: string // JSON string
+	adjustments: string // JSON string
+	observations?: string
+	status: string
+	audited_by?: string
+	audited_at?: string
+	created_at: string
+	updated_at: string
 }
 
 export interface CashSessionData {
-	cashierId: string;
-	cashierName: string;
-	initialBalances: Record<string, number>;
+	cashierId: string
+	cashierName: string
+	initialBalances: Record<string, number>
 }
 
 export interface CashClosingDBData {
-	sessionId: string;
-	cashierId: string;
-	cashierName: string;
-	startTime: Date;
-	endTime: Date;
-	shiftDuration: string;
-	initialBalances: Record<string, number>;
-	finalBalances: Record<string, number>;
-	balanceDifferences: Record<string, number>;
-	totalTransactions: number;
-	salesByCurrency: Record<string, number>;
-	salesByPaymentMethod: Record<string, number>;
-	totalSalesAmount: number;
-	expenses?: Record<string, number>;
-	adjustments?: Record<string, number>;
-	observations?: string;
+	sessionId: string
+	cashierId: string
+	cashierName: string
+	startTime: Date
+	endTime: Date
+	shiftDuration: string
+	initialBalances: Record<string, number>
+	finalBalances: Record<string, number>
+	balanceDifferences: Record<string, number>
+	totalTransactions: number
+	salesByCurrency: Record<string, number>
+	salesByPaymentMethod: Record<string, number>
+	totalSalesAmount: number
+	expenses?: Record<string, number>
+	adjustments?: Record<string, number>
+	observations?: string
 }
 
 export interface CashReport {
-	id: string;
-	tenant_id: string;
-	session_id: string;
-	cashier_id: string;
-	cashier_name: string;
-	report_type: string;
-	report_data: string; // JSON string
-	file_name?: string;
-	file_path?: string;
-	generated_at: string;
-	created_at: string;
+	id: string
+	tenant_id: string
+	session_id: string
+	cashier_id: string
+	cashier_name: string
+	report_type: string
+	report_data: string // JSON string
+	file_name?: string
+	file_path?: string
+	generated_at: string
+	created_at: string
 }
 
 export interface CashReportData {
-	sessionId: string;
-	cashierId: string;
-	cashierName: string;
-	reportType: string;
-	reportData: Record<string, any>;
-	fileName?: string;
-	filePath?: string;
+	sessionId: string
+	cashierId: string
+	cashierName: string
+	reportType: string
+	reportData: Record<string, any>
+	fileName?: string
+	filePath?: string
 }
 
 export function useCashClosingDB() {
@@ -112,17 +112,17 @@ export function useCashClosingDB() {
 	const createCashSession = async (data: CashSessionData): Promise<CashSession> => {
 		try {
 			await ensureTablesExist();
-			
+
 			const id = createId();
 			const now = new Date().toISOString();
-			
+
 			const sql = `
 				INSERT INTO cash_sessions (
 					id, tenant_id, cashier_id, cashier_name, 
 					start_time, initial_balances, status, created_at, updated_at
 				) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 			`;
-			
+
 			const params = [
 				id,
 				tenantId,
@@ -166,9 +166,9 @@ export function useCashClosingDB() {
 				ORDER BY created_at DESC 
 				LIMIT 1
 			`;
-			
+
 			const session = await get<CashSession>(sql, [tenantId, "open"]);
-			
+
 			if (session) {
 				// Debug: Verificar datos de la sesión (snake_case)
 				console.log("Sesión recuperada de BD:", {
@@ -179,7 +179,7 @@ export function useCashClosingDB() {
 					cashier_name: session.cashier_name
 				});
 			}
-			
+
 			return session || null;
 		} catch (error) {
 			console.error("Error getting active cash session:", error);
@@ -198,7 +198,7 @@ export function useCashClosingDB() {
 				SET end_time = ?, status = ?, updated_at = ?
 				WHERE id = ?
 			`;
-			
+
 			await execute(sql, [now, "closed", now, sessionId]);
 			return true;
 		} catch (error) {
@@ -222,10 +222,10 @@ export function useCashClosingDB() {
 				endTime: data.endTime,
 				endTimeType: typeof data.endTime
 			});
-			
+
 			const id = createId();
 			const now = new Date().toISOString();
-			
+
 			const sql = `
 				INSERT INTO cash_closings (
 					id, tenant_id, session_id, cashier_id, cashier_name,
@@ -236,15 +236,15 @@ export function useCashClosingDB() {
 					status, created_at, updated_at
 				) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			`;
-			
+
 			// Validar fechas antes de convertir a ISO string
 			if (!(data.startTime instanceof Date) || isNaN(data.startTime.getTime())) {
-				throw new Error(`startTime inválida: ${data.startTime}`);
+				throw new TypeError(`startTime inválida: ${data.startTime}`);
 			}
 			if (!(data.endTime instanceof Date) || isNaN(data.endTime.getTime())) {
-				throw new Error(`endTime inválida: ${data.endTime}`);
+				throw new TypeError(`endTime inválida: ${data.endTime}`);
 			}
-			
+
 			const params = [
 				id,
 				tenantId,
@@ -304,7 +304,7 @@ export function useCashClosingDB() {
 	const createCashReport = async (data: CashReportData): Promise<CashReport> => {
 		try {
 			await ensureTablesExist();
-			
+
 			// Debug: Verificar datos recibidos
 			console.log("Datos recibidos en createCashReport:", {
 				sessionId: data.sessionId,
@@ -312,7 +312,7 @@ export function useCashClosingDB() {
 				cashierName: data.cashierName,
 				reportType: data.reportType
 			});
-			
+
 			// Validar datos requeridos
 			if (!data.sessionId) {
 				throw new Error("sessionId es requerido");
@@ -323,10 +323,10 @@ export function useCashClosingDB() {
 			if (!data.cashierName) {
 				throw new Error("cashierName es requerido");
 			}
-			
+
 			const id = createId();
 			const now = new Date().toISOString();
-			
+
 			const sql = `
 				INSERT INTO cash_reports (
 					id, tenant_id, session_id, cashier_id, cashier_name,
@@ -334,7 +334,7 @@ export function useCashClosingDB() {
 					generated_at, created_at
 				) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			`;
-			
+
 			const params = [
 				id,
 				tenantId,
@@ -375,13 +375,13 @@ export function useCashClosingDB() {
 	const getReportsBySession = async (sessionId: string): Promise<CashReport[]> => {
 		try {
 			await ensureTablesExist();
-			
+
 			const sql = `
 				SELECT * FROM cash_reports 
 				WHERE session_id = ? 
 				ORDER BY generated_at DESC
 			`;
-			
+
 			const reports = await query<CashReport>(sql, [sessionId]);
 			return reports;
 		} catch (error) {
@@ -396,14 +396,14 @@ export function useCashClosingDB() {
 	const getReportsByCashier = async (cashierId: string, limit = 50): Promise<CashReport[]> => {
 		try {
 			await ensureTablesExist();
-			
+
 			const sql = `
 				SELECT * FROM cash_reports 
 				WHERE cashier_id = ? 
 				ORDER BY generated_at DESC 
 				LIMIT ?
 			`;
-			
+
 			const reports = await query<CashReport>(sql, [cashierId, limit]);
 			return reports;
 		} catch (error) {
@@ -428,7 +428,7 @@ export function useCashClosingDB() {
 	return {
 		// Inicialización
 		ensureTablesExist,
-		
+
 		// Sesiones de caja
 		createCashSession,
 		getActiveCashSession,

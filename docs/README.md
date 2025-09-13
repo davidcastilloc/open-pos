@@ -25,5 +25,3 @@ Bienvenido a la documentación del proyecto Open POS System.
 - `SEMANTIC-RELEASE-FIX.md` — Detalles de la corrección CI/CD
 
 Si un documento no existe aún, se agregará progresivamente en este directorio.
-
-

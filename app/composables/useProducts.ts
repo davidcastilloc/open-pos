@@ -1,4 +1,4 @@
-import { computed, ref, readonly } from "vue";
+import { computed, readonly, ref } from "vue";
 import { useCurrency } from "./useCurrency";
 import { useDatabase } from "./useDatabase";
 
@@ -160,7 +160,7 @@ export function useProducts() {
 
 			products.value = productsWithOriginalPrices;
 			console.log(`✅ Productos cargados: ${productsWithOriginalPrices.length}`);
-			console.log("🔍 Productos en el array:", productsWithOriginalPrices.map(p => ({ id: p.id, name: p.name, isActive: p.isActive })));
+			console.log("🔍 Productos en el array:", productsWithOriginalPrices.map((p) => ({ id: p.id, name: p.name, isActive: p.isActive })));
 			console.log("🔍 products.value después de asignar:", products.value.length);
 			console.log("🔍 products.value contenido:", products.value);
 		} catch (err) {
@@ -417,9 +417,9 @@ export function useProducts() {
 			// Recargar productos
 			await loadProducts(currentPage.value, filters.value);
 
-			console.log(`✅ Producto ${isActive ? 'activado' : 'desactivado'}:`, id);
+			console.log(`✅ Producto ${isActive ? "activado" : "desactivado"}:`, id);
 		} catch (err) {
-			error.value = `Error al ${isActive ? 'activar' : 'desactivar'} producto`;
+			error.value = `Error al ${isActive ? "activar" : "desactivar"} producto`;
 			console.error("Error toggling product status:", err);
 			throw err;
 		}

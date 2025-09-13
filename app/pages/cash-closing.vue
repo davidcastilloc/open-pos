@@ -173,7 +173,9 @@
 
 				<!-- Top 5 clientes -->
 				<div v-if="customerStats.topCustomers.length > 0" class="mt-6">
-					<h3 class="text-lg font-medium mb-4">Top 5 Clientes del Turno</h3>
+					<h3 class="text-lg font-medium mb-4">
+						Top 5 Clientes del Turno
+					</h3>
 					<div class="space-y-2">
 						<div v-for="(customer, index) in customerStats.topCustomers" :key="customer.id" class="flex items-center justify-between p-3 border rounded-lg">
 							<div class="flex items-center space-x-3">
@@ -181,8 +183,12 @@
 									<span class="text-sm font-bold text-blue-600">#{{ index + 1 }}</span>
 								</div>
 								<div>
-									<div class="font-medium">{{ customer.name }}</div>
-									<div class="text-sm opacity-75">{{ customer.salesCount }} compras</div>
+									<div class="font-medium">
+										{{ customer.name }}
+									</div>
+									<div class="text-sm opacity-75">
+										{{ customer.salesCount }} compras
+									</div>
 								</div>
 							</div>
 							<span class="text-lg font-semibold">
@@ -297,8 +303,8 @@
 <script setup lang="ts">
 	import { computed, onMounted, ref } from "vue";
 	import { useCashClosing } from "~/composables/useCashClosing";
-	import { useCustomers } from "~/composables/useCustomers";
 	import { useCurrency } from "~/composables/useCurrency";
+	import { useCustomers } from "~/composables/useCustomers";
 	import { getPaymentMethodIcon, getPaymentMethodLabel } from "~/composables/usePaymentMethods";
 
 	// Composables
@@ -322,7 +328,7 @@
 	const cashierName = ref("Administrador");
 	const observations = ref("");
 	const showConfirmModal = ref(false);
-	
+
 	// Estadísticas de clientes
 	const customerStats = ref({
 		totalCustomers: 0,
@@ -331,10 +337,10 @@
 		customerSalesCount: 0,
 		averageTicket: 0,
 		topCustomers: [] as Array<{
-			id: string;
-			name: string;
-			totalAmount: number;
-			salesCount: number;
+			id: string
+			name: string
+			totalAmount: number
+			salesCount: number
 		}>
 	});
 
@@ -415,7 +421,7 @@
 		try {
 			const { useDatabase } = await import("~/composables/useDatabase");
 			const { execute } = useDatabase();
-			
+
 			// Obtener estadísticas de clientes del turno actual
 			const result = await execute(`
 				SELECT 
@@ -427,9 +433,9 @@
 				INNER JOIN sales s ON cs.sale_id = s.id
 				WHERE s.created_at >= datetime('now', '-8 hours')
 			`);
-			
+
 			const stats = result.rows[0] as any;
-			
+
 			// Obtener top 5 clientes del turno
 			const topCustomersResult = await execute(`
 				SELECT 
@@ -445,7 +451,7 @@
 				ORDER BY totalAmount DESC
 				LIMIT 5
 			`);
-			
+
 			customerStats.value = {
 				totalCustomers: stats.totalSales || 0,
 				uniqueCustomers: stats.uniqueCustomers || 0,

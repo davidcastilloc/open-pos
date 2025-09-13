@@ -44,5 +44,3 @@ test/                # Setup de pruebas
 - Íconos con Nuxt Icons, imágenes con `<NuxtImage>/<NuxtPicture>`.
 
 Consulta también `ESTADO-ACTUAL-PROYECTO.md` y `ROADMAP-TAREAS-DESARROLLO.md`.
-
-

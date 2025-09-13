@@ -42,9 +42,9 @@ Todos los usos de `useHead()` siguen la estructura correcta:
 // ... código del componente ...
 
 // Meta de la página
-useHead({
-  title: "Título de la Página"
-});
+	useHead({
+		title: "Título de la Página"
+	});
 </script>
 ```
 
@@ -98,9 +98,9 @@ Al crear nuevas páginas, seguir el patrón establecido:
 // ... lógica de la página ...
 
 // Meta de la página
-useHead({
-  title: "Título - POS Venezuela"
-});
+	useHead({
+		title: "Título - POS Venezuela"
+	});
 </script>
 ```
 
@@ -145,6 +145,6 @@ Es muy poco probable que este error vuelva a ocurrir.
 
 ---
 
-**Fecha de Auditoría:** 12 de Septiembre de 2025  
-**Realizada por:** Sistema de Auditoría Automatizada  
+**Fecha de Auditoría:** 12 de Septiembre de 2025
+**Realizada por:** Sistema de Auditoría Automatizada
 **Estado Final:** ✅ APROBADO - Sin problemas encontrados

@@ -224,5 +224,4 @@
 			addLog("error", `Error en prueba de categorías: ${err}`);
 		}
 	};
-
 </script>
