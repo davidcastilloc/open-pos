@@ -1,5 +1,11 @@
 # 🎉 Estado Actual del Proyecto POS Venezuela
 
+> Actualización rápida (v1.9.0 - 13 Sep 2025)
+>
+> - Se agregaron y documentaron reglas de UI (colores y modales Nuxt UI v3)
+> - Mejoras en `customers.vue`: búsqueda simplificada y eliminación de `useHead`
+> - Ajustes menores en POS y migraciones estabilizadas en 1.8.x
+
 ## ✅ **Tareas Completadas (11/12)**
 
 ### 1. ✅ **Configuración del Entorno de Desarrollo**

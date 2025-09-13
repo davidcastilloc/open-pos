@@ -7,8 +7,8 @@ Construido con [Nuxt 4](https://nuxt.com) y [Tauri 2](https://v2.tauri.app).
 
 ---
 
-![GitHub version](https://img.shields.io/github/package-json/v/davidjose/pos-system)
-![GitHub license](https://img.shields.io/github/license/davidjose/pos-system)
+![GitHub version](https://img.shields.io/github/package-json/v/davidcastilloc/open-pos)
+![GitHub license](https://img.shields.io/github/license/davidcastilloc/open-pos)
 
 ---
 
@@ -115,8 +115,8 @@ Construido con [Nuxt 4](https://nuxt.com) y [Tauri 2](https://v2.tauri.app).
 
 ```bash
 # Clonar el repositorio
-git clone https://github.com/davidjose/pos-system
-cd pos-system
+git clone https://github.com/davidcastilloc/open-pos
+cd open-pos
 
 # Instalar dependencias
 pnpm install
@@ -179,4 +179,3 @@ Documentos relacionados en la raíz:
 ## 🤝 Contribución
 
 Lee `CONTRIBUTING.md` y usa Conventional Commits para PRs.
->>>>>>> Incoming (Background Agent changes)
