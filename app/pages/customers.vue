@@ -592,29 +592,13 @@
 			searchResults.value = [];
 			return;
 		}
-		try {
-			const results = await searchCustomers(
-				searchQuery.value,
-				statusFilter.value !== "inactive"
-			);
 
-			// Normalizar los resultados para asegurar que isActive nunca sea null
-			searchResults.value = results.map((c: any) => ({
-				...c,
-				isActive: c.isActive === null ? false : c.isActive,
-				createdAt: c.createdAt ?? undefined,
-				updatedAt: c.updatedAt ?? undefined,
-				email: c.email ?? undefined,
-				phone: c.phone ?? undefined,
-				address: c.address ?? undefined,
-				documentType: c.documentType ?? undefined,
-				documentNumber: c.documentNumber ?? undefined,
-				birthDate: c.birthDate ?? undefined,
-				notes: c.notes ?? undefined
-			}));
+		try {
+			searchResults.value = await searchCustomers(searchQuery.value, statusFilter.value !== "inactive");
 		} catch (err) {
-			console.error("Error buscando clientes:", err);
+			console.error("Error searching customers:", err);
 		}
+	};
 
 	const handleFilter = () => {
 		if (searchQuery.value) {
