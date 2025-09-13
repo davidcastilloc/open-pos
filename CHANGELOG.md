@@ -1,3 +1,9 @@
+## 1.10.0 (2025-09-13)
+
+* Merge pull request #23 from davidcastilloc/refactor-code ([922eabda85e525d9ebbfecfc101c39ad3893527a](https://github.com/davidcastilloc/open-pos/commit/922eabda85e525d9ebbfecfc101c39ad3893527a)), closes [#23](https://github.com/davidcastilloc/open-pos/issues/23)
+* feat: Actualizar reglas para proyectos POS System con Tauri ([5d9dcad56d9434904e3438613382718f3ebfe62c](https://github.com/davidcastilloc/open-pos/commit/5d9dcad56d9434904e3438613382718f3ebfe62c))
+* feat: Update docs, changelog, and version to 1.9.0 (#22) ([700dae10bec084e5917b3ece23e890625065eaac](https://github.com/davidcastilloc/open-pos/commit/700dae10bec084e5917b3ece23e890625065eaac)), closes [#22](https://github.com/davidcastilloc/open-pos/issues/22)
+
 ## 1.9.0 (2025-09-13)
 
 * Merge pull request #20 from davidcastilloc/transaction ([9c2a7194740390d6a0c27a3976ff08445ec88008](https://github.com/davidcastilloc/open-pos/commit/9c2a7194740390d6a0c27a3976ff08445ec88008)), closes [#20](https://github.com/davidcastilloc/open-pos/issues/20)
