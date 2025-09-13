@@ -71,6 +71,10 @@
 - **Saldos de cuentas:** Actualización automática con cada venta
 - **Integración completa:** Entre ventas, transacciones y reportes
 
+Nota reciente (1.10.1):
+- Corregido error en `handleCashClosing` debido a iteración sobre valor no-arreglo.
+- Se normaliza `todayTransactions` y se documenta que `useDatabase.query` retorna `{ rows }`.
+
 ### 10. ✅ **Sistema de Métodos de Pago Avanzado**
 - **Mapeo inteligente:** 5 métodos UI → 3 métodos backend
 - **Persistencia completa:** Métodos de pago guardados en transacciones
@@ -288,6 +292,11 @@ pnpm db:studio          # Interfaz de base de datos
 - **Resultado:** Página de productos funcional con datos de prueba
 
 ### ✅ **Error POS Resuelto**
+### ✅ **Error de Cierre de Caja Resuelto**
+- **Error identificado:** `TypeError: txs.forEach is not a function`
+- **Causa:** Inconsistencia en el tipo de retorno consumido (`{ rows }` vs arreglo directo)
+- **Solución:** Normalización de `listTodaySales` → `todayTransactions` como arreglo; mantener contrato `{ rows }` en `useDatabase.query`
+- **Resultado:** Cierre de caja estable; reportes y totales correctos
 - **Error identificado:** `TypeError: undefined is not an object (evaluating 'productData.stock')`
 - **Causa:** `usePOS.ts` no actualizado para nuevo formato de `useDatabase`
 - **Solución:** Corregido acceso a `product.rows[0]` en lugar de `product[0]`
