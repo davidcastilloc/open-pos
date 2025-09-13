@@ -4,6 +4,7 @@ import { useAccounts } from "~/composables/useAccounts";
 import { useCashClosingDB } from "~/composables/useCashClosingDB";
 import { getPaymentMethodLabel } from "~/composables/usePaymentMethods";
 import { useTransactions } from "~/composables/useTransactions";
+import { useUser } from "~/composables/useUser";
 
 export interface CashClosingData {
 	id?: number
@@ -48,6 +49,7 @@ export function useCashClosing() {
 	const { getTotalBalanceByCurrency } = useAccounts();
 	const transactions = useTransactions();
 	const cashClosingDB = useCashClosingDB();
+	const { getCashierInfo } = useUser();
 
 	// Usar estado global compartido
 	const isProcessing = globalState.isProcessing;
@@ -56,6 +58,19 @@ export function useCashClosing() {
 	const currentSession = globalState.currentSession;
 	const shiftStartTime = globalState.shiftStartTime;
 	const isCashSessionOpen = globalState.isCashSessionOpen;
+
+	// Función auxiliar para calcular duración del turno
+	const getShiftDuration = (): string => {
+		if (!shiftStartTime.value) return "00:00:00";
+
+		const now = new Date();
+		const diff = now.getTime() - shiftStartTime.value.getTime();
+
+		const hours = Math.floor(diff / (1000 * 60 * 60));
+		const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+		const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+		return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+	};
 
 	// Computed
 	const accountBalances = computed(() => {
@@ -107,7 +122,15 @@ export function useCashClosing() {
 				createdAt: startTime
 			};
 
-			// TODO: Guardar en base de datos cuando esté implementada
+			// Guardar en base de datos
+			await cashClosingDB.createCashSession({
+				cashierId: getCashierInfo.value.cashierId,
+				cashierName: getCashierInfo.value.cashierName,
+				startTime: startTime.toISOString(),
+				initialBalances: JSON.stringify({}),
+				status: "open"
+			});
+
 			console.log("Turno iniciado:", shiftData);
 
 			return shiftData;
@@ -186,8 +209,8 @@ export function useCashClosing() {
 			});
 
 			const cashClosingData: CashClosingData = {
-				cashierId: "admin", // TODO: Obtener del usuario actual
-				cashierName: "Administrador", // TODO: Obtener del usuario actual
+				cashierId: getCashierInfo.value.cashierId,
+				cashierName: getCashierInfo.value.cashierName,
 				startTime: shiftStartTime.value || new Date(),
 				endTime,
 				initialBalances: currentShift.value?.initialBalances || {},
@@ -201,7 +224,30 @@ export function useCashClosing() {
 				createdAt: new Date()
 			};
 
-			// TODO: Guardar en base de datos
+			// Calcular duración del turno
+			const shiftDuration = getShiftDuration();
+
+			// Guardar en base de datos
+			await cashClosingDB.createCashClosing({
+				sessionId: currentSession.value?.id || "temp-session",
+				cashierId: getCashierInfo.value.cashierId,
+				cashierName: getCashierInfo.value.cashierName,
+				startTime: cashClosingData.startTime.toISOString(),
+				endTime: cashClosingData.endTime.toISOString(),
+				shiftDuration,
+				initialBalances: JSON.stringify(cashClosingData.initialBalances),
+				finalBalances: JSON.stringify(cashClosingData.finalBalances),
+				balanceDifferences: JSON.stringify({}),
+				totalTransactions: cashClosingData.salesSummary.totalTransactions,
+				salesByCurrency: JSON.stringify(cashClosingData.salesSummary.totalAmount),
+				salesByPaymentMethod: JSON.stringify(cashClosingData.salesSummary.paymentMethods),
+				totalSalesAmount: Object.values(cashClosingData.salesSummary.totalAmount).reduce((sum, amount) => sum + amount, 0),
+				expenses: JSON.stringify({}),
+				adjustments: JSON.stringify({}),
+				observations: cashClosingData.observations || "",
+				status: "closed"
+			});
+
 			console.log("Reporte de cierre generado:", cashClosingData);
 
 			return cashClosingData;
@@ -335,18 +381,6 @@ export function useCashClosing() {
 		} finally {
 			isProcessing.value = false;
 		}
-	};
-
-	const getShiftDuration = (): string => {
-		if (!shiftStartTime.value) return "00:00:00";
-
-		const now = new Date();
-		const diff = now.getTime() - shiftStartTime.value.getTime();
-
-		const hours = Math.floor(diff / (1000 * 60 * 60));
-		const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-		const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-		return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 	};
 
 	const formatShiftTime = (date: Date): string => {
@@ -577,8 +611,8 @@ Generado el: ${new Date().toLocaleString("es-VE")}
 
 			// Crear nueva sesión en base de datos
 			const sessionData = {
-				cashierId: "admin", // TODO: Obtener del usuario actual
-				cashierName: "Administrador", // TODO: Obtener del usuario actual
+				cashierId: getCashierInfo.value.cashierId,
+				cashierName: getCashierInfo.value.cashierName,
 				initialBalances: initialBalance || accountBalances.value
 			};
 

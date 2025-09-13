@@ -33,3 +33,10 @@ export type {
 } from "./products";
 
 export * from "./sales";
+export * from "./users";
+
+// Re-exportar tipos de usuarios
+export type {
+	NewUser,
+	User
+} from "./users";

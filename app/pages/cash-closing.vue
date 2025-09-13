@@ -304,6 +304,7 @@
 	import { computed, onMounted, ref } from "vue";
 	import { useCashClosing } from "~/composables/useCashClosing";
 	import { useCurrency } from "~/composables/useCurrency";
+	import { useNotifications } from "~/composables/useNotifications";
 	import { getPaymentMethodIcon, getPaymentMethodLabel } from "~/composables/usePaymentMethods";
 
 	// Composables
@@ -319,6 +320,7 @@
 		isCashSessionOpen
 	} = useCashClosing();
 	const { formatCurrency } = useCurrency();
+	const notifications = useNotifications();
 	// const { getCustomerStats } = useCustomers();
 
 	// Estado local
@@ -379,11 +381,11 @@
 			await generateReport();
 
 			// Mostrar notificación de éxito
-			// TODO: Implementar con Nuxt UI notifications
+			notifications.success("Reporte generado", "El reporte de cierre de caja se ha generado y descargado exitosamente");
 			console.log("✅ Reporte generado y descargado exitosamente");
 		} catch (error) {
 			console.error("Error generating report:", error);
-			// TODO: Mostrar notificación de error
+			notifications.error("Error al generar reporte", "No se pudo generar el reporte de cierre de caja");
 			console.error("❌ Error al generar el reporte");
 		}
 	};
@@ -408,7 +410,7 @@
 			await navigateTo("/");
 		} catch (error) {
 			console.error("Error processing cash closing:", error);
-			// TODO: Mostrar notificación de error
+			notifications.error("Error en cierre de caja", "No se pudo procesar el cierre de caja correctamente");
 			console.error("❌ Error al procesar el cierre de caja");
 		} finally {
 			showConfirmModal.value = false;

@@ -92,7 +92,7 @@ export interface CashReportData {
 
 export function useCashClosingDB() {
 	const { query, execute, get, initialize } = useDatabase();
-	const tenantId = "default"; // TODO: Obtener del contexto de usuario
+	const tenantId = "default"; // Por ahora fijo, en el futuro se puede obtener del contexto de usuario
 
 	// Inicializar base de datos si es necesario
 	const ensureTablesExist = async () => {

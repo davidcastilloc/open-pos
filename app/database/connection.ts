@@ -343,6 +343,20 @@ async function createTables() {
 			out_of_stock_count INTEGER NOT NULL DEFAULT 0,
 			last_movement_date TEXT,
 			last_updated TEXT NOT NULL DEFAULT (datetime('now'))
+		)`,
+
+		// Tabla de usuarios/cajeros
+		`CREATE TABLE IF NOT EXISTS users (
+			id TEXT PRIMARY KEY,
+			username TEXT NOT NULL,
+			email TEXT NOT NULL,
+			first_name TEXT NOT NULL,
+			last_name TEXT NOT NULL,
+			role TEXT DEFAULT 'cashier' NOT NULL,
+			is_active INTEGER DEFAULT 1 NOT NULL,
+			password_hash TEXT NOT NULL,
+			created_at TEXT DEFAULT CURRENT_TIMESTAMP NOT NULL,
+			updated_at TEXT DEFAULT CURRENT_TIMESTAMP NOT NULL
 		)`
 	];
 
@@ -467,6 +481,9 @@ async function insertDefaultData() {
 
 	// Insertar categorías por defecto
 	await insertDefaultCategories();
+
+	// Insertar usuario por defecto
+	await insertDefaultUser();
 }
 
 // Función para insertar configuración por defecto
@@ -569,6 +586,27 @@ async function insertDefaultCategories() {
 	}
 
 	console.log("✅ Categorías por defecto insertadas");
+}
+
+// Función para insertar usuario por defecto
+async function insertDefaultUser() {
+	await executeSQL(`
+		INSERT OR IGNORE INTO users (
+			id, username, email, first_name, last_name, 
+			role, is_active, password_hash, created_at, updated_at
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+	`, [
+		"admin-user-001",
+		"admin",
+		"admin@pos.local",
+		"Administrador",
+		"Sistema",
+		"admin",
+		1,
+		"default_hash"
+	]);
+
+	console.log("✅ Usuario por defecto insertado");
 }
 
 // Función para asegurar columnas adicionales de customers

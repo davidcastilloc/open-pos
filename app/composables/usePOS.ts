@@ -2,6 +2,7 @@ import { computed, readonly, ref } from "vue";
 import { useCurrency } from "./useCurrency";
 import { useDatabase } from "./useDatabase";
 import { mapPaymentMethodToBackend } from "./usePaymentMethods";
+import { useUser } from "./useUser";
 
 export interface CartItem {
 	id: string
@@ -40,7 +41,8 @@ export function usePOS() {
 	const discount = ref<number>(0);
 	const discountType = ref<"percentage" | "amount">("percentage");
 	const customerId = ref<string | null>(null);
-	const cashierId = ref<string>("admin"); // TODO: Obtener del usuario actual
+	const { getCashierInfo } = useUser();
+	const cashierId = computed(() => getCashierInfo.value.cashierId);
 
 	// Estado de la venta
 	const isProcessing = ref(false);

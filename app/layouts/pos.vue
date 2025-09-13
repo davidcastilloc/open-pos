@@ -129,6 +129,9 @@
 			v-model:open="showOpenCashModal"
 			@success="handleCashSessionOpened"
 		/>
+
+		<!-- Contenedor de notificaciones -->
+		<NotificationContainer />
 	</div>
 </template>
 
@@ -149,7 +152,8 @@
 	// Estado local
 	const currentTime = ref("");
 	const currentDate = ref("");
-	const cashierName = ref("Administrador"); // TODO: Obtener del usuario actual
+	const { fullName } = useUser();
+	const cashierName = computed(() => fullName.value);
 	const lowStockCount = ref(0);
 	const totalProducts = ref(0);
 	const todaySales = ref(0);
