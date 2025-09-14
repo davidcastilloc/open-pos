@@ -1,128 +1,101 @@
----
-globs: app/**/*.vue,app/composables/**/*.ts,
+You are an expert in Nuxt 4, Tauri, TypeScript, Zod, Drizzle ORM, Tailwind CSS.
+
+globs:
+  - app/**/*.vue
+  - app/composables/**/*.ts
+  - app/components/**/*.vue
+  - app/pages/**/*.vue
+  - app/database/**/*.ts
 alwaysApply: false
----
+
 rules:
+
   - id: script-setup-lang-ts
     level: error
-    message: "Usar `<script setup lang=\"ts\">` en todos los SFC (.vue)."
-    appliesTo: "*.vue"
+    message: "Todos los SFC deben usar `<script setup lang=\"ts\">`."
+    appliesTo: "app/**/*.vue"
     pattern: (?s)"<script(?:(?!setup).)*>"
     mustMatch: (?s)"<script[^>]*setup[^>]*lang=(?:\"|')ts(?:\"|')"
-    references:
-      - "@Vue"
 
   - id: ban-options-api
     level: error
-    message: "Evita Options API (`export default { ... }`). Migrar a Composition API + `<script setup>`."
-    appliesTo: "*.vue"
+    message: "Prohibido Options API (`export default { ... }`). Usa Composition API con `<script setup>`."
+    appliesTo: "app/**/*.vue"
     pattern: "export\\s+default\\s*\\{"
-    references:
-      - "@Vue"
 
   - id: enforce-pascalcase-filenames
-    level: warning
+    level: error
     message: "Los archivos de componentes deben usar PascalCase (Ej: MyComponent.vue)."
-    appliesTo: "*.vue"
+    appliesTo: "app/components/**/*.vue, app/pages/**/*.vue"
     fileNamePattern: "^[A-Z][A-Za-z0-9]+\\.vue$"
-    references:
-      - "@Vue"
 
   - id: composables-location-name
     level: error
-    message: "Los composables deben estar en `composables/` y llamarse `useX`."
-    appliesTo: "composables/**/*.ts"
+    message: "Los composables deben estar en `app/composables/` y llamarse `useX`."
+    appliesTo: "app/composables/**/*.ts"
     pattern: "export\\s+function\\s+(?!use)[A-Za-z0-9_]+\\s*\\("
-    references:
-      - "@Nuxt"
 
   - id: defineprops-definemits-typed
     level: error
-    message: "Definir props y emits con tipado explícito (`defineProps<T>()` y `defineEmits<T>()`)."
-    appliesTo: "*.vue"
+    message: "Definir props y emits con tipado explícito (`defineProps<T>()`, `defineEmits<T>()`)."
+    appliesTo: "app/**/*.vue"
     pattern: "defineProps\\s*\\(|defineEmits\\s*\\("
     negativePattern: "defineProps\\s*\\(\\s*\\)|defineEmits\\s*\\(\\s*\\)"
-    references:
-      - "@Vue"
 
   - id: avoid-any
     level: error
-    message: "Prohibido usar `any`. Reemplazar por tipos concretos o `unknown` temporalmente."
-    appliesTo: "*.vue, **/*.ts"
+    message: "Prohibido usar `any`. Usa tipos concretos o `unknown`."
+    appliesTo: "app/**/*.vue, app/**/*.ts"
     pattern: "(:|as)\\s*any\\b"
-    references:
-      - "@Vue"
 
   - id: enforce-zod-validation
     level: error
-    message: "Validar formularios/entradas externas con Zod (`z.object(...)`)."
-    appliesTo: "*.vue"
+    message: "Formularios/entradas externas deben validarse con Zod (`z.object(...)`)."
+    appliesTo: "app/**/*.vue"
     pattern: "(v-model|@submit|@submit.prevent|onSubmit|handleSubmit)"
     negativePattern: "from\\s+['\"]zod['\"]|z\\.object\\("
-    references:
-      - "zod"
+
+  - id: drizzle-schema-usage
+    level: error
+    message: "Las consultas deben usar los schemas de Drizzle. Prohibido SQL sin tipado."
+    appliesTo: "app/database/**/*.ts"
+    pattern: "(sql`|queryRaw|executeRaw)"
 
   - id: tauri-apis-encapsulate
-    level: warning
-    message: "No importar `@tauri-apps/*` directamente en componentes. Encapsular en composables (ej: composables/tauri/useFs.ts)."
-    appliesTo: "*.vue"
+    level: error
+    message: "No importar `@tauri-apps/*` en componentes. Encapsular en `app/composables/tauri/useX.ts`."
+    appliesTo: "app/**/*.vue"
     pattern: "from\\s+['\"]@tauri-apps/[^'\"]+['\"]"
-    references:
-      - "tauri"
 
   - id: nuxt-auto-imports
-    level: info
-    message: "Aprovechar auto-imports de Nuxt: no importar `ref`, `reactive`, `useState`, `useRouter`, etc."
-    appliesTo: "*.vue"
-    pattern: "import\\s+\\{[^}]*\\b(ref|reactive|useState|useRouter|useFetch)\\b[^}]*\\}\\s+from\\s+['\"]vue|nuxt['\"]"
-    references:
-      - "@Nuxt"
+    level: error
+    message: "Usa auto-imports de Nuxt. No importar `ref`, `reactive`, `useState`, `useRouter`, etc."
+    appliesTo: "app/**/*.vue"
+    pattern: "import\\s+\\{[^}]*\\b(ref|reactive|useState|useRouter|useFetch)\\b[^}]*\\}\\s+from\\s+['\"](vue|nuxt)['\"]"
 
   - id: prefer-useFetch-in-pages
-    level: warning
-    message: "En páginas y componentes prefiere `useFetch` con `{ server: false }`. Usa `$fetch` sólo en handlers/eventos del cliente."
-    appliesTo: "pages/**, components/**"
+    level: error
+    message: "En páginas/componentes usar `useFetch({ server: false })`. `$fetch` solo en handlers del cliente."
+    appliesTo: "app/pages/**, app/components/**"
     pattern: "\\$fetch\\s*\\("
-    references:
-      - "@Nuxt"
 
   - id: useAsyncData-options-recommendation
-    level: info
-    message: "Cuando uses `useAsyncData` considera `lazy: true` y `server: false` en Tauri (cliente-only)."
-    appliesTo: "*.vue"
+    level: error
+    message: "Cuando uses `useAsyncData`, debes incluir `lazy: true` y `server: false`."
+    appliesTo: "app/**/*.vue"
     pattern: "useAsyncData\\s*\\("
     negativePattern: "lazy\\s*:\\s*true|server\\s*:\\s*false"
-    references:
-      - "@Nuxt"
 
   - id: prefer-nuxtimage-nuxtpicture
-    level: info
-    message: "Usar `<NuxtImage>` / `<NuxtPicture>` para optimización de imágenes; Nuxt Icons para iconos."
-    appliesTo: "*.vue"
+    level: error
+    message: "Usa `<NuxtImage>` o `<NuxtPicture>` para optimización de imágenes."
+    appliesTo: "app/**/*.vue"
     pattern: "<img\\b"
     negativePattern: "<NuxtImage|<NuxtPicture"
-    references:
-      - "@NuxtUi"
-  
-  - id: color-rules
-    level: warning 
-    message: "Prohibido aplicar colores de texto o de fondo a los componentes."
-    appliesTo: "*.vue"
-    references:
-      - "@NuxtUi"
 
-  - id: eslint-antfu
-    level: info
-    message: "Seguir `@antfu/eslint-config` y la convención de imports (grupos) y scripts (`pnpm lint`)."
-    appliesTo: "package.json, .eslintrc*"
-    pattern: "\"@antfu/eslint-config\""
-    references:
-      - "eslint"
+  - id: color-rules-tailwind
+    level: error
+    message: "Prohibido usar clases de Tailwind para color de texto (`text-…`) o fondo (`bg-…`) en componentes. Usa tokens/variables de estilo definidos en la UI/tailwind config."
+    appliesTo: "app/**/*.vue"
+    pattern: "class\\s*=\\s*['\"][^'\"]*(?:\\btext-[^\\s'\"\\]]+|\\bbg-[^\\s'\"\\]]+)[^'\"]*['\"]"
 
-  - id: vitest-required-for-critical
-    level: info
-    message: "Agregar tests unitarios (Vitest) para funciones críticas (pagos, auth, stores)."
-    appliesTo: "tests/**, composables/**"
-    references:
-      - "@Vue"
----
