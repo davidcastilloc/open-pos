@@ -158,6 +158,7 @@ async function createTables() {
 			tax REAL NOT NULL DEFAULT 0,
 			discount REAL NOT NULL DEFAULT 0,
 			total REAL NOT NULL,
+			currency TEXT NOT NULL DEFAULT 'BS',
 			payment_method TEXT NOT NULL,
 			status TEXT NOT NULL DEFAULT 'completed',
 			cashier_id TEXT NOT NULL,
@@ -357,6 +358,68 @@ async function createTables() {
 			password_hash TEXT NOT NULL,
 			created_at TEXT DEFAULT CURRENT_TIMESTAMP NOT NULL,
 			updated_at TEXT DEFAULT CURRENT_TIMESTAMP NOT NULL
+		)`,
+
+		// Tabla principal de devoluciones
+		`CREATE TABLE IF NOT EXISTS returns (
+			id TEXT PRIMARY KEY,
+			tenant_id TEXT NOT NULL,
+			original_sale_id TEXT NOT NULL,
+			customer_id TEXT,
+			return_type TEXT NOT NULL,
+			reason TEXT NOT NULL,
+			status TEXT DEFAULT 'pending' NOT NULL,
+			subtotal REAL NOT NULL,
+			tax REAL DEFAULT 0 NOT NULL,
+			discount REAL DEFAULT 0 NOT NULL,
+			total REAL NOT NULL,
+			currency TEXT NOT NULL,
+			cashier_id TEXT NOT NULL,
+			authorized_by TEXT,
+			authorized_at TEXT,
+			notes TEXT,
+			created_at TEXT NOT NULL,
+			updated_at TEXT NOT NULL,
+			completed_at TEXT
+		)`,
+
+		// Items específicos devueltos
+		`CREATE TABLE IF NOT EXISTS return_items (
+			id TEXT PRIMARY KEY,
+			return_id TEXT NOT NULL,
+			original_sale_item_id TEXT NOT NULL,
+			product_id TEXT NOT NULL,
+			quantity INTEGER NOT NULL,
+			original_quantity INTEGER NOT NULL,
+			price REAL NOT NULL,
+			total REAL NOT NULL,
+			reason TEXT,
+			created_at TEXT NOT NULL
+		)`,
+
+		// Transacciones contables de devoluciones
+		`CREATE TABLE IF NOT EXISTS return_transactions (
+			id TEXT PRIMARY KEY,
+			return_id TEXT NOT NULL,
+			transaction_id TEXT NOT NULL,
+			account_id TEXT NOT NULL,
+			amount REAL NOT NULL,
+			currency TEXT NOT NULL,
+			exchange_rate REAL,
+			description TEXT,
+			created_at TEXT NOT NULL
+		)`,
+
+		// Historial de cambios de estado de devoluciones
+		`CREATE TABLE IF NOT EXISTS return_status_history (
+			id TEXT PRIMARY KEY,
+			return_id TEXT NOT NULL,
+			previous_status TEXT,
+			new_status TEXT NOT NULL,
+			changed_by TEXT NOT NULL,
+			reason TEXT,
+			notes TEXT,
+			created_at TEXT NOT NULL
 		)`
 	];
 
@@ -377,24 +440,38 @@ async function createTables() {
 	// Verificar columnas adicionales de customers
 	await ensureCustomersColumns();
 
+	// Verificar columna currency en sales
+	await ensureSalesCurrencyColumn();
+
 	console.log("✅ Tablas creadas correctamente");
 }
 
-// Función para crear índices de inventario
+// Función para crear índices de inventario y devoluciones
 async function createInventoryIndexes() {
 	const indexes = [
+		// Índices de inventario
 		"CREATE INDEX IF NOT EXISTS idx_inventory_movements_product_id ON inventory_movements(product_id)",
 		"CREATE INDEX IF NOT EXISTS idx_inventory_movements_tenant_id ON inventory_movements(tenant_id)",
 		"CREATE INDEX IF NOT EXISTS idx_inventory_movements_created_at ON inventory_movements(created_at)",
 		"CREATE INDEX IF NOT EXISTS idx_inventory_movements_movement_type ON inventory_movements(movement_type)",
-		"CREATE INDEX IF NOT EXISTS idx_inventory_stats_tenant_id ON inventory_stats(tenant_id)"
+		"CREATE INDEX IF NOT EXISTS idx_inventory_stats_tenant_id ON inventory_stats(tenant_id)",
+
+		// Índices de devoluciones
+		"CREATE INDEX IF NOT EXISTS idx_returns_original_sale_id ON returns(original_sale_id)",
+		"CREATE INDEX IF NOT EXISTS idx_returns_customer_id ON returns(customer_id)",
+		"CREATE INDEX IF NOT EXISTS idx_returns_status ON returns(status)",
+		"CREATE INDEX IF NOT EXISTS idx_returns_created_at ON returns(created_at)",
+		"CREATE INDEX IF NOT EXISTS idx_return_items_return_id ON return_items(return_id)",
+		"CREATE INDEX IF NOT EXISTS idx_return_items_product_id ON return_items(product_id)",
+		"CREATE INDEX IF NOT EXISTS idx_return_transactions_return_id ON return_transactions(return_id)",
+		"CREATE INDEX IF NOT EXISTS idx_return_status_history_return_id ON return_status_history(return_id)"
 	];
 
 	for (const indexSQL of indexes) {
 		await executeSQL(indexSQL);
 	}
 
-	console.log("✅ Índices de inventario creados correctamente");
+	console.log("✅ Índices de inventario y devoluciones creados correctamente");
 }
 
 // Función para ejecutar SQL directamente
@@ -644,6 +721,30 @@ async function ensureCustomersColumns() {
 		console.log("✅ Columnas adicionales de customers verificadas");
 	} catch (error) {
 		console.error("❌ Error verificando columnas de customers:", error);
+	}
+}
+
+// Función para asegurar columna currency en sales
+async function ensureSalesCurrencyColumn() {
+	try {
+		const sqlite = await Database.load("sqlite:pos.db");
+
+		// Verificar si la columna currency existe en sales
+		const salesCols = await sqlite.select("PRAGMA table_info(sales)") as any[];
+		const hasCurrencyColumn = salesCols.some((col: any) => col.name === "currency");
+
+		if (!hasCurrencyColumn) {
+			console.log("🔄 Agregando columna currency a la tabla sales...");
+			await sqlite.execute("ALTER TABLE sales ADD COLUMN currency TEXT DEFAULT 'BS' NOT NULL");
+			console.log("✅ Columna currency agregada a la tabla sales");
+		} else {
+			console.log("✅ Columna currency ya existe en la tabla sales");
+		}
+
+		await sqlite.close();
+	} catch (error) {
+		console.error("❌ Error verificando columna currency en sales:", error);
+		// No lanzar el error para no interrumpir la inicialización
 	}
 }
 

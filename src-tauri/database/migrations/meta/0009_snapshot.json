@@ -1,0 +1,559 @@
+{
+	"id": "0009_add_returns_tables",
+	"prevId": "0008_strong_liz_osborn",
+	"version": "6",
+	"dialect": "sqlite",
+	"tables": {
+		"__drizzle_migrations": {
+			"name": "__drizzle_migrations",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true,
+					"dataType": "integer"
+				},
+				"hash": {
+					"name": "hash",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "numeric",
+					"primaryKey": false,
+					"notNull": false,
+					"dataType": "numeric"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"accounts": {
+			"name": "accounts",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"tenant_id": {
+					"name": "tenant_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"name": {
+					"name": "name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"type": {
+					"name": "type",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"currency": {
+					"name": "currency",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"bank_name": {
+					"name": "bank_name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"dataType": "text"
+				},
+				"account_number": {
+					"name": "account_number",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"dataType": "text"
+				},
+				"is_active": {
+					"name": "is_active",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"default": true,
+					"dataType": "integer"
+				},
+				"balance": {
+					"name": "balance",
+					"type": "real",
+					"primaryKey": false,
+					"notNull": true,
+					"default": 0,
+					"dataType": "real"
+				},
+				"min_balance": {
+					"name": "min_balance",
+					"type": "real",
+					"primaryKey": false,
+					"notNull": true,
+					"default": 0,
+					"dataType": "real"
+				},
+				"max_balance": {
+					"name": "max_balance",
+					"type": "real",
+					"primaryKey": false,
+					"notNull": false,
+					"dataType": "real"
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"returns": {
+			"name": "returns",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"tenant_id": {
+					"name": "tenant_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"original_sale_id": {
+					"name": "original_sale_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"customer_id": {
+					"name": "customer_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"dataType": "text"
+				},
+				"return_type": {
+					"name": "return_type",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"reason": {
+					"name": "reason",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"status": {
+					"name": "status",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "pending",
+					"dataType": "text"
+				},
+				"subtotal": {
+					"name": "subtotal",
+					"type": "real",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "real"
+				},
+				"tax": {
+					"name": "tax",
+					"type": "real",
+					"primaryKey": false,
+					"notNull": true,
+					"default": 0,
+					"dataType": "real"
+				},
+				"discount": {
+					"name": "discount",
+					"type": "real",
+					"primaryKey": false,
+					"notNull": true,
+					"default": 0,
+					"dataType": "real"
+				},
+				"total": {
+					"name": "total",
+					"type": "real",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "real"
+				},
+				"currency": {
+					"name": "currency",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"cashier_id": {
+					"name": "cashier_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"authorized_by": {
+					"name": "authorized_by",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"dataType": "text"
+				},
+				"authorized_at": {
+					"name": "authorized_at",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"dataType": "text"
+				},
+				"notes": {
+					"name": "notes",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"dataType": "text"
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"completed_at": {
+					"name": "completed_at",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"dataType": "text"
+				}
+			},
+			"indexes": {
+				"idx_returns_original_sale_id": {
+					"name": "idx_returns_original_sale_id",
+					"columns": ["original_sale_id"],
+					"isUnique": false
+				},
+				"idx_returns_customer_id": {
+					"name": "idx_returns_customer_id",
+					"columns": ["customer_id"],
+					"isUnique": false
+				},
+				"idx_returns_status": {
+					"name": "idx_returns_status",
+					"columns": ["status"],
+					"isUnique": false
+				},
+				"idx_returns_created_at": {
+					"name": "idx_returns_created_at",
+					"columns": ["created_at"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"return_items": {
+			"name": "return_items",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"return_id": {
+					"name": "return_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"original_sale_item_id": {
+					"name": "original_sale_item_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"product_id": {
+					"name": "product_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"quantity": {
+					"name": "quantity",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "integer"
+				},
+				"original_quantity": {
+					"name": "original_quantity",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "integer"
+				},
+				"price": {
+					"name": "price",
+					"type": "real",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "real"
+				},
+				"total": {
+					"name": "total",
+					"type": "real",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "real"
+				},
+				"reason": {
+					"name": "reason",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"dataType": "text"
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				}
+			},
+			"indexes": {
+				"idx_return_items_return_id": {
+					"name": "idx_return_items_return_id",
+					"columns": ["return_id"],
+					"isUnique": false
+				},
+				"idx_return_items_product_id": {
+					"name": "idx_return_items_product_id",
+					"columns": ["product_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"return_transactions": {
+			"name": "return_transactions",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"return_id": {
+					"name": "return_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"transaction_id": {
+					"name": "transaction_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"account_id": {
+					"name": "account_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"amount": {
+					"name": "amount",
+					"type": "real",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "real"
+				},
+				"currency": {
+					"name": "currency",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"exchange_rate": {
+					"name": "exchange_rate",
+					"type": "real",
+					"primaryKey": false,
+					"notNull": false,
+					"dataType": "real"
+				},
+				"description": {
+					"name": "description",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"dataType": "text"
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				}
+			},
+			"indexes": {
+				"idx_return_transactions_return_id": {
+					"name": "idx_return_transactions_return_id",
+					"columns": ["return_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"return_status_history": {
+			"name": "return_status_history",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"return_id": {
+					"name": "return_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"previous_status": {
+					"name": "previous_status",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"dataType": "text"
+				},
+				"new_status": {
+					"name": "new_status",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"changed_by": {
+					"name": "changed_by",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				},
+				"reason": {
+					"name": "reason",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"dataType": "text"
+				},
+				"notes": {
+					"name": "notes",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"dataType": "text"
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"dataType": "text"
+				}
+			},
+			"indexes": {
+				"idx_return_status_history_return_id": {
+					"name": "idx_return_status_history_return_id",
+					"columns": ["return_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		}
+	},
+	"enums": {},
+	"schemas": {},
+	"_meta": {
+		"columns": {},
+		"schemas": {},
+		"tables": {}
+	}
+}

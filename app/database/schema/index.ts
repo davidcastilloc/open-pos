@@ -32,7 +32,20 @@ export type {
 	Product
 } from "./products";
 
+export * from "./returns";
+// Re-exportar tipos de devoluciones
+export type {
+	NewReturn,
+	NewReturnItem,
+	NewReturnStatusHistory,
+	NewReturnTransaction,
+	Return,
+	ReturnItem,
+	ReturnStatusHistory,
+	ReturnTransaction
+} from "./returns";
 export * from "./sales";
+
 export * from "./users";
 
 // Re-exportar tipos de usuarios

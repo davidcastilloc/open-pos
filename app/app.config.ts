@@ -20,6 +20,10 @@ export default defineAppConfig({
 			label: "Interface",
 			icon: "lucide:app-window-mac"
 		},
+		sales: {
+			label: "Ventas",
+			icon: "lucide:shopping-cart"
+		},
 		other: {
 			label: "Other",
 			icon: "lucide:folder"
