@@ -8,5 +8,8 @@
 				<slot />
 			</UContainer>
 		</div>
+
+		<!-- Contenedor de notificaciones -->
+		<NotificationContainer />
 	</div>
 </template>

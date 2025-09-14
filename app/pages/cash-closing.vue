@@ -137,7 +137,7 @@
 
 				<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 					<div class="text-center p-4 border rounded-lg">
-						<div class="text-2xl font-bold mb-1 text-blue-600">
+						<div class="text-2xl font-bold mb-1">
 							{{ customerStats.totalCustomers }}
 						</div>
 						<div class="text-sm opacity-75 mb-2">
@@ -148,7 +148,7 @@
 						</div>
 					</div>
 					<div class="text-center p-4 border rounded-lg">
-						<div class="text-2xl font-bold mb-1 text-green-600">
+						<div class="text-2xl font-bold mb-1">
 							{{ formatCurrency(customerStats.totalCustomerSales, 'BS') }}
 						</div>
 						<div class="text-sm opacity-75 mb-2">
@@ -159,7 +159,7 @@
 						</div>
 					</div>
 					<div class="text-center p-4 border rounded-lg">
-						<div class="text-2xl font-bold mb-1 text-purple-600">
+						<div class="text-2xl font-bold mb-1">
 							{{ formatCurrency(customerStats.averageTicket, 'BS') }}
 						</div>
 						<div class="text-sm opacity-75 mb-2">
@@ -179,8 +179,8 @@
 					<div class="space-y-2">
 						<div v-for="(customer, index) in customerStats.topCustomers" :key="customer.id" class="flex items-center justify-between p-3 border rounded-lg">
 							<div class="flex items-center space-x-3">
-								<div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-									<span class="text-sm font-bold text-blue-600">#{{ index + 1 }}</span>
+								<div class="w-8 h-8 rounded-full border flex items-center justify-center">
+									<span class="text-sm font-bold">#{{ index + 1 }}</span>
 								</div>
 								<div>
 									<div class="font-medium">
@@ -263,37 +263,32 @@
 
 			<!-- Modal de confirmación -->
 			<UModal v-model:open="showConfirmModal">
-				<template #header>
-					<h3 class="text-lg font-semibold">
-						Confirmar Cierre de Caja
-					</h3>
-				</template>
+				<template #content>
+					<UCard>
+						<template #header>
+							<h3 class="text-lg font-semibold">
+								Confirmar Cierre de Caja
+							</h3>
+						</template>
 
-				<template #body>
-					<div class="space-y-4">
-						<p class="opacity-75">
-							¿Estás seguro de que deseas terminar el turno? Esta acción no se puede deshacer.
-						</p>
-						<UAlert color="warning" variant="soft" title="Advertencia" description="Se generará un reporte de cierre y se cerrará la sesión actual." />
-					</div>
-				</template>
+						<div class="space-y-4">
+							<p class="opacity-75">
+								¿Estás seguro de que deseas terminar el turno? Esta acción no se puede deshacer.
+							</p>
+							<UAlert color="warning" variant="soft" title="Advertencia" description="Se generará un reporte de cierre y se cerrará la sesión actual." />
+						</div>
 
-				<template #footer>
-					<div class="flex space-x-3">
-						<UButton
-							variant="outline"
-							@click="showConfirmModal = false"
-						>
-							Cancelar
-						</UButton>
-						<UButton
-							color="error"
-							:loading="isProcessingCashClosing"
-							@click="handleCashClosing"
-						>
-							Confirmar Cierre
-						</UButton>
-					</div>
+						<template #footer>
+							<div class="flex justify-end gap-3">
+								<UButton variant="outline" @click="showConfirmModal = false">
+									Cancelar
+								</UButton>
+								<UButton color="error" :loading="isProcessingCashClosing" @click="handleCashClosing">
+									Confirmar Cierre
+								</UButton>
+							</div>
+						</template>
+					</UCard>
 				</template>
 			</UModal>
 		</div>
@@ -304,6 +299,7 @@
 	import { computed, onMounted, ref } from "vue";
 	import { useCashClosing } from "~/composables/useCashClosing";
 	import { useCurrency } from "~/composables/useCurrency";
+	import { useNotifications } from "~/composables/useNotifications";
 	import { getPaymentMethodIcon, getPaymentMethodLabel } from "~/composables/usePaymentMethods";
 
 	// Composables
@@ -319,6 +315,7 @@
 		isCashSessionOpen
 	} = useCashClosing();
 	const { formatCurrency } = useCurrency();
+	const notifications = useNotifications();
 	// const { getCustomerStats } = useCustomers();
 
 	// Estado local
@@ -379,11 +376,11 @@
 			await generateReport();
 
 			// Mostrar notificación de éxito
-			// TODO: Implementar con Nuxt UI notifications
+			notifications.success("Reporte generado", "El reporte de cierre de caja se ha generado y descargado exitosamente");
 			console.log("✅ Reporte generado y descargado exitosamente");
 		} catch (error) {
 			console.error("Error generating report:", error);
-			// TODO: Mostrar notificación de error
+			notifications.error("Error al generar reporte", "No se pudo generar el reporte de cierre de caja");
 			console.error("❌ Error al generar el reporte");
 		}
 	};
@@ -408,7 +405,7 @@
 			await navigateTo("/");
 		} catch (error) {
 			console.error("Error processing cash closing:", error);
-			// TODO: Mostrar notificación de error
+			notifications.error("Error en cierre de caja", "No se pudo procesar el cierre de caja correctamente");
 			console.error("❌ Error al procesar el cierre de caja");
 		} finally {
 			showConfirmModal.value = false;

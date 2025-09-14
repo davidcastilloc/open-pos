@@ -1,14 +1,14 @@
 <template>
-	<div class="min-h-screen bg-gray-50">
+	<div class="min-h-screen">
 		<!-- Header -->
-		<div class="bg-white shadow-sm border-b">
+		<div class="shadow-sm border-b">
 			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div class="flex justify-between items-center py-6">
 					<div>
-						<h1 class="text-2xl font-bold text-gray-900">
+						<h1 class="text-2xl font-bold">
 							Gestión de Clientes
 						</h1>
-						<p class="mt-1 text-sm text-gray-500">
+						<p class="mt-1 text-sm opacity-75">
 							Administra la información de tus clientes
 						</p>
 					</div>
@@ -31,7 +31,7 @@
 				<UCard>
 					<div class="flex items-center">
 						<div class="flex-shrink-0">
-							<UIcon name="i-heroicons-users" class="h-8 w-8 text-blue-600" />
+							<UIcon name="i-heroicons-users" class="h-8 w-8" />
 						</div>
 						<div class="ml-4">
 							<p class="text-sm font-medium text-gray-500">
@@ -139,8 +139,8 @@
 				</div>
 
 				<div v-else-if="displayedCustomers.length === 0" class="text-center py-8">
-					<UIcon name="i-heroicons-users" class="h-12 w-12 text-gray-400 mx-auto mb-4" />
-					<p class="text-gray-500">
+					<UIcon name="i-heroicons-users" class="h-12 w-12 mx-auto mb-4 opacity-50" />
+					<p class="opacity-75">
 						No se encontraron clientes
 					</p>
 					<UButton class="mt-4" color="primary" @click="openCreateModal">
@@ -150,115 +150,94 @@
 
 				<div v-else>
 					<div class="overflow-x-auto">
-						<table class="min-w-full divide-y divide-gray-200">
-							<thead class="bg-gray-50">
+						<table class="min-w-full divide-y">
+							<thead>
 								<tr>
-									<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+									<th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider opacity-75">
 										Cliente
 									</th>
-									<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+									<th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider opacity-75">
 										Contacto
 									</th>
-									<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+									<th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider opacity-75">
 										Documento
 									</th>
-									<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+									<th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider opacity-75">
 										Estado
 									</th>
-									<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+									<th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider opacity-75">
 										Fecha de Registro
 									</th>
-									<th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+									<th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider opacity-75">
 										Acciones
 									</th>
 								</tr>
 							</thead>
-							<tbody class="bg-white divide-y divide-gray-200">
-								<tr v-for="customer in displayedCustomers" :key="customer.id" class="hover:bg-gray-50">
+							<tbody class="divide-y">
+								<tr v-for="customer in displayedCustomers" :key="customer.id" class="hover:opacity-75">
 									<td class="px-6 py-4 whitespace-nowrap">
 										<div class="flex items-center">
 											<div class="flex-shrink-0 h-10 w-10">
-												<div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-													<UIcon name="i-heroicons-user" class="h-6 w-6 text-blue-600" />
+												<div class="h-10 w-10 rounded-full border flex items-center justify-center">
+													<UIcon name="i-heroicons-user" class="h-6 w-6" />
 												</div>
 											</div>
 											<div class="ml-4">
-												<div class="text-sm font-medium text-gray-900">
+												<div class="text-sm font-medium">
 													{{ customer.name }}
 												</div>
-												<div v-if="customer.notes" class="text-sm text-gray-500 truncate max-w-xs">
+												<div v-if="customer.notes" class="text-sm opacity-75 truncate max-w-xs">
 													{{ customer.notes }}
 												</div>
 											</div>
 										</div>
 									</td>
 									<td class="px-6 py-4 whitespace-nowrap">
-										<div class="text-sm text-gray-900">
+										<div class="text-sm">
 											<div v-if="customer.email" class="flex items-center">
-												<UIcon name="i-heroicons-envelope" class="h-4 w-4 text-gray-400 mr-2" />
+												<UIcon name="i-heroicons-envelope" class="h-4 w-4 mr-2 opacity-50" />
 												{{ customer.email }}
 											</div>
 											<div v-if="customer.phone" class="flex items-center mt-1">
-												<UIcon name="i-heroicons-phone" class="h-4 w-4 text-gray-400 mr-2" />
+												<UIcon name="i-heroicons-phone" class="h-4 w-4 mr-2 opacity-50" />
 												{{ customer.phone }}
 											</div>
 											<div v-if="customer.address" class="flex items-center mt-1">
-												<UIcon name="i-heroicons-map-pin" class="h-4 w-4 text-gray-400 mr-2" />
+												<UIcon name="i-heroicons-map-pin" class="h-4 w-4 mr-2 opacity-50" />
 												<span class="truncate max-w-xs">{{ customer.address }}</span>
 											</div>
 										</div>
 									</td>
 									<td class="px-6 py-4 whitespace-nowrap">
-										<div v-if="customer.documentType && customer.documentNumber" class="text-sm text-gray-900">
+										<div v-if="customer.documentType && customer.documentNumber" class="text-sm">
 											<div class="font-medium">
 												{{ getDocumentTypeLabel(customer.documentType) }}
 											</div>
-											<div class="text-gray-500">
+											<div class="opacity-75">
 												{{ customer.documentNumber }}
 											</div>
 										</div>
-										<div v-else class="text-sm text-gray-400">
+										<div v-else class="text-sm opacity-50">
 											Sin documento
 										</div>
 									</td>
 									<td class="px-6 py-4 whitespace-nowrap">
-										<UBadge
-											:color="customer.isActive ? 'success' : 'neutral'"
-											variant="subtle"
-										>
+										<UBadge :color="customer.isActive ? 'success' : 'neutral'" variant="subtle">
 											{{ customer.isActive ? 'Activo' : 'Inactivo' }}
 										</UBadge>
 									</td>
-									<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+									<td class="px-6 py-4 whitespace-nowrap text-sm opacity-75">
 										{{ formatDate(customer.createdAt || '') }}
 									</td>
 									<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
 										<div class="flex justify-end gap-2">
-											<UButton
-												icon="i-heroicons-eye"
-												size="sm"
-												variant="ghost"
-												color="primary"
-												@click="viewCustomer(customer)"
-											>
+											<UButton icon="i-heroicons-eye" size="sm" variant="ghost" color="primary" @click="viewCustomer(customer)">
 												Ver
 											</UButton>
-											<UButton
-												icon="i-heroicons-pencil"
-												size="sm"
-												variant="ghost"
-												color="warning"
-												@click="editCustomer(customer)"
-											>
+											<UButton icon="i-heroicons-pencil" size="sm" variant="ghost" color="warning" @click="editCustomer(customer)">
 												Editar
 											</UButton>
-											<UButton
-												icon="i-heroicons-trash"
-												size="sm"
-												variant="ghost"
-												color="error"
-												@click="requestDeleteCustomer(customer)"
-											>
+											<UButton icon="i-heroicons-trash" size="sm" variant="ghost" color="error" @click="requestDeleteCustomer(customer)">
 												Eliminar
 											</UButton>
 										</div>
@@ -335,22 +314,21 @@
 
 						<UFormGroup label="Estado" name="isActive">
 							<UToggle v-model="formState.isActive" />
-							<span class="ml-2 text-sm text-gray-500">
+							<span class="ml-2 text-sm opacity-75">
 								{{ formState.isActive ? 'Cliente activo' : 'Cliente inactivo' }}
 							</span>
 						</UFormGroup>
-
-						<template #footer>
-							<div class="flex justify-end gap-3">
-								<UButton variant="outline" @click="closeModal">
-									Cancelar
-								</UButton>
-								<UButton type="submit" :loading="loading" color="primary">
-									{{ isEditing ? 'Actualizar' : 'Crear' }} Cliente
-								</UButton>
-							</div>
-						</template>
 					</UForm>
+					<template #footer>
+						<div class="flex justify-end gap-3">
+							<UButton variant="outline" @click="closeModal">
+								Cancelar
+							</UButton>
+							<UButton :loading="loading" color="primary" @click="handleSubmit">
+								{{ isEditing ? 'Actualizar' : 'Crear' }} Cliente
+							</UButton>
+						</div>
+					</template>
 				</UCard>
 			</template>
 		</UModal>
@@ -377,22 +355,18 @@
 						<!-- Basic Info -->
 						<div class="flex items-start space-x-4">
 							<div class="flex-shrink-0">
-								<div class="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center">
-									<UIcon name="i-heroicons-user" class="h-8 w-8 text-blue-600" />
+								<div class="h-16 w-16 rounded-full border flex items-center justify-center">
+									<UIcon name="i-heroicons-user" class="h-8 w-8" />
 								</div>
 							</div>
 							<div class="flex-1">
-								<h4 class="text-xl font-semibold text-gray-900">
+								<h4 class="text-xl font-semibold">
 									{{ selectedCustomer.name }}
 								</h4>
-								<p class="text-sm text-gray-500">
+								<p class="text-sm opacity-75">
 									Registrado el {{ formatDate(selectedCustomer.createdAt) }}
 								</p>
-								<UBadge
-									:color="selectedCustomer.isActive ? 'success' : 'neutral'"
-									variant="subtle"
-									class="mt-2"
-								>
+								<UBadge :color="selectedCustomer.isActive ? 'success' : 'neutral'" variant="subtle" class="mt-2">
 									{{ selectedCustomer.isActive ? 'Activo' : 'Inactivo' }}
 								</UBadge>
 							</div>
@@ -401,40 +375,40 @@
 						<!-- Contact Info -->
 						<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 							<div>
-								<h5 class="text-sm font-medium text-gray-900 mb-3">
+								<h5 class="text-sm font-medium mb-3">
 									Información de Contacto
 								</h5>
 								<div class="space-y-2">
 									<div v-if="selectedCustomer.email" class="flex items-center">
-										<UIcon name="i-heroicons-envelope" class="h-4 w-4 text-gray-400 mr-2" />
-										<span class="text-sm text-gray-600">{{ selectedCustomer.email }}</span>
+										<UIcon name="i-heroicons-envelope" class="h-4 w-4 mr-2 opacity-50" />
+										<span class="text-sm opacity-75">{{ selectedCustomer.email }}</span>
 									</div>
 									<div v-if="selectedCustomer.phone" class="flex items-center">
-										<UIcon name="i-heroicons-phone" class="h-4 w-4 text-gray-400 mr-2" />
-										<span class="text-sm text-gray-600">{{ selectedCustomer.phone }}</span>
+										<UIcon name="i-heroicons-phone" class="h-4 w-4 mr-2 opacity-50" />
+										<span class="text-sm opacity-75">{{ selectedCustomer.phone }}</span>
 									</div>
 									<div v-if="selectedCustomer.address" class="flex items-center">
-										<UIcon name="i-heroicons-map-pin" class="h-4 w-4 text-gray-400 mr-2" />
-										<span class="text-sm text-gray-600">{{ selectedCustomer.address }}</span>
+										<UIcon name="i-heroicons-map-pin" class="h-4 w-4 mr-2 opacity-50" />
+										<span class="text-sm opacity-75">{{ selectedCustomer.address }}</span>
 									</div>
 								</div>
 							</div>
 
 							<div>
-								<h5 class="text-sm font-medium text-gray-900 mb-3">
+								<h5 class="text-sm font-medium mb-3">
 									Documento
 								</h5>
 								<div v-if="selectedCustomer.documentType && selectedCustomer.documentNumber" class="space-y-2">
-									<div class="text-sm text-gray-600">
+									<div class="text-sm opacity-75">
 										<span class="font-medium">{{ getDocumentTypeLabel(selectedCustomer.documentType) }}:</span>
 										{{ selectedCustomer.documentNumber }}
 									</div>
-									<div v-if="selectedCustomer.birthDate" class="text-sm text-gray-600">
+									<div v-if="selectedCustomer.birthDate" class="text-sm opacity-75">
 										<span class="font-medium">Fecha de Nacimiento:</span>
 										{{ formatDate(selectedCustomer.birthDate) }}
 									</div>
 								</div>
-								<div v-else class="text-sm text-gray-400">
+								<div v-else class="text-sm opacity-50">
 									Sin información de documento
 								</div>
 							</div>
@@ -442,10 +416,10 @@
 
 						<!-- Notes -->
 						<div v-if="selectedCustomer.notes">
-							<h5 class="text-sm font-medium text-gray-900 mb-3">
+							<h5 class="text-sm font-medium mb-3">
 								Notas
 							</h5>
-							<p class="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+							<p class="text-sm opacity-75 border p-3 rounded-lg">
 								{{ selectedCustomer.notes }}
 							</p>
 						</div>
@@ -564,19 +538,47 @@
 	const customerSchema = isEditing.value ? UpdateCustomerSchema : CreateCustomerSchema;
 
 	// Computed
-	const displayedCustomers = computed(() => {
-		if (searchQuery.value) {
-			return searchResults.value;
-		}
+	const displayedCustomers = computed<Customer[]>(() => {
+		const coerce = (list: any[]): Customer[] =>
+			list.map((c: any) => ({
+				id: c.id,
+				tenantId: c.tenantId ?? "default",
+				name: c.name ?? "",
+				isActive: Boolean(c.isActive ?? true),
+				createdAt: (c.createdAt ?? new Date().toISOString()) as string,
+				updatedAt: (c.updatedAt ?? new Date().toISOString()) as string,
+				email: c.email ?? undefined,
+				phone: c.phone ?? undefined,
+				address: c.address ?? undefined,
+				documentType: c.documentType ?? undefined,
+				documentNumber: c.documentNumber ?? undefined,
+				birthDate: c.birthDate ?? undefined,
+				notes: c.notes ?? undefined
+			}));
 
-		if (statusFilter.value === "active") {
-			return activeCustomers.value;
-		} else if (statusFilter.value === "inactive") {
-			return inactiveCustomers.value;
-		}
-
-		return customers.value;
+		if (searchQuery.value) return coerce(searchResults.value as any[]);
+		if (statusFilter.value === "active") return coerce(activeCustomers.value as any[]);
+		if (statusFilter.value === "inactive") return coerce(inactiveCustomers.value as any[]);
+		return coerce(customers.value as any[]);
 	});
+
+	// Helpers
+	const normalizeCustomers = (list: any[]): Customer[] =>
+		(list || []).map((c: any) => ({
+			id: c.id,
+			tenantId: c.tenantId ?? "default",
+			name: c.name ?? "",
+			isActive: Boolean(c.isActive ?? true),
+			createdAt: (c.createdAt ?? new Date().toISOString()) as string,
+			updatedAt: (c.updatedAt ?? new Date().toISOString()) as string,
+			email: c.email ?? undefined,
+			phone: c.phone ?? undefined,
+			address: c.address ?? undefined,
+			documentType: c.documentType ?? undefined,
+			documentNumber: c.documentNumber ?? undefined,
+			birthDate: c.birthDate ?? undefined,
+			notes: c.notes ?? undefined
+		}));
 
 	// Methods
 	const loadCustomers = async () => {
@@ -589,12 +591,13 @@
 
 	const handleSearch = async () => {
 		if (!searchQuery.value.trim()) {
-			searchResults.value = [];
+			searchResults.value = [] as unknown as Customer[];
 			return;
 		}
 
 		try {
-			searchResults.value = await searchCustomers(searchQuery.value, statusFilter.value !== "inactive");
+			const raw = await searchCustomers(searchQuery.value, statusFilter.value !== "inactive");
+			searchResults.value = normalizeCustomers(raw as any[]) as unknown as Customer[];
 		} catch (err) {
 			console.error("Error searching customers:", err);
 		}

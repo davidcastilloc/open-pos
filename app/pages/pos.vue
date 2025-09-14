@@ -515,6 +515,7 @@
 	import { useAccounts } from "~/composables/useAccounts";
 	import { useCashClosing } from "~/composables/useCashClosing";
 	import { useCustomers } from "~/composables/useCustomers";
+	import { useNotifications } from "~/composables/useNotifications";
 	import { PAYMENT_METHOD_OPTIONS } from "~/composables/usePaymentMethods";
 	import { usePOS } from "~/composables/usePOS";
 	import { useProducts } from "~/composables/useProducts";
@@ -536,6 +537,8 @@
 		processSale,
 		formatPrice
 	} = usePOS();
+
+	const notifications = useNotifications();
 
 	const { customers, getCustomers, createCustomer } = useCustomers();
 
@@ -793,19 +796,19 @@
 		// Verificar que la caja esté abierta
 		if (!isCashSessionOpen.value) {
 			console.error("No se puede procesar pago: la caja está cerrada");
-			// TODO: Mostrar error al usuario
+			notifications.error("Caja cerrada", "Debe abrir una sesión de caja antes de procesar pagos");
 			return;
 		}
 
 		if (!selectedPaymentMethod.value) {
 			console.error("Debe seleccionar un método de pago");
-			// TODO: Mostrar error
+			notifications.error("Método de pago requerido", "Debe seleccionar un método de pago para continuar");
 			return;
 		}
 
 		if (!selectedPaymentAccount.value?.value) {
 			console.error("Debe seleccionar una cuenta de pago");
-			// TODO: Mostrar error
+			notifications.error("Cuenta de pago requerida", "Debe seleccionar una cuenta de pago para continuar");
 			return;
 		}
 
@@ -825,9 +828,9 @@
 			selectedPaymentAccount.value = undefined;
 			selectedCustomer.value = undefined;
 			discountInput.value = ""; // Limpiar descuento después de la venta
-			// TODO: Mostrar mensaje de éxito
+			notifications.success("Venta procesada", `Venta completada`);
 		} catch (error) {
-			// TODO: Mostrar error
+			notifications.error("Error en la venta", "No se pudo procesar la venta. Intente nuevamente.");
 			console.error("Error processing payment:", error);
 		}
 	};

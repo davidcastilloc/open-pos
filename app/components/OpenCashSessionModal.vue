@@ -121,6 +121,7 @@
 	import { useAccounts } from "~/composables/useAccounts";
 	import { useCashClosing } from "~/composables/useCashClosing";
 	import { useCurrency } from "~/composables/useCurrency";
+	import { useNotifications } from "~/composables/useNotifications";
 
 	// Props
 	interface Props {
@@ -139,6 +140,7 @@
 	const { getTotalBalanceByCurrency } = useAccounts();
 	const { openCashSession } = useCashClosing();
 	const { formatCurrency } = useCurrency();
+	const notifications = useNotifications();
 
 	// Estado local
 	const isProcessing = ref(false);
@@ -151,7 +153,8 @@
 		set: (value) => emit("update:open", value)
 	});
 
-	const cashierName = computed(() => "Administrador"); // TODO: Obtener del usuario actual
+	const { fullName } = useUser();
+	const cashierName = computed(() => fullName.value);
 
 	const currentDate = computed(() => {
 		return new Date().toLocaleDateString("es-VE", {
@@ -232,7 +235,7 @@
 			closeModal();
 		} catch (error) {
 			console.error("Error abriendo sesión de caja:", error);
-		// TODO: Mostrar error al usuario
+			notifications.error("Error al abrir caja", "No se pudo abrir la sesión de caja. Intente nuevamente.");
 		} finally {
 			isProcessing.value = false;
 		}
