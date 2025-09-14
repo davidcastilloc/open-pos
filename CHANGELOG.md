@@ -1,3 +1,11 @@
+## 1.13.0 (2025-09-14)
+
+* Merge pull request #26 from davidcastilloc/Sistema-de-devoluciones ([e7f08568cded6b8baad03d843b17829a80a28c20](https://github.com/davidcastilloc/open-pos/commit/e7f08568cded6b8baad03d843b17829a80a28c20)), closes [#26](https://github.com/davidcastilloc/open-pos/issues/26)
+* Update LICENSE ([afcee13521716369bd85019efc7d14fb1c7e0a4c](https://github.com/davidcastilloc/open-pos/commit/afcee13521716369bd85019efc7d14fb1c7e0a4c))
+* docs: Actualizar documentación para el sistema de devoluciones en la versión 1.13.0 ([0edee67be134c2bf810ad8d4126286c3cef36b5b](https://github.com/davidcastilloc/open-pos/commit/0edee67be134c2bf810ad8d4126286c3cef36b5b))
+* fix: Eliminar importación innecesaria de useReturns en pos.vue ([ccf9f1a6f22b7ec774b7bc6566c63b53955194b6](https://github.com/davidcastilloc/open-pos/commit/ccf9f1a6f22b7ec774b7bc6566c63b53955194b6))
+* feat: Implementar sistema de devoluciones completo ([693175d4a4615afba7cd22946488ff77543e7082](https://github.com/davidcastilloc/open-pos/commit/693175d4a4615afba7cd22946488ff77543e7082))
+
 ## 1.12.0 (2025-09-14)
 
 * Merge pull request #25 from davidcastilloc/Todo-things-br-pr ([33d57913e818f1d79b5b5f2fc1e1b1087067f27f](https://github.com/davidcastilloc/open-pos/commit/33d57913e818f1d79b5b5f2fc1e1b1087067f27f)), closes [#25](https://github.com/davidcastilloc/open-pos/issues/25)
