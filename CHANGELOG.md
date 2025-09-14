@@ -1,3 +1,12 @@
+## 1.12.0 (2025-09-14)
+
+* Merge pull request #25 from davidcastilloc/Todo-things-br-pr ([33d57913e818f1d79b5b5f2fc1e1b1087067f27f](https://github.com/davidcastilloc/open-pos/commit/33d57913e818f1d79b5b5f2fc1e1b1087067f27f)), closes [#25](https://github.com/davidcastilloc/open-pos/issues/25)
+* feat: Actualizar reglas de validación y mejorar la estructura de los componentes ([7287e3311bbddd226988a6f1261e3d61ba07a865](https://github.com/davidcastilloc/open-pos/commit/7287e3311bbddd226988a6f1261e3d61ba07a865))
+* feat: Añadir contenedor de notificaciones y mejorar la gestión de errores ([b1e6a88326c8dccf072ad39e9890f5d0b411a2a5](https://github.com/davidcastilloc/open-pos/commit/b1e6a88326c8dccf072ad39e9890f5d0b411a2a5))
+* fix: Simplificar mensaje de éxito en la notificación de venta ([a86ecc1354fc6dbb65751f038974583482670aea](https://github.com/davidcastilloc/open-pos/commit/a86ecc1354fc6dbb65751f038974583482670aea))
+* docs: Actualizar README y ROADMAP con nuevas guías de UI y detalles sobre tasas de cambio ([4f82db5b8f398425a3b116743f69be6118ed9436](https://github.com/davidcastilloc/open-pos/commit/4f82db5b8f398425a3b116743f69be6118ed9436))
+* docs: update documentation ([c7c8b6740a782943618d3007dff215f1e6152bb4](https://github.com/davidcastilloc/open-pos/commit/c7c8b6740a782943618d3007dff215f1e6152bb4))
+
 ## 1.11.0 (2025-09-13)
 
 * Merge pull request #24 from davidcastilloc/test-rules ([d6af62ed224b409fa896603f0c7303af0e88d74a](https://github.com/davidcastilloc/open-pos/commit/d6af62ed224b409fa896603f0c7303af0e88d74a)), closes [#24](https://github.com/davidcastilloc/open-pos/issues/24)
