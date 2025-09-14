@@ -66,7 +66,7 @@ export function useReturns() {
 	const { createExpenseTx } = useTransactions();
 	const { getCashierInfo } = useUser();
 	const notifications = useNotifications();
-	const { createMovement } = useInventoryMovements();
+	const { recordMovement } = useInventoryMovements();
 
 	// Crear una nueva devolución
 	const createReturn = async (input: CreateReturnInput) => {
@@ -225,12 +225,13 @@ export function useReturns() {
 
 			// Procesar devolución de stock
 			for (const item of items.rows) {
-				await createMovement({
-					type: "return",
+				await recordMovement({
+					movementType: "return",
 					productId: item.product_id,
 					quantity: item.quantity,
 					reason: `Devolución de venta ${returnInfo.original_sale_id}`,
-					reference: returnId
+					referenceDocument: returnId,
+					createdBy: cashierId
 				});
 			}
 		});

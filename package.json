@@ -29,7 +29,8 @@
 		"tauri:build": "tauri build",
 		"tauri:build:debug": "tauri build --debug",
 		"test:semantic-release": "node scripts/test-semantic-release.js",
-		"prepare": "husky"
+		"prepare": "husky",
+		"policy:check": "node scripts/policy-checks.mjs"
 	},
 	"dependencies": {
 		"@nuxt/ui": "^3.3.3",

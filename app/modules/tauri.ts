@@ -7,6 +7,11 @@ import * as tauriShell from "@tauri-apps/plugin-shell";
 import * as tauriStore from "@tauri-apps/plugin-store";
 import { addImports, defineNuxtModule } from "nuxt/kit";
 
+// Definir tipo local si no está disponible globalmente
+interface LocalModuleOptions {
+	prefix: false | string
+}
+
 const capitalize = (name: string) => {
 	return name.charAt(0).toUpperCase() + name.slice(1);
 };
@@ -21,7 +26,7 @@ const tauriModules = [
 	{ module: tauriStore, prefix: "Store", importPath: "@tauri-apps/plugin-store" }
 ];
 
-export default defineNuxtModule<ModuleOptions>({
+export default defineNuxtModule<LocalModuleOptions>({
 	meta: {
 		name: "nuxt-tauri",
 		configKey: "tauri"

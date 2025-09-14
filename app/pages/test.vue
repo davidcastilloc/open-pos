@@ -355,13 +355,13 @@
     `);
 
 			const tableCounts: string[] = [];
-			for (const table of tables) {
+			for (const table of tables.rows) {
 				const countRows = await query<{ count: number }>(`SELECT COUNT(*) as count FROM ${table.name}`);
-				const cnt = (countRows && countRows.length > 0 && typeof countRows[0]?.count === "number") ? countRows[0].count : 0;
+				const cnt = (countRows && countRows.rows.length > 0 && typeof countRows.rows[0]?.count === "number") ? countRows.rows[0].count : 0;
 				tableCounts.push(`${table.name}: ${cnt} registros`);
 			}
 
-			dbTestResults.value = `📊 Tablas encontradas (${tables.length}):\n${tableCounts.join("\n")}`;
+			dbTestResults.value = `📊 Tablas encontradas (${tables.rows.length}):\n${tableCounts.join("\n")}`;
 		} catch (err) {
 			dbTestResults.value = `❌ Error al contar tablas: ${err}`;
 		} finally {
@@ -385,7 +385,7 @@
 			// Verificar que se insertó
 			const inserted = await query("SELECT * FROM products WHERE id = ?", [productId]);
 
-			dbTestResults.value = `✅ Producto insertado exitosamente:\n${JSON.stringify(inserted[0], null, 2)}`;
+			dbTestResults.value = `✅ Producto insertado exitosamente:\n${JSON.stringify(inserted.rows[0], null, 2)}`;
 		} catch (err) {
 			dbTestResults.value = `❌ Error al insertar datos: ${err}`;
 		} finally {
@@ -422,7 +422,7 @@
       WHERE type='table' AND name NOT LIKE 'sqlite_%'
       ORDER BY name
     `);
-			systemTables.value = tables.map((t: { name: string }) => t.name);
+			systemTables.value = tables.rows.map((t: { name: string }) => t.name);
 
 			// Cargar configuración real
 			const configs = await query<{ key: string, value: string }>(`
@@ -430,7 +430,7 @@
       WHERE tenant_id = 'default' AND category = 'general'
       ORDER BY key
     `);
-			defaultConfigs.value = configs.map((c: { key: string, value: string }) => ({ key: c.key, value: c.value }));
+			defaultConfigs.value = configs.rows.map((c: { key: string, value: string }) => ({ key: c.key, value: c.value }));
 		} catch (err) {
 			console.error("Error cargando información de la base de datos:", err);
 		}

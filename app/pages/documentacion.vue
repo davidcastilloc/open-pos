@@ -30,7 +30,7 @@
 					<h2 class="text-lg font-semibold">
 						Información de la versión
 					</h2>
-					<UButton size="sm" :loading="pending" @click="refresh">
+					<UButton size="sm" :loading="pending" @click="() => refresh()">
 						<UIcon name="i-heroicons-arrow-path" />
 						Actualizar
 					</UButton>

@@ -25,9 +25,9 @@ export async function runMigrations() {
 		// Verificar si cash_closings existe y tiene la estructura antigua
 		const tableInfo = await query<any>("PRAGMA table_info(cash_closings)");
 
-		if (tableInfo.length > 0) {
+		if (tableInfo.rows.length > 0) {
 			// Verificar si tiene session_id
-			const hasSessionId = tableInfo.some((col: any) => col.name === "session_id");
+			const hasSessionId = tableInfo.rows.some((col: any) => col.name === "session_id");
 
 			if (!hasSessionId) {
 				console.log("🔄 Migrando tabla cash_closings...");

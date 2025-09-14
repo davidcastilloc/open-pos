@@ -203,7 +203,7 @@ export function useUser() {
 			if (currentUser.value?.id === id) {
 				const result = await query<User>("SELECT * FROM users WHERE id = ? LIMIT 1", [id]);
 				if (result.rows.length > 0) {
-					currentUser.value = result.rows[0];
+					currentUser.value = result.rows[0] || null;
 				}
 			}
 		} catch (error) {

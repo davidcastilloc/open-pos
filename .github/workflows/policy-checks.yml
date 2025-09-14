@@ -1,0 +1,28 @@
+name: Policy Checks (UI Rules)
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [develop]
+
+jobs:
+  ui-policy:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install minimal deps
+        run: |
+          corepack enable
+          pnpm --version || npm i -g pnpm@9
+
+      - name: Run policy checks
+        run: |
+          node scripts/policy-checks.mjs

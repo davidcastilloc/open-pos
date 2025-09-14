@@ -23,8 +23,23 @@ export function useDatabase() {
 			isInitialized.value = true;
 			console.log("✅ Base de datos inicializada correctamente");
 		} catch (err) {
-			error.value = "Error al inicializar la base de datos";
+			const errorMessage = err instanceof Error ? err.message : "Error desconocido";
+			error.value = `Error al inicializar la base de datos: ${errorMessage}`;
 			console.error("❌ Error initializing database:", err);
+
+			// Intentar una segunda vez después de un breve delay
+			console.log("🔄 Reintentando inicialización en 1 segundo...");
+			await new Promise((resolve) => setTimeout(resolve, 1000));
+
+			try {
+				await initDatabase();
+				isInitialized.value = true;
+				error.value = null;
+				console.log("✅ Base de datos inicializada correctamente en el segundo intento");
+			} catch (retryErr) {
+				console.error("❌ Error en segundo intento:", retryErr);
+				// No lanzar el error, permitir que la aplicación continúe
+			}
 		} finally {
 			isLoading.value = false;
 		}
@@ -32,39 +47,64 @@ export function useDatabase() {
 
 	// Ejecutar consulta
 	const query = async <T>(sql: string, params: any[] = []): Promise<{ rows: T[] }> => {
+		let sqlite = null;
 		try {
 			console.log("🔍 Ejecutando query:", { sql, params });
-			const sqlite = await getSqlite();
-			const rows = await sqlite.select(sql, params) as unknown as T[];
-			await sqlite.close();
-			console.log("✅ Query ejecutado exitosamente, filas:", rows.length);
-			return { rows: rows as T[] };
+			sqlite = await getSqlite();
+
+			// Validar parámetros antes de ejecutar
+			const safeParams = (params || []).map((param) => {
+				if (param === null || param === undefined) {
+					return null;
+				}
+				return param;
+			});
+
+			const rows = await sqlite.select(sql, safeParams) as unknown as T[];
+			console.log("✅ Query ejecutado exitosamente, filas:", rows?.length || 0);
+			return { rows: rows as T[] || [] };
 		} catch (err) {
 			console.error("❌ Error executing query:", err);
 			throw err;
+		} finally {
+			if (sqlite) {
+				try {
+					await sqlite.close();
+				} catch (closeError) {
+					console.warn("⚠️ Error cerrando conexión en query:", closeError);
+				}
+			}
 		}
 	};
 
 	// Ejecutar comando
 	const execute = async (sql: string, params: any[] = []): Promise<{ rows: any[] }> => {
+		let sqlite = null;
 		try {
 			console.log("🔧 Ejecutando comando:", { sql, params });
-			const sqlite = await getSqlite();
+			sqlite = await getSqlite();
 			console.log("🔍 Base de datos cargada:", "sqlite:pos.db");
+
+			// Validar parámetros antes de ejecutar
+			const safeParams = (params || []).map((param) => {
+				if (param === null || param === undefined) {
+					return null;
+				}
+				return param;
+			});
 
 			// Verificar si es una consulta SELECT
 			const isSelect = sql.trim().toLowerCase().startsWith("select");
 			let result;
 
 			if (isSelect) {
-				const rows = await sqlite.select(sql, params) as any[];
-				result = { rows };
+				const rows = await sqlite.select(sql, safeParams) as any[];
+				result = { rows: rows || [] };
 			} else {
-				await sqlite.execute(sql, params);
+				await sqlite.execute(sql, safeParams);
 				result = { rows: [] };
 			}
 
-			await sqlite.close();
 			console.log("✅ Comando ejecutado exitosamente");
 			return result;
 		} catch (err: any) {
@@ -76,40 +116,78 @@ export function useDatabase() {
 			}
 			console.error("❌ Error executing command:", err);
 			throw err;
+		} finally {
+			if (sqlite) {
+				try {
+					await sqlite.close();
+				} catch (closeError) {
+					console.warn("⚠️ Error cerrando conexión en execute:", closeError);
+				}
+			}
 		}
 	};
 
 	// Obtener una fila
 	const get = async <T>(sql: string, params: any[] = []): Promise<T | undefined> => {
+		let sqlite = null;
 		try {
 			console.log("🔍 Obteniendo fila:", { sql, params });
-			const sqlite = await getSqlite();
-			const rows = await sqlite.select(sql, params) as unknown as T[];
-			await sqlite.close();
+			sqlite = await getSqlite();
+
+			// Validar parámetros antes de ejecutar
+			const safeParams = (params || []).map((param) => {
+				if (param === null || param === undefined) {
+					return null;
+				}
+				return param;
+			});
+
+			const rows = await sqlite.select(sql, safeParams) as unknown as T[];
 			console.log("✅ Fila obtenida exitosamente");
-			return (rows as any[])[0] as T | undefined;
+			return (rows as any[])?.[0] as T | undefined;
 		} catch (err) {
 			console.error("❌ Error getting row:", err);
 			throw err;
+		} finally {
+			if (sqlite) {
+				try {
+					await sqlite.close();
+				} catch (closeError) {
+					console.warn("⚠️ Error cerrando conexión en get:", closeError);
+				}
+			}
 		}
 	};
 
 	// Transacción
 	const transaction = async <T>(callback: (db: any) => Promise<T>): Promise<T> => {
+		let sqlite = null;
 		console.log("🔄 Iniciando transacción");
-		const sqlite = await getSqlite();
 		try {
+			sqlite = await getSqlite();
 			await sqlite.execute("BEGIN TRANSACTION");
 			const result = await callback(sqlite);
 			await sqlite.execute("COMMIT");
 			console.log("✅ Transacción completada exitosamente");
 			return result;
 		} catch (err) {
-			await sqlite.execute("ROLLBACK");
+			if (sqlite) {
+				try {
+					await sqlite.execute("ROLLBACK");
+				} catch (rollbackError) {
+					console.warn("⚠️ Error durante rollback:", rollbackError);
+				}
+			}
 			console.error("❌ Error en transacción, haciendo rollback:", err);
 			throw err;
 		} finally {
-			await sqlite.close();
+			if (sqlite) {
+				try {
+					await sqlite.close();
+				} catch (closeError) {
+					console.warn("⚠️ Error cerrando conexión en transaction:", closeError);
+				}
+			}
 		}
 	};
 

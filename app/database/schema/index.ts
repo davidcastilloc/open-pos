@@ -11,7 +11,7 @@ export type {
 	Transaction
 } from "./accounts";
 export * from "./config";
-export * from "./customers";
+export * as customers from "./customers";
 // Re-exportar tipos de clientes
 export type {
 	Customer,

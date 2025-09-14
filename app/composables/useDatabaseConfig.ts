@@ -26,7 +26,7 @@ export function useDatabaseConfig() {
 			// Organizar configuración por categoría
 			const organizedConfig: Record<string, any> = {};
 
-			configs.forEach((item: any) => {
+			configs.rows.forEach((item: any) => {
 				if (!organizedConfig[item.category]) {
 					organizedConfig[item.category] = {};
 				}

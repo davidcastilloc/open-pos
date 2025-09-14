@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install
+        run: |
+          corepack enable
+          pnpm --version || npm i -g pnpm@9
+          pnpm install --frozen-lockfile
+      - name: Lint
+        run: pnpm lint
+      - name: Type Check
+        run: pnpm type-check
+      - name: Tests
+        run: pnpm test -- --run
+      - name: UI Policy Checks
+        run: pnpm policy:check

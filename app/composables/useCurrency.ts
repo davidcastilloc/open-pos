@@ -1,5 +1,6 @@
 import { computed, readonly, ref } from "vue";
 import { z } from "zod";
+import { useDatabase } from "./useDatabase";
 
 // Schema para tasas de cambio
 export const ExchangeRateSchema = z.object({
@@ -7,7 +8,7 @@ export const ExchangeRateSchema = z.object({
 	fromCurrency: z.enum(["BS", "USD", "EUR"]),
 	toCurrency: z.enum(["BS", "USD", "EUR"]),
 	rate: z.number().positive(),
-	source: z.enum(["BCV", "DOLAR_TODAY", "MANUAL"]),
+	source: z.enum(["BCV", "DOLAR_TODAY", "MANUAL", "FALLBACK"]),
 	date: z.string(),
 	isValid: z.boolean().default(true),
 	createdAt: z.string()
@@ -107,7 +108,7 @@ export function useCurrency() {
 					toCurrency: "BS",
 					rate: 36.5,
 					source: "BCV",
-					date: new Date().toISOString().split("T")[0],
+					date: new Date().toISOString().split("T")[0] || new Date().toISOString(),
 					isValid: true,
 					createdAt: new Date().toISOString()
 				},
@@ -117,7 +118,7 @@ export function useCurrency() {
 					toCurrency: "BS",
 					rate: 40.2,
 					source: "BCV",
-					date: new Date().toISOString().split("T")[0],
+					date: new Date().toISOString().split("T")[0] || new Date().toISOString(),
 					isValid: true,
 					createdAt: new Date().toISOString()
 				},
@@ -127,7 +128,7 @@ export function useCurrency() {
 					toCurrency: "USD",
 					rate: 1.1,
 					source: "BCV",
-					date: new Date().toISOString().split("T")[0],
+					date: new Date().toISOString().split("T")[0] || new Date().toISOString(),
 					isValid: true,
 					createdAt: new Date().toISOString()
 				}
@@ -136,7 +137,7 @@ export function useCurrency() {
 			// Actualizar tasas
 			rates.forEach((rate) => {
 				const key = `${rate.fromCurrency}_${rate.toCurrency}`;
-				exchangeRates.value[key] = rate;
+				exchangeRates.value[key] = rate as ExchangeRate;
 			});
 
 			lastUpdate.value = new Date();
@@ -178,7 +179,7 @@ export function useCurrency() {
 			console.log("Fetching BCV rates...");
 
 			// API del BCV - usando endpoint público
-			const response = await $fetch("https://bcv.org.ve/api/exchange", {
+			const response = await $fetch<any>("https://bcv.org.ve/api/exchange", {
 				method: "GET",
 				headers: {
 					Accept: "application/json",
@@ -187,27 +188,27 @@ export function useCurrency() {
 				timeout: 10000 // 10 segundos timeout
 			});
 
-			if (response && response.USD) {
-				const usdRate = Number.parseFloat(response.USD.replace(",", "."));
+			if (response && (response as any).USD) {
+				const usdRate = Number.parseFloat((response as any).USD.replace(",", "."));
 
 				// Actualizar tasas en el estado
 				exchangeRates.value.USD = {
 					id: `bcv_usd_${Date.now()}`,
-					fromCurrency: "BS" as any,
-					toCurrency: "USD" as any,
+					fromCurrency: "BS",
+					toCurrency: "USD",
 					rate: usdRate,
-					source: "BCV" as any,
-					date: new Date().toISOString().split("T")[0],
+					source: "BCV",
+					date: new Date().toISOString().split("T")[0] || new Date().toISOString(),
 					isValid: true,
 					createdAt: new Date().toISOString()
 				};
 				exchangeRates.value.EUR = {
 					id: `bcv_eur_${Date.now()}`,
-					fromCurrency: "BS" as any,
-					toCurrency: "EUR" as any,
+					fromCurrency: "BS",
+					toCurrency: "EUR",
 					rate: usdRate * 0.85,
-					source: "BCV" as any,
-					date: new Date().toISOString().split("T")[0],
+					source: "BCV",
+					date: new Date().toISOString().split("T")[0] || new Date().toISOString(),
 					isValid: true,
 					createdAt: new Date().toISOString()
 				};
@@ -226,8 +227,8 @@ export function useCurrency() {
 				fromCurrency: "BS" as any,
 				toCurrency: "USD" as any,
 				rate: 36.5,
-				source: "FALLBACK" as any,
-				date: new Date().toISOString().split("T")[0],
+				source: "FALLBACK",
+				date: new Date().toISOString().split("T")[0] || new Date().toISOString(),
 				isValid: true,
 				createdAt: new Date().toISOString()
 			};
@@ -236,8 +237,8 @@ export function useCurrency() {
 				fromCurrency: "BS" as any,
 				toCurrency: "EUR" as any,
 				rate: 31.0,
-				source: "FALLBACK" as any,
-				date: new Date().toISOString().split("T")[0],
+				source: "FALLBACK",
+				date: new Date().toISOString().split("T")[0] || new Date().toISOString(),
 				isValid: true,
 				createdAt: new Date().toISOString()
 			};
@@ -250,7 +251,7 @@ export function useCurrency() {
 			console.log("Fetching DolarToday rates...");
 
 			// API de DolarToday - usando endpoint público
-			const response = await $fetch("https://s3.amazonaws.com/dolartoday/data.json", {
+			const response = await $fetch<any>("https://s3.amazonaws.com/dolartoday/data.json", {
 				method: "GET",
 				headers: {
 					Accept: "application/json",
@@ -259,28 +260,28 @@ export function useCurrency() {
 				timeout: 10000 // 10 segundos timeout
 			});
 
-			if (response && response.USD) {
-				const usdRate = Number.parseFloat(response.USD.dolartoday);
-				const eurRate = Number.parseFloat(response.EUR.dolartoday);
+			if (response && (response as any).USD) {
+				const usdRate = Number.parseFloat((response as any).USD.dolartoday);
+				const eurRate = Number.parseFloat((response as any).EUR.dolartoday);
 
 				// Actualizar tasas en el estado
 				exchangeRates.value.USD = {
 					id: `dolartoday_usd_${Date.now()}`,
-					fromCurrency: "BS" as any,
-					toCurrency: "USD" as any,
+					fromCurrency: "BS",
+					toCurrency: "USD",
 					rate: usdRate,
-					source: "DOLAR_TODAY" as any,
-					date: new Date().toISOString().split("T")[0],
+					source: "DOLAR_TODAY",
+					date: new Date().toISOString().split("T")[0] || new Date().toISOString(),
 					isValid: true,
 					createdAt: new Date().toISOString()
 				};
 				exchangeRates.value.EUR = {
 					id: `dolartoday_eur_${Date.now()}`,
-					fromCurrency: "BS" as any,
-					toCurrency: "EUR" as any,
+					fromCurrency: "BS",
+					toCurrency: "EUR",
 					rate: eurRate,
-					source: "DOLAR_TODAY" as any,
-					date: new Date().toISOString().split("T")[0],
+					source: "DOLAR_TODAY",
+					date: new Date().toISOString().split("T")[0] || new Date().toISOString(),
 					isValid: true,
 					createdAt: new Date().toISOString()
 				};
@@ -299,8 +300,8 @@ export function useCurrency() {
 				fromCurrency: "BS" as any,
 				toCurrency: "USD" as any,
 				rate: 36.5,
-				source: "FALLBACK" as any,
-				date: new Date().toISOString().split("T")[0],
+				source: "FALLBACK",
+				date: new Date().toISOString().split("T")[0] || new Date().toISOString(),
 				isValid: true,
 				createdAt: new Date().toISOString()
 			};
@@ -309,8 +310,8 @@ export function useCurrency() {
 				fromCurrency: "BS" as any,
 				toCurrency: "EUR" as any,
 				rate: 31.0,
-				source: "FALLBACK" as any,
-				date: new Date().toISOString().split("T")[0],
+				source: "FALLBACK",
+				date: new Date().toISOString().split("T")[0] || new Date().toISOString(),
 				isValid: true,
 				createdAt: new Date().toISOString()
 			};
@@ -322,11 +323,11 @@ export function useCurrency() {
 		const key = `${from}_${to}`;
 		exchangeRates.value[key] = {
 			id: `manual_${key}`,
-			fromCurrency: from as any,
-			toCurrency: to as any,
+			fromCurrency: from as "BS" | "USD" | "EUR",
+			toCurrency: to as "BS" | "USD" | "EUR",
 			rate,
 			source: "MANUAL",
-			date: new Date().toISOString().split("T")[0],
+			date: new Date().toISOString().split("T")[0] || new Date().toISOString(),
 			isValid: true,
 			createdAt: new Date().toISOString()
 		};
@@ -405,8 +406,8 @@ export function useCurrency() {
 				const key = row.to_currency;
 				exchangeRates.value[key] = {
 					id: `db_${key}`,
-					fromCurrency: row.from_currency as any,
-					toCurrency: row.to_currency as any,
+					fromCurrency: row.from_currency as "BS" | "USD" | "EUR",
+					toCurrency: row.to_currency as "BS" | "USD" | "EUR",
 					rate: Number.parseFloat(row.rate),
 					source: row.source,
 					date: row.date,

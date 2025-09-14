@@ -126,9 +126,7 @@ export function useCashClosing() {
 			await cashClosingDB.createCashSession({
 				cashierId: getCashierInfo.value.cashierId,
 				cashierName: getCashierInfo.value.cashierName,
-				startTime: startTime.toISOString(),
-				initialBalances: JSON.stringify({}),
-				status: "open"
+				initialBalances
 			});
 
 			console.log("Turno iniciado:", shiftData);
@@ -232,20 +230,19 @@ export function useCashClosing() {
 				sessionId: currentSession.value?.id || "temp-session",
 				cashierId: getCashierInfo.value.cashierId,
 				cashierName: getCashierInfo.value.cashierName,
-				startTime: cashClosingData.startTime.toISOString(),
-				endTime: cashClosingData.endTime.toISOString(),
+				startTime: cashClosingData.startTime,
+				endTime,
 				shiftDuration,
-				initialBalances: JSON.stringify(cashClosingData.initialBalances),
-				finalBalances: JSON.stringify(cashClosingData.finalBalances),
-				balanceDifferences: JSON.stringify({}),
+				initialBalances: cashClosingData.initialBalances,
+				finalBalances: cashClosingData.finalBalances,
+				balanceDifferences: {},
 				totalTransactions: cashClosingData.salesSummary.totalTransactions,
-				salesByCurrency: JSON.stringify(cashClosingData.salesSummary.totalAmount),
-				salesByPaymentMethod: JSON.stringify(cashClosingData.salesSummary.paymentMethods),
+				salesByCurrency: cashClosingData.salesSummary.totalAmount,
+				salesByPaymentMethod: cashClosingData.salesSummary.paymentMethods,
 				totalSalesAmount: Object.values(cashClosingData.salesSummary.totalAmount).reduce((sum, amount) => sum + amount, 0),
-				expenses: JSON.stringify({}),
-				adjustments: JSON.stringify({}),
-				observations: cashClosingData.observations || "",
-				status: "closed"
+				expenses: {},
+				adjustments: {},
+				observations: cashClosingData.observations || ""
 			});
 
 			console.log("Reporte de cierre generado:", cashClosingData);

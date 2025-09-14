@@ -383,7 +383,7 @@ export function useCashClosingDB() {
 			`;
 
 			const reports = await query<CashReport>(sql, [sessionId]);
-			return reports;
+			return reports.rows;
 		} catch (error) {
 			console.error("Error getting reports by session:", error);
 			return [];
@@ -405,7 +405,7 @@ export function useCashClosingDB() {
 			`;
 
 			const reports = await query<CashReport>(sql, [cashierId, limit]);
-			return reports;
+			return reports.rows;
 		} catch (error) {
 			console.error("Error getting reports by cashier:", error);
 			return [];

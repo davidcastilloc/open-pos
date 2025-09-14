@@ -32,10 +32,10 @@ export function useInventoryMovements() {
 				[productId, "default"]
 			);
 
-			if (productResult.length === 0) return;
+			if (productResult.rows.length === 0) return;
 
-			const currentCost = productResult[0].cost || 0;
-			const currentStock = productResult[0].stock || 0;
+			const currentCost = productResult.rows[0].cost || 0;
+			const currentStock = productResult.rows[0].stock || 0;
 
 			// Calcular costo promedio ponderado
 			const totalCostValue = (currentCost * currentStock) + (newUnitCost * quantity);
@@ -80,11 +80,11 @@ export function useInventoryMovements() {
 				[movementData.productId, "default"]
 			);
 
-			if (productResult.length === 0) {
+			if (productResult.rows.length === 0) {
 				throw new Error("Producto no encontrado");
 			}
 
-			const currentStock = productResult[0].stock;
+			const currentStock = productResult.rows[0].stock;
 			const newStock = currentStock + movementData.quantity;
 
 			// Validar que el nuevo stock no sea negativo
@@ -152,10 +152,10 @@ export function useInventoryMovements() {
 				[productId, "default"]
 			);
 
-			if (productResult.length === 0) return;
+			if (productResult.rows.length === 0) return;
 
-			const currentCost = productResult[0].cost || 0;
-			const currentStock = productResult[0].stock || 0;
+			const currentCost = productResult.rows[0].cost || 0;
+			const currentStock = productResult.rows[0].stock || 0;
 
 			// Calcular costo promedio ponderado
 			const totalCostValue = (currentCost * currentStock) + (newUnitCost * quantity);
@@ -311,7 +311,7 @@ export function useInventoryMovements() {
 			// Contar total de items
 			const countSql = sql.replace("SELECT im.id, im.product_id, im.movement_type, im.quantity, im.previous_stock, im.new_stock, im.unit_cost, im.total_cost, im.reason, im.reference_document, im.notes, im.created_by, im.created_at, p.name as product_name, p.sku as product_sku", "SELECT COUNT(*) as total");
 			const countResult = await query<any>(countSql, params);
-			totalItems.value = countResult[0]?.total || 0;
+			totalItems.value = countResult.rows[0]?.total || 0;
 
 			// Aplicar paginación
 			const limit = filters.limit || itemsPerPage.value;
@@ -387,7 +387,7 @@ export function useInventoryMovements() {
 				LIMIT 5
 			`, ["default"]);
 
-			const basicData = basicStats[0] || {};
+			const basicData = basicStats.rows[0] || {};
 
 			stats.value = {
 				totalProducts: basicData.total_products || 0,
@@ -395,8 +395,8 @@ export function useInventoryMovements() {
 				totalValue: basicData.total_value || 0,
 				lowStockCount: basicData.low_stock_count || 0,
 				outOfStockCount: basicData.out_of_stock_count || 0,
-				lastMovementDate: lastMovement[0]?.last_movement_date || null,
-				topMovedProducts: topMovedProducts.map((row: any) => ({
+				lastMovementDate: lastMovement.rows[0]?.last_movement_date || null,
+				topMovedProducts: topMovedProducts.rows.map((row: any) => ({
 					productId: row.product_id,
 					productName: row.product_name,
 					totalMovements: row.total_movements,

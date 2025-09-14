@@ -143,7 +143,7 @@
 								<UButton
 									variant="ghost"
 									size="sm"
-									@click="editCategory(category)"
+									@click="editCategory({ ...category, description: category.description || null })"
 								>
 									<UIcon name="i-heroicons-pencil" />
 								</UButton>
@@ -151,7 +151,7 @@
 									variant="ghost"
 									size="sm"
 									color="error"
-									@click="handleDeleteCategory(category)"
+									@click="handleDeleteCategory({ ...category, description: category.description || null })"
 								>
 									<UIcon name="i-heroicons-trash" />
 								</UButton>
@@ -193,7 +193,7 @@
 							{{ categoryToDelete.name }}
 						</h4>
 						<p class="text-sm opacity-75">
-							{{ categoryToDelete.productCount || 0 }} productos asignados
+							{{ (categoryToDelete as any).productCount || 0 }} productos asignados
 						</p>
 					</div>
 					<p class="text-sm opacity-75">
@@ -226,6 +226,7 @@
 </template>
 
 <script setup lang="ts">
+	import type { Category } from "~/database/schema";
 	import { computed, onMounted, ref } from "vue";
 	import { useCategories } from "~/composables/useCategories";
 
@@ -242,8 +243,8 @@
 	const isLoading = ref(false);
 	const showCreateModal = ref(false);
 	const showDeleteModal = ref(false);
-	const editingCategory = ref(null);
-	const categoryToDelete = ref(null);
+	const editingCategory = ref<Category | null>(null);
+	const categoryToDelete = ref<Category | null>(null);
 	const isDeleting = ref(false);
 
 	// Computed properties
@@ -271,13 +272,13 @@
 	};
 
 	// Editar categoría
-	const editCategory = (category: any) => {
+	const editCategory = (category: Category) => {
 		editingCategory.value = category;
 		showCreateModal.value = true;
 	};
 
 	// Eliminar categoría
-	const handleDeleteCategory = (category: any) => {
+	const handleDeleteCategory = (category: Category) => {
 		categoryToDelete.value = category;
 		showDeleteModal.value = true;
 	};

@@ -24,36 +24,54 @@ export async function initDatabase() {
 	try {
 		console.log("🔄 Inicializando base de datos...");
 
-		// Crear la instancia de Drizzle con el proxy de SQLite
-		db = drizzle<typeof schema>(
+		// Crear la instancia de Drizzle con una configuración más robusta
+		db = drizzle(
 			async (sql, params, method) => {
-				const sqlite = await Database.load("sqlite:pos.db");
-				let rows: any = [];
-				let results = [];
-
+				let sqlite = null;
 				try {
+					sqlite = await Database.load("sqlite:pos.db");
+
+					// Validar parámetros antes de ejecutar
+					const safeParams = (params || []).map((param) => {
+						if (param === null || param === undefined) {
+							return null;
+						}
+						return param;
+					});
+
+					let rows: any = [];
+
 					if (isSelectQuery(sql)) {
-						rows = await sqlite.select(sql, params);
+						rows = await sqlite.select(sql, safeParams);
 					} else {
-						rows = await sqlite.execute(sql, params);
+						await sqlite.execute(sql, safeParams);
 						return { rows: [] };
 					}
 
-					// Convertir los resultados al formato esperado por Drizzle
-					rows = rows.map((row: any) => {
-						return Object.values(row);
-					});
+					// Validar que rows no sea null o undefined
+					if (!rows || !Array.isArray(rows)) {
+						console.warn("⚠️ Resultados de consulta inválidos:", rows);
+						return { rows: [] };
+					}
 
-					results = method === "all" ? rows : rows[0];
+					// Para consultas SELECT, devolver los resultados directamente sin mapeo complejo
+					// Esto evita problemas con Object.getPrototypeOf en valores null
+					const results = method === "all" ? rows : (rows.length > 0 ? rows[0] : null);
 					return { rows: results };
 				} catch (error) {
 					console.error("SQL Error:", error);
 					return { rows: [] };
 				} finally {
-					await sqlite.close();
+					if (sqlite) {
+						try {
+							await sqlite.close();
+						} catch (closeError) {
+							console.warn("⚠️ Error cerrando conexión SQLite:", closeError);
+						}
+					}
 				}
 			},
-			{ schema, logger: true }
+			{ schema }
 		);
 
 		// Crear tablas si no existen (ignorar errores idempotentes)
@@ -73,6 +91,73 @@ export async function initDatabase() {
 		console.log("✅ Base de datos inicializada correctamente");
 	} catch (error) {
 		console.error("❌ Error al inicializar la base de datos:", error);
+
+		// Intentar inicialización alternativa sin Drizzle si hay problemas
+		console.log("🔄 Intentando inicialización alternativa...");
+		try {
+			await initDatabaseAlternative();
+			console.log("✅ Base de datos inicializada con método alternativo");
+		} catch (altError) {
+			console.error("❌ Error en inicialización alternativa:", altError);
+			throw error; // Lanzar el error original
+		}
+	}
+}
+
+// Función alternativa de inicialización sin Drizzle
+async function initDatabaseAlternative() {
+	try {
+		console.log("🔄 Inicializando base de datos con método alternativo...");
+
+		// Crear un proxy simple sin Drizzle
+		db = {
+			select: async (query: any) => {
+				const sqlite = await Database.load("sqlite:pos.db");
+				try {
+					const result = await sqlite.select(query.sql, query.params);
+					return result;
+				} finally {
+					await sqlite.close();
+				}
+			},
+			insert: async (query: any) => {
+				const sqlite = await Database.load("sqlite:pos.db");
+				try {
+					const result = await sqlite.execute(query.sql, query.params);
+					return result;
+				} finally {
+					await sqlite.close();
+				}
+			},
+			update: async (query: any) => {
+				const sqlite = await Database.load("sqlite:pos.db");
+				try {
+					const result = await sqlite.execute(query.sql, query.params);
+					return result;
+				} finally {
+					await sqlite.close();
+				}
+			},
+			delete: async (query: any) => {
+				const sqlite = await Database.load("sqlite:pos.db");
+				try {
+					const result = await sqlite.execute(query.sql, query.params);
+					return result;
+				} finally {
+					await sqlite.close();
+				}
+			}
+		} as any;
+
+		// Crear tablas si no existen
+		await createTables();
+
+		// Insertar datos por defecto
+		await insertDefaultData();
+
+		console.log("✅ Inicialización alternativa completada");
+	} catch (error) {
+		console.error("❌ Error en inicialización alternativa:", error);
 		throw error;
 	}
 }
@@ -476,25 +561,43 @@ async function createInventoryIndexes() {
 
 // Función para ejecutar SQL directamente
 async function executeSQL(sql: string, params: any[] = []) {
-	const sqlite = await Database.load("sqlite:pos.db");
+	let sqlite = null;
 	try {
-		await sqlite.execute(sql, params);
+		sqlite = await Database.load("sqlite:pos.db");
+
+		// Validar parámetros antes de ejecutar
+		const safeParams = params.map((param) => {
+			if (param === null || param === undefined) {
+				return null;
+			}
+			return param;
+		});
+
+		await sqlite.execute(sql, safeParams);
 	} catch (error) {
 		// Ignorar errores de tablas ya existentes
 		if (error instanceof Error && error.message.includes("already exists")) {
 			console.log(`⚠️ Tabla ya existe, ignorando: ${sql.substring(0, 50)}...`);
 			return;
 		}
+		console.error("❌ Error ejecutando SQL:", sql.substring(0, 100), error);
 		throw error;
 	} finally {
-		await sqlite.close();
+		if (sqlite) {
+			try {
+				await sqlite.close();
+			} catch (closeError) {
+				console.warn("⚠️ Error cerrando conexión SQLite:", closeError);
+			}
+		}
 	}
 }
 
 // Función para asegurar que la columna currency existe en la tabla products
 async function ensureCurrencyColumn() {
+	let sqlite = null;
 	try {
-		const sqlite = await Database.load("sqlite:pos.db");
+		sqlite = await Database.load("sqlite:pos.db");
 
 		// Verificar si la columna currency existe
 		const columns = await sqlite.select("PRAGMA table_info(products)") as any[];
@@ -507,18 +610,25 @@ async function ensureCurrencyColumn() {
 		} else {
 			console.log("✅ Columna currency ya existe en la tabla products");
 		}
-
-		await sqlite.close();
 	} catch (error) {
 		console.error("❌ Error verificando columna currency:", error);
 		// No lanzar el error para no interrumpir la inicialización
+	} finally {
+		if (sqlite) {
+			try {
+				await sqlite.close();
+			} catch (closeError) {
+				console.warn("⚠️ Error cerrando conexión en ensureCurrencyColumn:", closeError);
+			}
+		}
 	}
 }
 
 // Asegurar columnas e índices de transactions (cashier_id, sale_id, payment_method, índices)
 async function ensureTransactionsColumns() {
+	let sqlite = null;
 	try {
-		const sqlite = await Database.load("sqlite:pos.db");
+		sqlite = await Database.load("sqlite:pos.db");
 
 		// Columnas
 		const txCols = await sqlite.select("PRAGMA table_info(transactions)") as any[];
@@ -541,10 +651,16 @@ async function ensureTransactionsColumns() {
 		await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_transactions_type ON transactions(type)");
 		await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_transactions_sale_id ON transactions(sale_id)");
 		await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_transactions_payment_method ON transactions(payment_method)");
-
-		await sqlite.close();
 	} catch (error) {
 		console.error("❌ Error asegurando columnas/índices de transactions:", error);
+	} finally {
+		if (sqlite) {
+			try {
+				await sqlite.close();
+			} catch (closeError) {
+				console.warn("⚠️ Error cerrando conexión en ensureTransactionsColumns:", closeError);
+			}
+		}
 	}
 }
 
@@ -688,8 +804,9 @@ async function insertDefaultUser() {
 
 // Función para asegurar columnas adicionales de customers
 async function ensureCustomersColumns() {
+	let sqlite = null;
 	try {
-		const sqlite = await Database.load("sqlite:pos.db");
+		sqlite = await Database.load("sqlite:pos.db");
 
 		// Verificar columnas adicionales
 		const customerCols = await sqlite.select("PRAGMA table_info(customers)") as any[];
@@ -717,17 +834,25 @@ async function ensureCustomersColumns() {
 		await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_customers_phone ON customers(phone)");
 		await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_customers_document_number ON customers(document_number)");
 
-		await sqlite.close();
 		console.log("✅ Columnas adicionales de customers verificadas");
 	} catch (error) {
 		console.error("❌ Error verificando columnas de customers:", error);
+	} finally {
+		if (sqlite) {
+			try {
+				await sqlite.close();
+			} catch (closeError) {
+				console.warn("⚠️ Error cerrando conexión en ensureCustomersColumns:", closeError);
+			}
+		}
 	}
 }
 
 // Función para asegurar columna currency en sales
 async function ensureSalesCurrencyColumn() {
+	let sqlite = null;
 	try {
-		const sqlite = await Database.load("sqlite:pos.db");
+		sqlite = await Database.load("sqlite:pos.db");
 
 		// Verificar si la columna currency existe en sales
 		const salesCols = await sqlite.select("PRAGMA table_info(sales)") as any[];
@@ -740,11 +865,17 @@ async function ensureSalesCurrencyColumn() {
 		} else {
 			console.log("✅ Columna currency ya existe en la tabla sales");
 		}
-
-		await sqlite.close();
 	} catch (error) {
 		console.error("❌ Error verificando columna currency en sales:", error);
 		// No lanzar el error para no interrumpir la inicialización
+	} finally {
+		if (sqlite) {
+			try {
+				await sqlite.close();
+			} catch (closeError) {
+				console.warn("⚠️ Error cerrando conexión en ensureSalesCurrencyColumn:", closeError);
+			}
+		}
 	}
 }
 

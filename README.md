@@ -7,6 +7,8 @@ Construido con [Nuxt 4](https://nuxt.com) y [Tauri 2](https://v2.tauri.app).
 
 ![GitHub version](https://img.shields.io/github/package-json/v/davidcastilloc/open-pos)
 ![GitHub license](https://img.shields.io/github/license/davidcastilloc/open-pos)
+![CI](https://github.com/davidcastilloc/open-pos/actions/workflows/ci.yml/badge.svg)
+![Policy Checks](https://github.com/davidcastilloc/open-pos/actions/workflows/policy-checks.yml/badge.svg)
 
 ---
 
@@ -168,6 +170,7 @@ pnpm tauri:dev    # app desktop con Tauri
 pnpm lint
 pnpm type-check
 pnpm test
+pnpm policy:check
 
 # Base de datos (Drizzle)
 pnpm db:generate

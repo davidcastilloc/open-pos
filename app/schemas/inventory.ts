@@ -8,9 +8,7 @@ export const inventoryMovementSchema = z.object({
 	productId: z.string()
 		.min(1, "El ID del producto es requerido"),
 
-	movementType: z.enum(movementTypes, {
-		errorMap: () => ({ message: "Tipo de movimiento inválido" })
-	}),
+	movementType: z.enum(movementTypes),
 
 	quantity: z.number()
 		.min(-99999, "La cantidad no puede ser menor a -99,999")

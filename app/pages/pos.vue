@@ -547,11 +547,10 @@
 							<div>
 								<UFormGroup label="Buscar por Cliente" name="customer">
 									<USelectMenu
-										v-model="returnSearchForm.customerId"
+										v-model="selectedCustomerForReturn"
 										:items="customerOptions"
 										placeholder="Seleccionar cliente"
 										searchable
-										@change="searchSalesByCustomer"
 									/>
 								</UFormGroup>
 							</div>
@@ -711,6 +710,7 @@
 		saleId: "",
 		customerId: ""
 	});
+	const selectedCustomerForReturn = ref<{ label: string, value: string } | undefined>(undefined);
 	const foundSales = ref<any[]>([]);
 	const hasSearched = ref(false);
 	const isSearchingSales = ref(false);
@@ -1095,6 +1095,7 @@
 	const closeReturnModal = () => {
 		showReturnModal.value = false;
 		returnSearchForm.value = { saleId: "", customerId: "" };
+		selectedCustomerForReturn.value = undefined;
 		foundSales.value = [];
 		hasSearched.value = false;
 		selectedSaleForReturn.value = undefined;
@@ -1115,6 +1116,14 @@
 			minute: "2-digit"
 		});
 	};
+
+	// Watcher para cliente seleccionado en devoluciones
+	watch(selectedCustomerForReturn, (newCustomer) => {
+		if (newCustomer) {
+			returnSearchForm.value.customerId = newCustomer.value;
+			searchSalesByCustomer();
+		}
+	});
 
 	// Watcher para forzar reactividad cuando cambie el estado de la caja
 	watch(isCashSessionOpen, (newValue, oldValue) => {
