@@ -171,6 +171,17 @@
 								<UIcon name="i-heroicons-banknotes" />
 								Registrar egreso
 							</UButton>
+							<UButton
+								variant="outline"
+								size="sm"
+								color="warning"
+								class="ml-2"
+								:disabled="!isCashSessionOpen"
+								@click="isCashSessionOpen ? showReturnModal = true : null"
+							>
+								<UIcon name="i-heroicons-arrow-uturn-left" />
+								Devolución
+							</UButton>
 						</div>
 					</div>
 
@@ -506,6 +517,118 @@
 					</UCard>
 				</template>
 			</UModal>
+
+			<!-- Modal de búsqueda de ventas para devolución -->
+			<UModal v-model:open="showReturnModal">
+				<template #content>
+					<UCard>
+						<template #header>
+							<h3 class="text-lg font-semibold">
+								Buscar Venta para Devolución
+							</h3>
+							<p class="text-sm opacity-75">
+								Ingresa el ID de la venta o busca por cliente
+							</p>
+						</template>
+
+						<div class="space-y-4">
+							<!-- Búsqueda por ID de venta -->
+							<div>
+								<UFormGroup label="ID de Venta" name="saleId">
+									<UInput
+										v-model="returnSearchForm.saleId"
+										placeholder="sale_1234567890_abcdef"
+										@keyup.enter="searchSaleById"
+									/>
+								</UFormGroup>
+							</div>
+
+							<!-- O búsqueda por cliente -->
+							<div>
+								<UFormGroup label="Buscar por Cliente" name="customer">
+									<USelectMenu
+										v-model="returnSearchForm.customerId"
+										:items="customerOptions"
+										placeholder="Seleccionar cliente"
+										searchable
+										@change="searchSalesByCustomer"
+									/>
+								</UFormGroup>
+							</div>
+
+							<!-- Resultados de búsqueda -->
+							<div v-if="foundSales.length > 0" class="space-y-3">
+								<h4 class="font-medium">
+									Ventas Encontradas
+								</h4>
+								<div class="max-h-64 overflow-y-auto space-y-2">
+									<div
+										v-for="sale in foundSales"
+										:key="sale.id"
+										class="rounded-lg border p-3 cursor-pointer hover:border-primary transition-colors"
+										@click="selectSaleForReturn(sale.id)"
+									>
+										<div class="flex justify-between items-start">
+											<div>
+												<p class="font-medium text-sm">
+													{{ sale.id }}
+												</p>
+												<p class="text-xs opacity-75">
+													{{ formatDate(sale.created_at) }} - {{ sale.customer_name || 'Cliente general' }}
+												</p>
+											</div>
+											<div class="text-right">
+												<p class="font-semibold">
+													{{ formatPrice(sale.total, sale.currency) }}
+												</p>
+												<p class="text-xs opacity-75">
+													{{ sale.payment_method }}
+												</p>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Mensaje cuando no hay resultados -->
+							<div v-else-if="hasSearched && foundSales.length === 0" class="text-center py-4">
+								<UIcon name="i-heroicons-magnifying-glass" class="w-8 h-8 opacity-50 mx-auto mb-2" />
+								<p class="text-sm opacity-75">
+									No se encontraron ventas
+								</p>
+							</div>
+						</div>
+
+						<template #footer>
+							<div class="flex space-x-3">
+								<UButton
+									variant="outline"
+									class="flex-1"
+									@click="closeReturnModal"
+								>
+									Cancelar
+								</UButton>
+								<UButton
+									:loading="isSearchingSales"
+									color="primary"
+									class="flex-1"
+									@click="searchSaleById"
+								>
+									Buscar Venta
+								</UButton>
+							</div>
+						</template>
+					</UCard>
+				</template>
+			</UModal>
+
+			<!-- Modal de devolución -->
+			<ReturnModal
+				:open="showReturnDetailsModal"
+				:sale-id="selectedSaleForReturn"
+				@update:open="showReturnDetailsModal = false"
+				@success="handleReturnSuccess"
+			/>
 		</div>
 	</NuxtLayout>
 </template>
@@ -569,6 +692,8 @@
 	const showPaymentModal = ref(false);
 	const showExpenseModal = ref(false);
 	const showCustomerModal = ref(false);
+	const showReturnModal = ref(false);
+	const showReturnDetailsModal = ref(false);
 	const selectedPaymentMethod = ref({ label: "Efectivo", value: "cash" as const });
 	const selectedPaymentAccount = ref<{ label: string, value: string } | undefined>(undefined);
 	const selectedCustomer = ref<{ label: string, value: string } | undefined>(undefined);
@@ -580,6 +705,16 @@
 		email: "",
 		phone: ""
 	});
+
+	// Estado para devoluciones
+	const returnSearchForm = ref({
+		saleId: "",
+		customerId: ""
+	});
+	const foundSales = ref<any[]>([]);
+	const hasSearched = ref(false);
+	const isSearchingSales = ref(false);
+	const selectedSaleForReturn = ref<string | undefined>(undefined);
 
 	// Cargar cuentas de pago usando el composable useAccounts
 	const { loadAccounts, getCashAccounts } = useAccounts();
@@ -889,6 +1024,97 @@
 			loadProducts(newPage, filters);
 		}
 	});
+
+	// Funciones para devoluciones
+	const searchSaleById = async () => {
+		if (!returnSearchForm.value.saleId.trim()) return;
+
+		isSearchingSales.value = true;
+		hasSearched.value = true;
+
+		try {
+			const { useDatabase } = await import("~/composables/useDatabase");
+			const { query } = useDatabase();
+
+			const sales = await query<any>(
+				`SELECT s.*, c.name as customer_name
+				 FROM sales s
+				 LEFT JOIN customers c ON s.customer_id = c.id
+				 WHERE s.id = ?
+				 ORDER BY s.created_at DESC
+				 LIMIT 10`,
+				[returnSearchForm.value.saleId.trim()]
+			);
+
+			foundSales.value = sales.rows || [];
+		} catch (error) {
+			console.error("Error buscando venta:", error);
+			notifications.error("Error", "No se pudo buscar la venta");
+			foundSales.value = [];
+		} finally {
+			isSearchingSales.value = false;
+		}
+	};
+
+	const searchSalesByCustomer = async () => {
+		if (!returnSearchForm.value.customerId) return;
+
+		isSearchingSales.value = true;
+		hasSearched.value = true;
+
+		try {
+			const { useDatabase } = await import("~/composables/useDatabase");
+			const { query } = useDatabase();
+
+			const sales = await query<any>(
+				`SELECT s.*, c.name as customer_name
+				 FROM sales s
+				 LEFT JOIN customers c ON s.customer_id = c.id
+				 WHERE s.customer_id = ?
+				 ORDER BY s.created_at DESC
+				 LIMIT 10`,
+				[returnSearchForm.value.customerId]
+			);
+
+			foundSales.value = sales.rows || [];
+		} catch (error) {
+			console.error("Error buscando ventas por cliente:", error);
+			notifications.error("Error", "No se pudieron buscar las ventas del cliente");
+			foundSales.value = [];
+		} finally {
+			isSearchingSales.value = false;
+		}
+	};
+
+	const selectSaleForReturn = (saleId: string) => {
+		selectedSaleForReturn.value = saleId;
+		showReturnModal.value = false;
+		showReturnDetailsModal.value = true;
+	};
+
+	const closeReturnModal = () => {
+		showReturnModal.value = false;
+		returnSearchForm.value = { saleId: "", customerId: "" };
+		foundSales.value = [];
+		hasSearched.value = false;
+		selectedSaleForReturn.value = undefined;
+	};
+
+	const handleReturnSuccess = (returnId: string) => {
+		notifications.success("Devolución creada", `Devolución ${returnId} creada exitosamente`);
+		showReturnDetailsModal.value = false;
+		selectedSaleForReturn.value = undefined;
+	};
+
+	const formatDate = (dateString: string) => {
+		return new Date(dateString).toLocaleDateString("es-ES", {
+			year: "numeric",
+			month: "short",
+			day: "numeric",
+			hour: "2-digit",
+			minute: "2-digit"
+		});
+	};
 
 	// Watcher para forzar reactividad cuando cambie el estado de la caja
 	watch(isCashSessionOpen, (newValue, oldValue) => {

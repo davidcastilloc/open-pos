@@ -9,6 +9,7 @@ export const sales = sqliteTable("sales", {
 	tax: real("tax").notNull().default(0),
 	discount: real("discount").notNull().default(0),
 	total: real("total").notNull(),
+	currency: text("currency").notNull().default("BS"),
 	paymentMethod: text("payment_method").notNull(),
 	status: text("status").notNull().default("completed"),
 	cashierId: text("cashier_id").notNull(),
