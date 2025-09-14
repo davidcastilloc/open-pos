@@ -642,7 +642,6 @@
 	import { PAYMENT_METHOD_OPTIONS } from "~/composables/usePaymentMethods";
 	import { usePOS } from "~/composables/usePOS";
 	import { useProducts } from "~/composables/useProducts";
-	import { useReturns } from "~/composables/useReturns";
 
 	// Composables
 	const {
