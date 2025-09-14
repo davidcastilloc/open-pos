@@ -19,6 +19,17 @@ Consulta `BASE-DE-DATOS-INICIALIZADA.md` para estructura y datos iniciales.
 - `cash_reports` — Reportes generados (por ahora texto descargable).
   - Campos: `id`, `tenant_id`, `session_id`, `cashier_id`, `cashier_name`, `report_type`, `report_data(json)`, `file_name?`, `file_path?`, `generated_at`, `created_at`.
 
+## Tablas del Sistema de Devoluciones
+
+- `returns` — Devoluciones principales.
+  - Campos: `id`, `tenant_id`, `original_sale_id`, `customer_id`, `return_type`, `reason`, `status`, `subtotal`, `tax`, `discount`, `total`, `currency`, `cashier_id`, `authorized_by`, `authorized_at`, `notes`, `created_at`, `updated_at`, `completed_at`.
+- `return_items` — Items específicos devueltos.
+  - Campos: `id`, `return_id`, `original_sale_item_id`, `product_id`, `quantity`, `original_quantity`, `price`, `total`, `reason`, `created_at`.
+- `return_status_history` — Historial de cambios de estado.
+  - Campos: `id`, `return_id`, `previous_status`, `new_status`, `changed_by`, `reason`, `notes`, `created_at`.
+- `return_transactions` — Transacciones contables de reembolsos.
+  - Campos: `id`, `return_id`, `transaction_id`, `account_id`, `amount`, `currency`, `exchange_rate`, `description`, `created_at`.
+
 Notas:
 - Campos JSON se almacenan como TEXT (JSON serializado) para simplicidad y portabilidad.
 - Las fechas se almacenan como ISO strings.

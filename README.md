@@ -40,6 +40,7 @@ Construido con [Nuxt 4](https://nuxt.com) y [Tauri 2](https://v2.tauri.app).
 - **Gestión de impuestos** (IVA 16%, ISLR 2%)
 - **Selección de clientes** en ventas
 - **Creación rápida** de clientes desde POS
+- **Sistema de devoluciones** parciales y totales con trazabilidad completa
 - **Sistema de notificaciones** en tiempo real
 - **Gestión de usuarios/cajeros** con roles
 
@@ -59,6 +60,15 @@ Construido con [Nuxt 4](https://nuxt.com) y [Tauri 2](https://v2.tauri.app).
 - **Formateo local** según estándares venezolanos
 - **Histórico de tasas** de cambio con persistencia
 - **Fallback automático** a tasas por defecto
+
+### 🔄 **Sistema de Devoluciones**
+- **Devoluciones parciales y totales** con selección granular de productos
+- **Trazabilidad completa** con historial de estados y auditoría
+- **Integración con POS** para búsqueda rápida de ventas
+- **Gestión de stock automática** al procesar devoluciones
+- **Transacciones contables** para reembolsos
+- **Aprobación por supervisores** con control de permisos
+- **Dashboard de gestión** con estadísticas en tiempo real
 
 ### 👤 **Sistema de Usuarios y Notificaciones**
 - **Gestión de usuarios/cajeros** con roles (admin, cashier, manager)
@@ -90,6 +100,7 @@ Construido con [Nuxt 4](https://nuxt.com) y [Tauri 2](https://v2.tauri.app).
 - Cálculo automático de impuestos
 - Selección de clientes en ventas
 - Creación rápida de clientes
+- **Sistema de devoluciones** integrado con búsqueda de ventas
 - **Sistema de notificaciones** para feedback del usuario
 - **Gestión de sesiones de caja** con apertura/cierre
 
@@ -107,6 +118,14 @@ Construido con [Nuxt 4](https://nuxt.com) y [Tauri 2](https://v2.tauri.app).
 - Formularios con validación en tiempo real
 - Vista detallada de información del cliente
 - Estadísticas en tiempo real
+
+### 🔄 **Gestión de Devoluciones** (`/returns`)
+- **Dashboard completo** con estadísticas en tiempo real
+- **Filtros avanzados** por estado, fecha, cliente
+- **Gestión de estados** (pendiente, aprobada, completada, rechazada)
+- **Acciones rápidas** para aprobar, rechazar y completar devoluciones
+- **Vista detallada** con historial completo de cambios
+- **Búsqueda de ventas** para crear nuevas devoluciones
 
 ### 🧪 **Página de Pruebas** (`/test`)
 - Estado de la base de datos
@@ -187,6 +206,7 @@ Documentos relacionados en la raíz:
 - `RESUMEN-EJECUTIVO-v1.9.0.md`
 - `INTERFAZ-POS-COMPLETADA.md`, `GESTION-PRODUCTOS-COMPLETADA.md`
 - `CRUD-PRODUCTOS-COMPLETADO.md` - Documentación detallada del CRUD de productos
+- `SISTEMA-DEVOLUCIONES-IMPLEMENTADO.md` - Documentación completa del sistema de devoluciones
 - `BASE-DE-DATOS-INICIALIZADA.md`, `SEMANTIC-RELEASE-FIX.md`
 
 ---

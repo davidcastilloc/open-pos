@@ -12,6 +12,7 @@ Bienvenido a la documentación del proyecto Open POS System.
 - [Cierre de caja](./cash-closing.md)
 - [Sistema de usuarios y notificaciones](./users-notifications.md) 🆕
 - [APIs de tasas de cambio](./currency-apis.md) 🆕
+- [Sistema de devoluciones](./returns-system.md) 🆕
 - [Testing (Vitest) y calidad](./testing.md)
 - [Versionado y releases](./versioning.md)
 - [Variables de entorno y configuración](./env.md)
@@ -24,6 +25,7 @@ Bienvenido a la documentación del proyecto Open POS System.
 - `ROADMAP-TAREAS-DESARROLLO.md` — Plan por fases
 - `INTERFAZ-POS-COMPLETADA.md` — Detalles de la UI POS
 - `GESTION-PRODUCTOS-COMPLETADA.md` — Gestión de productos
+- `SISTEMA-DEVOLUCIONES-IMPLEMENTADO.md` — Sistema de devoluciones completo
 - `BASE-DE-DATOS-INICIALIZADA.md` — Estado inicial de la BD
 - `SEMANTIC-RELEASE-FIX.md` — Detalles de la corrección CI/CD
 
