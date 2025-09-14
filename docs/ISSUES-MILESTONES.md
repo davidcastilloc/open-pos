@@ -1,107 +1,138 @@
-# 🗂️ Backlog por Milestones (Issues Ejecutables)
+# 🗂️ Backlog por Milestones (issues ejecutables)
 
-Este documento define un backlog accionable basado en el PRD y el estado actual. Cada issue incluye objetivo, criterios de aceptación y referencias técnicas. Al implementar UI, respetar `docs/ui-guidelines.md` (colores semánticos y sintaxis de modales Nuxt UI v3).
+Este backlog convierte la comparativa del documento `ANALISIS-UNIFICADO-PRD.md` en issues accionables agrupados por milestone. Cada issue incluye criterios de aceptación, áreas impactadas y estimación.
 
----
+## 🔖 Convenciones
 
-## Milestone 1: MVP Extendido (2–3 semanas)
-
-### 1.1 Tickets/Impresión básica del POS
-- Objetivo: Generar ticket (A4 y térmico) con desglose (subtotal, IVA 16%, ISLR 2%), imprimir vía Tauri e imprimir/guardar PDF.
-- Criterios de aceptación:
-  - Desde `app/pages/pos.vue`, botón "Imprimir ticket" post‑venta.
-  - Previsualización (`UCard`) y descarga PDF; impresión directa si hay impresora térmica.
-  - Template respetando `docs/ui-guidelines.md` (sin colores Tailwind explícitos).
-  - Funciona offline.
-- Entregables:
-  - `app/components/TicketPreview.vue`
-  - `app/composables/usePrint.ts` (Tauri print/HTML→PDF)
-  - Actualización `app/pages/pos.vue` (acciones post‑venta)
-- Referencias: `INTERFAZ-POS-COMPLETADA.md`, `PRD-POS-Sistema-Completo.md` (Tickets/Facturas), `src-tauri/`.
-
-### 1.2 Exportación CSV/Excel (ventas e inventario)
-- Objetivo: Exportar ventas del día y catálogo de productos.
-- Criterios de aceptación:
-  - En `app/pages/cash-closing.vue`: botón "Exportar ventas (CSV)".
-  - En `app/pages/products.vue`: botón "Exportar catálogo (CSV)".
-  - Encabezados y separadores válidos; UTF‑8 con BOM.
-- Entregables: utilidades `useExport.ts` y botones en las vistas mencionadas.
-- Referencias: `docs/cash-closing.md`, `docs/products-inventory.md`.
-
-### 1.3 Auditoría de cierres de caja (estado audited)
-- Objetivo: Flujo de auditoría para cierres: marcar/auditar con usuario y timestamp.
-- Criterios de aceptación:
-  - Persistir `audited_by`, `audited_at` y `status='audited'` en `cash_closings`.
-  - UI con acción "Marcar como auditado" y filtro por estado.
-  - Registro de notificación de éxito/error.
-- Entregables: actualización de `useCashClosing`, `app/pages/cash-closing.vue` y consultas.
-- Referencias: `docs/cash-closing.md`, `docs/database.md`.
+- Formato de título: `[Área] Acción concisa`
+- Etiquetas sugeridas: `type:feature`, `type:chore`, `prio:alta|media|baja`, `size:S|M|L`
+- Estimaciones: S (<=1 día), M (2-3 días), L (4-7 días)
+- Referencias: enlazar a archivos y docs relevantes
 
 ---
 
-## Milestone 2: SaaS Core (6–8 semanas)
+## ✅ Milestone M1 — MVP Extendido (4–6 semanas)
 
-### 2.1 Autenticación + Multi‑tenant (base)
-- Objetivo: Autenticación con sesiones persistentes y aislamiento por tenant (local→preparado nube).
-- Aceptación: registro/login/logout mínimo, tabla tenants, FK `tenant_id` en entidades principales, guardas de ruta.
-- Referencias: PRD (SaaS), `docs/users-notifications.md`.
+1) [POS] Implementar tickets/impresión básica
+- Criterios de aceptación
+  - Imprimir ticket térmico local (Tauri) al completar venta
+  - Exportar PDF simple desde `/pos` y adjuntar a descarga
+  - Plantilla con encabezado, items, impuestos (IVA/ISLR), totales y método de pago
+  - Opción de reimpresión desde historial de ventas (mínimo hook preparado)
+- Áreas impactadas: `app/pages/pos.vue`, `src-tauri/`, `app/components/`
+- Referencias: PRD (Tickets/Facturas), `INTERFAZ-POS-COMPLETADA.md`
+- Estimación: L — prio: alta — etiquetas: `type:feature`, `prio:alta`, `size:L`
 
-### 2.2 Cola de sincronización local + API Edge mínima
-- Objetivo: Persistir operaciones en `sync_queue` y sincronizar con Worker en Cloudflare.
-- Aceptación: encolado, reintentos, endpoint `/sync` (edge), confirmación y marcado "synced".
-- Referencias: PRD (Sincronización), `docs/project-structure.md`.
+2) [Reportes] Exportación CSV/Excel
+- Criterios de aceptación
+  - Exportar ventas del día desde `/cash-closing` a CSV
+  - Exportar productos e inventario desde `/products` a CSV
+  - Columnas alineadas con DB y formato `es-VE`
+- Áreas impactadas: `app/pages/cash-closing.vue`, `app/pages/products.vue`, utilidades
+- Referencias: PRD (Exportación), `docs/cash-closing.md`, `docs/products-inventory.md`
+- Estimación: M — prio: alta — etiquetas: `type:feature`, `prio:alta`, `size:M`
 
-### 2.3 Dashboard KPIs básicos
-- Objetivo: KPIs (ventas del día, ticket promedio, top productos) en `/`.
-- Aceptación: tarjetas con KPIs; consultas eficientes; actualización manual.
-- Referencias: PRD (Analítica), `ESTADO-ACTUAL-PROYECTO.md`.
-
-### 2.4 API pública mínima
-- Objetivo: Endpoints locales/edge para listar productos y ventas (read‑only) con token simple.
-- Aceptación: auth por header, rate‑limit básico, tipos TS compartidos.
-- Referencias: PRD (API pública).
-
----
-
-## Milestone 3: Expansión (4–6 semanas)
-
-### 3.1 Multi‑sucursal básico
-- Objetivo: Entidad `branches`, asignación de ventas/inventario por sucursal y vistas filtradas.
-- Aceptación: CRUD de sucursales, selector de sucursal activa, totales por sucursal.
-- Referencias: PRD (Multi‑sucursal).
-
-### 3.2 Suscripciones con Stripe
-- Objetivo: Planes Free/Starter/Pro/Enterprise con validación en edge.
-- Aceptación: creación/cancelación, webhooks mínimos, gating de features.
-- Referencias: PRD (Monetización).
-
-### 3.3 Reportes fiscales básicos (SENIAT)
-- Objetivo: Libro de ventas e IVA exportables.
-- Aceptación: formatos válidos, filtros por período, exportación CSV/PDF.
-- Referencias: PRD (Compliance), `docs/cash-closing.md`.
+3) [Caja] Auditoría de cierres (estado audited end‑to‑end)
+- Criterios de aceptación
+  - Marcar cierre como `audited` con usuario y timestamp
+  - Historial visible y filtro por estado en `/cash-closing`
+  - Validaciones: solo roles con permiso pueden auditar
+- Áreas impactadas: `app/composables/useCashClosing.ts`, `app/pages/cash-closing.vue`, DB (`cash_closings`)
+- Referencias: PRD (Auditoría), `docs/cash-closing.md`, `docs/database.md`
+- Estimación: M — prio: media — etiquetas: `type:feature`, `prio:media`, `size:M`
 
 ---
 
-## Milestone 4: Premium/Enterprise (8–12 semanas)
+## 🚀 Milestone M2 — SaaS Core (8–12 semanas)
 
-### 4.1 Integraciones (e‑commerce/contabilidad)
-- Objetivo: Conectores iniciales (Shopify, QuickBooks) de solo exportación.
-- Aceptación: jobs manuales, logs y reintentos.
-- Referencias: PRD (Integraciones).
+4) [Auth] Autenticación y multi‑tenant básico
+- Criterios de aceptación
+  - Login/logout local + estructura para tenants
+  - Roles/Permisos básicos aplicados en UI crítica (caja, devoluciones)
+- Áreas impactadas: `app/composables/useUser.ts`, middlewares, DB (`users`, `system_config`)
+- Referencias: PRD (SaaS), `docs/users-notifications.md`
+- Estimación: L — prio: alta — etiquetas: `type:feature`, `prio:alta`, `size:L`
 
-### 4.2 Seguridad avanzada
-- Objetivo: 2FA, roles granulares, registro de auditoría completo.
-- Aceptación: 2FA por TOTP; auditoría consultable por fecha/usuario.
-- Referencias: PRD (Seguridad/Auditoría).
+5) [Sync] Cola local y API edge básica (Cloudflare)
+- Criterios de aceptación
+  - Tabla `sync_queue` y productor/consumidor local offline‑first
+  - Worker cloud con endpoint `/sync` que acepta lotes y responde confirmación
+  - Reintentos con backoff y métricas mínimas
+- Áreas impactadas: `app/database/`, `server/api/*` o Worker, `app/composables`
+- Referencias: PRD (Sincronización), `docs/project-structure.md`
+- Estimación: L — prio: alta — etiquetas: `type:feature`, `prio:alta`, `size:L`
 
-### 4.3 IA/ML (recomendaciones)
-- Objetivo: Recomendaciones de productos complementarios simples (reglas/soporte ML posterior).
-- Aceptación: módulo sugerencias en POS con métricas de conversión.
-- Referencias: PRD (IA/Plus).
+6) [KPIs] Dashboard analítico básico
+- Criterios de aceptación
+  - Vista con ventas del día, ticket promedio, top productos
+  - Consultas agregadas eficientes y cache local
+- Áreas impactadas: `app/pages/`, `app/composables/`, consultas DB
+- Referencias: PRD (Analítica), `ESTADO-ACTUAL-PROYECTO.md`
+- Estimación: M — prio: media — etiquetas: `type:feature`, `prio:media`, `size:M`
+
+7) [API] API pública mínima (REST)
+- Criterios de aceptación
+  - Endpoints read‑only para productos y ventas agregadas
+  - Token simple (bearer) y rate limit básico
+- Áreas impactadas: `server/api/*`, configuración
+- Referencias: PRD (API pública)
+- Estimación: M — prio: media — etiquetas: `type:feature`, `prio:media`, `size:M`
 
 ---
 
-## Notas generales
-- UI: seguir `docs/ui-guidelines.md` (sin colores explícitos Tailwind; modales Nuxt UI v3 con `v-model:open` y `#content` + `UCard`).
-- Datos: respetar contrato `{ rows }` de `useDatabase.query` y normalización de arreglos en consumo.
-- Testing: agregar casos mínimos por feature (Vitest) y verificación de tipos.
+## 🏢 Milestone M3 — Expansión Operativa (6–10 semanas)
+
+8) [Sucursales] Multi‑sucursal básico
+- Criterios de aceptación
+  - Estructura de sucursales en DB y asignación de ventas/productos
+  - Filtros por sucursal y consolidado simple
+- Áreas impactadas: DB, `app/pages/`, `app/composables/`
+- Referencias: PRD (Multi‑sucursal)
+- Estimación: L — prio: media — etiquetas: `type:feature`, `prio:media`, `size:L`
+
+9) [Stripe] Suscripciones SaaS
+- Criterios de aceptación
+  - Planes Free/Starter/Pro con webhook de validación
+  - Bloqueos/UI de límites por plan
+- Áreas impactadas: backend/worker, `app/plugins/`, UI estados
+- Referencias: PRD (Monetización)
+- Estimación: L — prio: media — etiquetas: `type:feature`, `prio:media`, `size:L`
+
+10) [Fiscal] Reportes SENIAT/IVA básicos
+- Criterios de aceptación
+  - Libro de ventas y reporte de IVA exportables (CSV)
+  - Validaciones de formato y fechas `es-VE`
+- Áreas impactadas: consultas SQL, páginas de reportes
+- Referencias: PRD (Compliance), `docs/database.md`
+- Estimación: M — prio: media — etiquetas: `type:feature`, `prio:media`, `size:M`
+
+---
+
+## 💎 Milestone M4 — Premium/Enterprise (variable)
+
+11) [Integraciones] E‑commerce/contabilidad
+- Criterios de aceptación
+  - Conectores base (Shopify/WooCommerce o QuickBooks)
+  - Sincronización unidireccional mínima
+- Estimación: L — prio: baja — etiquetas: `type:feature`, `prio:baja`, `size:L`
+
+12) [Seguridad] 2FA y auditoría avanzada
+- Criterios de aceptación
+  - 2FA opcional, logs detallados de acciones
+- Estimación: L — prio: baja — etiquetas: `type:feature`, `prio:baja`, `size:L`
+
+13) [IA] Recomendaciones de productos
+- Criterios de aceptación
+  - Motor inicial basado en ventas históricas (reglas o ML simple)
+- Estimación: L — prio: baja — etiquetas: `type:feature`, `prio:baja`, `size:L`
+
+---
+
+## 🔗 Referencias cruzadas
+
+- Comparativa y brechas: `docs/ANALISIS-UNIFICADO-PRD.md`
+- Estado actual y logros: `ESTADO-ACTUAL-PROYECTO.md`
+- DB y modelos: `docs/database.md`
+- POS/Productos/Caja/Devoluciones: `docs/*.md` correspondientes
+
+
