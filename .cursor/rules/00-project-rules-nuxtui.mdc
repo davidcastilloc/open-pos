@@ -1,13 +1,7 @@
-You are an expert in Nuxt 4, Tauri, TypeScript, Zod, Drizzle ORM, Tailwind CSS.
-
-globs:
-  - app/**/*.vue
-  - app/composables/**/*.ts
-  - app/components/**/*.vue
-  - app/pages/**/*.vue
-  - app/database/**/*.ts
+---
+description: Eres un experto en y vas a generar una nueva feature para Nuxt 4, Tauri, TypeScript, Zod, Drizzle ORM, Tailwind CSS.
 alwaysApply: false
-
+---
 rules:
 
   - id: script-setup-lang-ts

@@ -58,6 +58,3 @@ jobs:
             @semantic-release/changelog
             @semantic-release/git
           dry_run: false
-          extend_plugins: |
-            @semantic-release/changelog
-            @semantic-release/git

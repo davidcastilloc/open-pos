@@ -8,5 +8,5 @@ export default defineConfig({
 		url: "./src-tauri/database/pos.db"
 	},
 	verbose: true,
-	strict: true
+	strict: false
 });

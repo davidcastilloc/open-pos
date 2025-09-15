@@ -27,8 +27,7 @@
 						{
 							"validator": "\\S+"
 						}
-					],
-					"sidecar": false
+					]
 				}
 			]
 		},
@@ -135,19 +134,6 @@
 		"core:path:allow-is-absolute",
 		"core:path:allow-join",
 		"core:path:allow-normalize",
-		"core:path:allow-resolve",
-
-		"mcp:allow-list-windows",
-		"mcp:allow-control-window",
-		"mcp:allow-take-screenshot",
-		"mcp:allow-get-html",
-		"mcp:allow-get-title",
-		"mcp:allow-get-url",
-		"mcp:allow-eval-js",
-		"mcp:allow-type-text",
-		"mcp:allow-set-element-value",
-		"mcp:allow-click-element",
-		"mcp:allow-get-element-text",
-		"mcp:allow-ping"
+		"core:path:allow-resolve"
 	]
 }
