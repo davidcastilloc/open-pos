@@ -1,0 +1,10 @@
+{
+  "permission": {
+    "read": {
+      "/home/dcastillo/git-proyects/open-pos/.opencode/get-shit-done/*": "allow"
+    },
+    "external_directory": {
+      "/home/dcastillo/git-proyects/open-pos/.opencode/get-shit-done/*": "allow"
+    }
+  }
+}
