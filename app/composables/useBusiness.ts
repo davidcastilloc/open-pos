@@ -102,6 +102,40 @@ export function useBusiness() {
 		await updateBusiness(defaultData);
 	};
 
+	// Cargar logo desde archivo
+	const uploadLogo = async (filePath: string): Promise<string> => {
+		try {
+			const { readFile, writeFile, mkdir } = await import("@tauri-apps/plugin-fs");
+			const { join, appDataDir } = await import("@tauri-apps/api/path");
+
+			const data = await readFile(filePath);
+			const dir = await appDataDir();
+			const logoDir = await join(dir, "business");
+			const logoPath = await join(logoDir, "logo.png");
+
+			// Guardar archivo
+			await mkdir(logoDir, { recursive: true });
+			await writeFile(logoPath, data);
+
+			// Actualizar en base de datos
+			await updateBusiness({ logoPath });
+
+			return logoPath;
+		} catch (err) {
+			error.value = "Error al subir logo";
+			console.error("Error uploading logo:", err);
+			throw err;
+		}
+	};
+
+	// Obtener URL del logo
+	const getLogoUrl = computed(() => {
+		const path = businessData.value.logoPath;
+		if (!path) return null;
+		// Para Tauri, usamos el sistema de archivos local
+		return `file://${path}`;
+	});
+
 	return {
 		// Estado
 		businessData: readonly(businessData),
@@ -113,6 +147,8 @@ export function useBusiness() {
 		updateBusiness,
 		validateRIFWithFeedback,
 		resetToDefault,
-		validateRIF
+		validateRIF,
+		uploadLogo,
+		getLogoUrl
 	};
 }
