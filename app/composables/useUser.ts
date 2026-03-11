@@ -212,6 +212,52 @@ export function useUser() {
 		}
 	};
 
+	// Eliminar usuario (soft-delete)
+	const deleteUser = async (id: string) => {
+		try {
+			await execute(
+				"UPDATE users SET is_active = 0, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+				[id]
+			);
+			return true;
+		} catch (error) {
+			console.error("Error deleting user:", error);
+			throw error;
+		}
+	};
+
+	// Función auxiliar para hashear contraseña (mock)
+	const hashPassword = async (password: string): Promise<string> => {
+		// En producción, usar librería de hashing
+		// Por ahora, usamos un hash simple
+		return `hashed_${password}`;
+	};
+
+	// Cambiar contraseña
+	const changePassword = async (id: string, newPassword: string) => {
+		try {
+			// En producción, usar bcrypt o similar
+			const hashedPassword = await hashPassword(newPassword);
+			await execute(
+				"UPDATE users SET password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+				[hashedPassword, id]
+			);
+			return true;
+		} catch (error) {
+			console.error("Error changing password:", error);
+			throw error;
+		}
+	};
+
+	// Verificar permisos
+	const canManageUsers = computed(() => {
+		return currentUser.value?.role === "admin" || currentUser.value?.role === "manager";
+	});
+
+	const canCreateAdmin = computed(() => {
+		return currentUser.value?.role === "admin";
+	});
+
 	return {
 		// Estado
 		currentUser: readonly(currentUser),
@@ -223,6 +269,8 @@ export function useUser() {
 		isCashier,
 		fullName,
 		username,
+		canManageUsers,
+		canCreateAdmin,
 
 		// Métodos
 		initializeUser,
@@ -230,6 +278,8 @@ export function useUser() {
 		setCurrentUser,
 		getAllUsers,
 		createUser,
-		updateUser
+		updateUser,
+		deleteUser,
+		changePassword
 	};
 }
