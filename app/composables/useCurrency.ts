@@ -1,4 +1,5 @@
 import { computed, readonly, ref } from "vue";
+
 import { z } from "zod";
 
 // Schema para tasas de cambio
@@ -107,7 +108,7 @@ export function useCurrency() {
 					toCurrency: "BS",
 					rate: 36.5,
 					source: "BCV",
-					date: new Date().toISOString().split("T")[0],
+					date: new Date().toISOString().split("T")[0] as string,
 					isValid: true,
 					createdAt: new Date().toISOString()
 				},
@@ -117,7 +118,7 @@ export function useCurrency() {
 					toCurrency: "BS",
 					rate: 40.2,
 					source: "BCV",
-					date: new Date().toISOString().split("T")[0],
+					date: new Date().toISOString().split("T")[0] as string,
 					isValid: true,
 					createdAt: new Date().toISOString()
 				},
@@ -127,7 +128,7 @@ export function useCurrency() {
 					toCurrency: "USD",
 					rate: 1.1,
 					source: "BCV",
-					date: new Date().toISOString().split("T")[0],
+					date: new Date().toISOString().split("T")[0] as string,
 					isValid: true,
 					createdAt: new Date().toISOString()
 				}
@@ -163,7 +164,7 @@ export function useCurrency() {
 				to,
 				rate,
 				source,
-				new Date().toISOString().split("T")[0],
+				new Date().toISOString().split("T")[0] as string,
 				1,
 				new Date().toISOString()
 			]);
@@ -185,7 +186,7 @@ export function useCurrency() {
 					"User-Agent": "POS-Venezuela/1.0"
 				},
 				timeout: 10000 // 10 segundos timeout
-			});
+			}) as any;
 
 			if (response && response.USD) {
 				const usdRate = Number.parseFloat(response.USD.replace(",", "."));
@@ -197,7 +198,7 @@ export function useCurrency() {
 					toCurrency: "USD" as any,
 					rate: usdRate,
 					source: "BCV" as any,
-					date: new Date().toISOString().split("T")[0],
+					date: new Date().toISOString().split("T")[0] as string,
 					isValid: true,
 					createdAt: new Date().toISOString()
 				};
@@ -207,7 +208,7 @@ export function useCurrency() {
 					toCurrency: "EUR" as any,
 					rate: usdRate * 0.85,
 					source: "BCV" as any,
-					date: new Date().toISOString().split("T")[0],
+					date: new Date().toISOString().split("T")[0] as string,
 					isValid: true,
 					createdAt: new Date().toISOString()
 				};
@@ -227,7 +228,7 @@ export function useCurrency() {
 				toCurrency: "USD" as any,
 				rate: 36.5,
 				source: "FALLBACK" as any,
-				date: new Date().toISOString().split("T")[0],
+				date: new Date().toISOString().split("T")[0] as string,
 				isValid: true,
 				createdAt: new Date().toISOString()
 			};
@@ -237,7 +238,7 @@ export function useCurrency() {
 				toCurrency: "EUR" as any,
 				rate: 31.0,
 				source: "FALLBACK" as any,
-				date: new Date().toISOString().split("T")[0],
+				date: new Date().toISOString().split("T")[0] as string,
 				isValid: true,
 				createdAt: new Date().toISOString()
 			};
@@ -257,7 +258,7 @@ export function useCurrency() {
 					"User-Agent": "POS-Venezuela/1.0"
 				},
 				timeout: 10000 // 10 segundos timeout
-			});
+			}) as any;
 
 			if (response && response.USD) {
 				const usdRate = Number.parseFloat(response.USD.dolartoday);
@@ -270,7 +271,7 @@ export function useCurrency() {
 					toCurrency: "USD" as any,
 					rate: usdRate,
 					source: "DOLAR_TODAY" as any,
-					date: new Date().toISOString().split("T")[0],
+					date: new Date().toISOString().split("T")[0] as string,
 					isValid: true,
 					createdAt: new Date().toISOString()
 				};
@@ -280,7 +281,7 @@ export function useCurrency() {
 					toCurrency: "EUR" as any,
 					rate: eurRate,
 					source: "DOLAR_TODAY" as any,
-					date: new Date().toISOString().split("T")[0],
+					date: new Date().toISOString().split("T")[0] as string,
 					isValid: true,
 					createdAt: new Date().toISOString()
 				};
@@ -300,7 +301,7 @@ export function useCurrency() {
 				toCurrency: "USD" as any,
 				rate: 36.5,
 				source: "FALLBACK" as any,
-				date: new Date().toISOString().split("T")[0],
+				date: new Date().toISOString().split("T")[0] as string,
 				isValid: true,
 				createdAt: new Date().toISOString()
 			};
@@ -310,7 +311,7 @@ export function useCurrency() {
 				toCurrency: "EUR" as any,
 				rate: 31.0,
 				source: "FALLBACK" as any,
-				date: new Date().toISOString().split("T")[0],
+				date: new Date().toISOString().split("T")[0] as string,
 				isValid: true,
 				createdAt: new Date().toISOString()
 			};
@@ -326,7 +327,7 @@ export function useCurrency() {
 			toCurrency: to as any,
 			rate,
 			source: "MANUAL",
-			date: new Date().toISOString().split("T")[0],
+			date: new Date().toISOString().split("T")[0] as string,
 			isValid: true,
 			createdAt: new Date().toISOString()
 		};

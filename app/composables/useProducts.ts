@@ -3,23 +3,23 @@ import { useCurrency } from "./useCurrency";
 import { useDatabase } from "./useDatabase";
 
 export interface Product {
-	id: string
-	tenantId: string
-	name: string
-	description?: string
-	sku: string
-	barcode?: string
-	price: number
-	cost: number
-	currency: string
-	categoryId?: string
-	categoryName?: string
-	stock: number
-	minStock: number
-	images?: string[]
-	isActive: boolean
-	createdAt: string
-	updatedAt: string
+	readonly id: string
+	readonly tenantId: string
+	readonly name: string
+	readonly description?: string
+	readonly sku: string
+	readonly barcode?: string
+	readonly price: number
+	readonly cost: number
+	readonly currency: string
+	readonly categoryId?: string
+	readonly categoryName?: string
+	readonly stock: number
+	readonly minStock: number
+	readonly images?: readonly string[]
+	readonly isActive: boolean
+	readonly createdAt: string
+	readonly updatedAt: string
 }
 
 export interface ProductFilters {

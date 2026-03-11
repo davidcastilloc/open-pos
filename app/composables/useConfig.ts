@@ -1,4 +1,4 @@
-import { computed, ref } from "vue";
+import { computed, readonly, ref } from "vue";
 import { z } from "zod";
 
 // Schema de configuración base

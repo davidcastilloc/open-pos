@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useTransactions } from "~/composables/useTransactions";
+import { useTransactions } from "../app/composables/useTransactions";
 
-vi.mock("~/composables/useDatabase", () => {
+vi.mock("../app/composables/useDatabase", () => {
 	const execute = vi.fn();
 	const query = vi.fn();
 	const transaction = async (cb: any) => {

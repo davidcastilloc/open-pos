@@ -1,70 +1,75 @@
 <template>
 	<div class="min-h-screen flex flex-col">
 		<!-- Header del POS -->
-		<header class="shadow-sm border-b">
-			<div class="px-6 py-4">
-				<div class="flex items-center justify-between">
+		<header class="bg-white dark:bg-gray-950 border-b border-gray-100 dark:border-gray-800 z-10 shadow-sm">
+			<div class="px-6 py-3">
+				<div class="flex items-center justify-between gap-8">
 					<!-- Logo y nombre -->
-					<div class="flex items-center space-x-4">
-						<div class="flex items-center space-x-3">
-							<UIcon name="i-heroicons-shopping-cart" class="w-8 h-8" />
-							<div>
-								<h1 class="text-2xl font-bold">
-									POS Venezuela
-								</h1>
-								<p class="text-sm opacity-75">
-									Sistema de Punto de Venta
-								</p>
+					<div class="flex items-center gap-4 shrink-0">
+						<div class="bg-primary/10 p-2 rounded-xl">
+							<UIcon name="i-heroicons-shopping-cart" class="w-6 h-6 text-primary" />
+						</div>
+						<div>
+							<h1 class="text-lg font-black tracking-tighter uppercase leading-none">
+								Open POS
+							</h1>
+							<p class="text-[10px] font-bold opacity-40 uppercase tracking-widest mt-0.5">
+								Venezuela Edition
+							</p>
+						</div>
+					</div>
+
+					<!-- Saldos y Estado de Caja -->
+					<div class="flex-1 flex items-center justify-center gap-6 overflow-hidden">
+						<div class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 dark:bg-gray-900 rounded-full border border-gray-100 dark:border-gray-800">
+							<div class="w-2 h-2 rounded-full" :class="isCashSessionOpen ? 'bg-success animate-pulse' : 'bg-error'" />
+							<span class="text-[10px] font-black uppercase tracking-widest opacity-70">
+								{{ isCashSessionOpen ? 'Caja Abierta' : 'Caja Cerrada' }}
+							</span>
+						</div>
+
+						<div class="h-8 w-px bg-gray-100 dark:bg-gray-800" />
+
+						<!-- Saldos simplificados -->
+						<div class="flex items-center gap-8 overflow-x-auto no-scrollbar py-1">
+							<div v-for="(balance, currency) in accountBalances" :key="currency" class="flex flex-col items-center">
+								<span class="text-[10px] font-bold opacity-30 uppercase tracking-tighter">{{ currency }}</span>
+								<span class="text-sm font-black tracking-tight">{{ formatCurrency(balance, currency) }}</span>
 							</div>
 						</div>
 					</div>
 
-					<!-- Estado de caja y saldos -->
-					<div class="flex items-center space-x-6">
-						<!-- Estado de caja -->
-						<div class="flex items-center space-x-2">
-							<UBadge :color="isCashSessionOpen ? 'success' : 'error'" variant="soft">
-								{{ isCashSessionOpen ? 'Caja Abierta' : 'Caja Cerrada' }}
-							</UBadge>
+					<!-- Acciones de Usuario -->
+					<div class="flex items-center gap-4 shrink-0">
+						<div class="text-right hidden md:block">
+							<p class="text-sm font-black leading-none">
+								{{ cashierName }}
+							</p>
+							<p class="text-[10px] font-medium opacity-40 uppercase tracking-widest mt-1">
+								{{ currentTime }}
+							</p>
 						</div>
 
-						<!-- Vendedor -->
-						<div class="text-sm opacity-75">
-							<span class="font-medium">Vendedor:</span> {{ cashierName }}
-						</div>
+						<div class="h-8 w-px bg-gray-100 dark:bg-gray-800" />
 
-						<!-- Hora actual -->
-						<div class="text-sm opacity-75">
-							<UIcon name="i-heroicons-clock" class="w-4 h-4 inline mr-1" />
-							{{ currentTime }}
-						</div>
-
-						<!-- Saldos por moneda -->
-						<div class="flex items-center space-x-4">
-							<div v-for="(balance, currency) in accountBalances" :key="currency" class="text-sm">
-								<span class="font-medium">{{ currency }}:</span>
-								<span class="font-semibold">{{ formatCurrency(balance, currency) }}</span>
-							</div>
-						</div>
-
-						<!-- Botón Terminar Turno (solo visible si hay sesión abierta) -->
 						<UButton
 							v-if="isCashSessionOpen"
 							color="error"
-							variant="outline"
+							variant="subtle"
 							size="sm"
+							class="font-black uppercase tracking-widest text-[10px] h-9 px-4 rounded-xl"
 							@click="navigateTo('/cash-closing')"
 						>
 							<UIcon name="i-heroicons-lock-closed" />
-							Terminar Turno
+							Cerrar Caja
 						</UButton>
 
-						<!-- Botón Abrir Caja (solo visible si hay sesión cerrada) -->
 						<UButton
 							v-else
 							color="success"
-							variant="outline"
+							variant="solid"
 							size="sm"
+							class="font-black uppercase tracking-widest text-[10px] h-9 px-4 rounded-xl shadow-lg shadow-success/20"
 							@click="showOpenCashModal = true"
 						>
 							<UIcon name="i-heroicons-lock-open" />
@@ -75,30 +80,26 @@
 			</div>
 		</header>
 
-		<!-- Barra de estado -->
-		<div class="border-b">
-			<div class="px-6 py-2">
-				<div class="flex items-center justify-between text-sm">
-					<!-- Estado de conexión -->
-					<div class="flex items-center space-x-4">
-						<div class="flex items-center space-x-2">
-							<div class="w-2 h-2 rounded-full opacity-50" />
-							<span class="opacity-75">Online</span>
-						</div>
-						<div class="opacity-50">
-							Última sincronización: {{ lastSync }}
-						</div>
+		<!-- Barra de estado discreta -->
+		<div class="bg-gray-50/50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-800 px-6 py-1.5">
+			<div class="flex items-center justify-between">
+				<div class="flex items-center gap-6">
+					<div class="flex items-center gap-2">
+						<div class="w-1.5 h-1.5 rounded-full bg-success opacity-50" />
+						<span class="text-[10px] font-bold opacity-40 uppercase tracking-widest">Sistema Online</span>
 					</div>
+					<div class="text-[10px] font-bold opacity-30 uppercase tracking-widest">
+						Sinc: {{ lastSync }}
+					</div>
+				</div>
 
-					<!-- Notificaciones -->
-					<div class="flex items-center space-x-4">
-						<div v-if="lowStockCount > 0" class="flex items-center space-x-2">
-							<UIcon name="i-heroicons-exclamation-triangle" class="w-4 h-4" />
-							<span>{{ lowStockCount }} productos con stock bajo</span>
-						</div>
-						<div class="opacity-50">
-							{{ totalProducts }} productos disponibles
-						</div>
+				<div class="flex items-center gap-6">
+					<div v-if="lowStockCount > 0" class="flex items-center gap-1.5 text-warning">
+						<UIcon name="i-heroicons-exclamation-triangle" class="w-3 h-3" />
+						<span class="text-[10px] font-black uppercase tracking-widest">{{ lowStockCount }} ALERTAS DE STOCK</span>
+					</div>
+					<div class="text-[10px] font-bold opacity-40 uppercase tracking-widest">
+						{{ totalProducts }} PRODUCTOS
 					</div>
 				</div>
 			</div>

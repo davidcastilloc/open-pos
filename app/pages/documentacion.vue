@@ -30,7 +30,7 @@
 					<h2 class="text-lg font-semibold">
 						Información de la versión
 					</h2>
-					<UButton size="sm" :loading="pending" @click="refresh">
+					<UButton size="sm" :loading="pending" @click="refreshVersion">
 						<UIcon name="i-heroicons-arrow-path" />
 						Actualizar
 					</UButton>
@@ -161,6 +161,10 @@
 		"/version.json",
 		{ server: false, immediate: true }
 	);
+
+	const refreshVersion = async () => {
+		await refresh();
+	};
 
 	onMounted(() => {
 		document.title = `Documentación · ${config.public.appName}`;

@@ -21,10 +21,10 @@ dependencies:
     specifier: ^0.5.1
     version: 0.5.5(tslite@5.7.3)(vue@3.5.30)
   '@tauri-apps/api':
-    specifier: ^2.6.0
+    specifier: ^2.6.2
     version: 2.10.1
   '@tauri-apps/plugin-dialog':
-    specifier: ~2
+    specifier: ^2.6.0
     version: 2.6.0
   '@tauri-apps/plugin-fs':
     specifier: ^2.4.5
@@ -39,10 +39,10 @@ dependencies:
     specifier: ^2.3.0
     version: 2.3.5
   '@tauri-apps/plugin-sql':
-    specifier: ^2.3.0
+    specifier: ^2.3.2
     version: 2.3.2
   '@tauri-apps/plugin-store':
-    specifier: ^2.3.0
+    specifier: ^2.4.2
     version: 2.4.2
   date-fns:
     specifier: ^4.1.0

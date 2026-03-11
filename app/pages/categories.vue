@@ -242,8 +242,8 @@
 	const isLoading = ref(false);
 	const showCreateModal = ref(false);
 	const showDeleteModal = ref(false);
-	const editingCategory = ref(null);
-	const categoryToDelete = ref(null);
+	const editingCategory = ref<any | null>(null);
+	const categoryToDelete = ref<any | null>(null);
 	const isDeleting = ref(false);
 
 	// Computed properties

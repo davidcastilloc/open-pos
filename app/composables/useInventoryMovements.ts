@@ -501,6 +501,7 @@ export function useInventoryMovements() {
 		recentMovements,
 
 		// Métodos
+		createMovement: recordMovement,
 		recordMovement,
 		performInventoryAdjustment,
 		loadMovements,

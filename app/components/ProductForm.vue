@@ -280,7 +280,7 @@
 	// Props
 	interface Props {
 		product?: any
-		categories?: Array<{ id: string, name: string }>
+		categories?: ReadonlyArray<{ id: string, name: string }>
 		initialData?: any
 		isQuickCreate?: boolean
 	}

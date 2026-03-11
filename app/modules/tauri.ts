@@ -7,6 +7,10 @@ import * as tauriShell from "@tauri-apps/plugin-shell";
 import * as tauriStore from "@tauri-apps/plugin-store";
 import { addImports, defineNuxtModule } from "nuxt/kit";
 
+interface ModuleOptions {
+	prefix: string
+}
+
 const capitalize = (name: string) => {
 	return name.charAt(0).toUpperCase() + name.slice(1);
 };

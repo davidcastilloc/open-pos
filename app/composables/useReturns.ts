@@ -226,11 +226,12 @@ export function useReturns() {
 			// Procesar devolución de stock
 			for (const item of items.rows) {
 				await createMovement({
-					type: "return",
 					productId: item.product_id,
+					movementType: "return",
 					quantity: item.quantity,
 					reason: `Devolución de venta ${returnInfo.original_sale_id}`,
-					reference: returnId
+					referenceDocument: returnId,
+					createdBy: cashierId
 				});
 			}
 		});

@@ -1,12 +1,15 @@
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { getDatabase, getSqlite, initDatabase } from "~/database/connection";
 
 let initPromise: Promise<void> | null = null;
+const isInitializedState = ref(false);
+const isLoadingState = ref(false);
+const errorState = ref<string | null>(null);
 
 export function useDatabase() {
-	const isInitialized = useState("database.isInitialized", () => false);
-	const isLoading = useState("database.isLoading", () => false);
-	const error = useState<string | null>("database.error", () => null);
+	const isInitialized = isInitializedState;
+	const isLoading = isLoadingState;
+	const error = errorState;
 
 	// Inicializar base de datos
 	const initialize = async () => {

@@ -3,27 +3,36 @@
 		<div>
 			<div class="flex h-screen">
 				<!-- Área de productos (izquierda) -->
-				<div class="flex-1 p-6">
+				<div class="flex-1 p-6 overflow-y-auto scrollbar-thin">
 					<!-- Aviso cuando la caja esté cerrada -->
-					<div v-if="!isCashSessionOpen" class="mb-6">
-						<UAlert
-							color="warning"
-							title="Caja Cerrada"
-							description="No se pueden realizar ventas mientras la caja esté cerrada. Usa el botón 'Abrir Caja' en el header para iniciar la jornada de ventas."
-							icon="i-heroicons-lock-closed"
-						/>
+					<div v-if="!isCashSessionOpen" class="mb-8">
+						<div class="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 flex items-center gap-4">
+							<div class="bg-amber-100 dark:bg-amber-900/40 p-2 rounded-xl">
+								<UIcon name="i-heroicons-lock-closed" class="w-6 h-6 text-amber-600 dark:text-amber-400" />
+							</div>
+							<div class="flex-1">
+								<h4 class="text-sm font-bold text-amber-900 dark:text-amber-100 uppercase tracking-wide">
+									Ventas Deshabilitadas
+								</h4>
+								<p class="text-xs text-amber-700 dark:text-amber-300">
+									Inicia el turno de hoy haciendo clic en <span class="font-bold underline">Abrir Caja</span> para procesar pagos.
+								</p>
+							</div>
+						</div>
 					</div>
 
 					<!-- Barra de búsqueda y filtros -->
-					<div class="mb-6">
-						<div class="flex items-center space-x-4 mb-4">
+					<div class="mb-8 space-y-4">
+						<div class="flex items-center gap-3">
 							<!-- Búsqueda -->
 							<div class="flex-1">
 								<UInput
 									v-model="searchQuery"
-									placeholder="Buscar productos por nombre, SKU o código de barras..."
-									size="lg"
+									placeholder="Buscar por nombre, SKU o código..."
+									size="xl"
 									icon="i-heroicons-magnifying-glass"
+									variant="subtle"
+									class="shadow-sm"
 									@input="handleSearch"
 								/>
 							</div>
@@ -32,8 +41,10 @@
 							<USelectMenu
 								v-model="selectedCategory"
 								:items="categoryOptions"
-								placeholder="Todas las categorías"
-								size="lg"
+								placeholder="Categoría"
+								size="xl"
+								variant="subtle"
+								class="w-48"
 							/>
 
 							<!-- Moneda -->
@@ -41,93 +52,101 @@
 								v-model="selectedCurrency"
 								:items="currencyOptions"
 								placeholder="Moneda"
-								size="lg"
+								size="xl"
+								variant="subtle"
+								class="w-32 font-bold"
 							/>
 						</div>
 
 						<!-- Filtros adicionales -->
-						<div class="flex items-center space-x-4">
-							<UCheckbox v-model="showOnlyInStock" label="Solo con stock" />
-							<UCheckbox v-model="showLowStock" label="Stock bajo" />
-							<UButton variant="outline" size="sm" @click="clearFilters">
-								<UIcon name="i-heroicons-x-mark" />
+						<div class="flex items-center justify-between px-1">
+							<div class="flex items-center gap-6">
+								<UCheckbox v-model="showOnlyInStock" label="En Stock" class="text-xs font-medium" />
+								<UCheckbox v-model="showLowStock" label="Stock Bajo" class="text-xs font-medium" />
+							</div>
+							<UButton
+								v-if="searchQuery || selectedCategory.value || showOnlyInStock || showLowStock"
+								variant="link"
+								size="xs"
+								color="neutral"
+								icon="i-heroicons-x-mark"
+								class="font-bold uppercase tracking-widest text-[10px]"
+								@click="clearFilters"
+							>
 								Limpiar filtros
 							</UButton>
 						</div>
 					</div>
 
 					<!-- Grid de productos -->
-					<div v-if="isLoading" class="flex justify-center items-center h-64">
-						<UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin" />
-						<span class="ml-2">Cargando productos...</span>
+					<div v-if="isLoading" class="flex flex-col justify-center items-center h-64 gap-3 opacity-50">
+						<UIcon name="i-heroicons-arrow-path" class="w-10 h-10 animate-spin text-primary" />
+						<span class="text-xs font-black uppercase tracking-widest">Sincronizando...</span>
 					</div>
 
-					<div v-else-if="products.length === 0" class="text-center py-12">
-						<UIcon name="i-heroicons-cube" class="w-16 h-16 opacity-50 mx-auto mb-4" />
-						<h3 class="text-lg font-medium mb-2">
-							No se encontraron productos
+					<div v-else-if="products.length === 0" class="flex flex-col justify-center items-center h-96 text-center">
+						<div class="bg-gray-50 dark:bg-gray-900/50 p-12 rounded-full mb-6">
+							<UIcon name="i-heroicons-cube" class="w-16 h-16 opacity-10" />
+						</div>
+						<h3 class="text-xl font-black uppercase tracking-tight mb-2 opacity-50">
+							Inventario Vacío
 						</h3>
-						<p class="opacity-75">
-							Intenta ajustar los filtros de búsqueda
-						</p>
-						<p class="text-xs opacity-50 mt-2">
-							Total: {{ products.length }} productos, Cargando: {{ isLoading }}
+						<p class="text-sm opacity-30 max-w-xs">
+							No encontramos productos que coincidan con tu búsqueda actual.
 						</p>
 					</div>
 
-					<div v-else class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4" :class="{ 'opacity-50': !isCashSessionOpen }">
+					<div v-else class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6" :class="{ 'pointer-events-none opacity-80': !isCashSessionOpen }">
 						<div
 							v-for="product in products"
 							:key="product.id"
-							class="rounded-lg shadow-sm border p-4 hover:shadow-md transition-shadow cursor-pointer"
-							:class="{ 'cursor-not-allowed opacity-50': !isCashSessionOpen }"
+							class="group relative bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-3 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 cursor-pointer"
 							@click="isCashSessionOpen ? addToCart(product.id) : null"
 						>
 							<!-- Imagen del producto -->
-							<div class="aspect-square rounded-lg mb-3 flex items-center justify-center border">
+							<div class="aspect-square rounded-xl mb-4 overflow-hidden bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center group-hover:scale-[1.02] transition-transform duration-500">
 								<img
 									v-if="product.images && product.images.length > 0"
 									:src="product.images[0]"
 									:alt="product.name"
-									class="w-full h-full object-cover rounded-lg"
+									class="w-full h-full object-cover"
 								>
-								<UIcon v-else name="i-heroicons-photo" class="w-12 h-12 opacity-50" />
+								<UIcon v-else name="i-heroicons-photo" class="w-10 h-10 opacity-10" />
+
+								<!-- Overlay Añadir -->
+								<div v-if="isCashSessionOpen" class="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300">
+									<div class="bg-primary text-white p-3 rounded-full shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+										<UIcon name="i-heroicons-plus" class="w-6 h-6" />
+									</div>
+								</div>
 							</div>
 
-							<!-- Información del producto -->
-							<div class="space-y-2">
-								<h3 class="font-medium text-sm line-clamp-2">
-									{{ product.name }}
-								</h3>
-
-								<p class="text-xs opacity-75">
-									SKU: {{ product.sku }}
-								</p>
-
-								<!-- Precio -->
-								<div class="flex items-center justify-between">
-									<span class="text-lg font-bold">
-										{{ formatPrice(product.price, typeof selectedCurrency === "string" ? selectedCurrency : selectedCurrency.value) }}
-									</span>
-									<span class="text-xs opacity-75">
-										{{ selectedCurrency.value || selectedCurrency }}
-									</span>
+							<!-- Información -->
+							<div class="space-y-3">
+								<div class="min-h-[2.5rem]">
+									<h3 class="font-bold text-sm line-clamp-2 leading-tight group-hover:text-primary transition-colors">
+										{{ product.name }}
+									</h3>
+									<p class="text-[10px] font-medium opacity-40 uppercase tracking-tighter mt-1">
+										SKU: {{ product.sku }}
+									</p>
 								</div>
 
-								<!-- Stock -->
-								<div class="flex items-center justify-between">
-									<span class="text-xs opacity-75">Stock:</span>
+								<div class="flex items-end justify-between">
+									<div class="flex flex-col">
+										<span class="text-[10px] font-black uppercase tracking-widest text-primary opacity-50 mb-[-2px]">Precio</span>
+										<span class="text-xl font-black tracking-tighter">
+											{{ formatPrice(product.price, typeof selectedCurrency === "string" ? selectedCurrency : selectedCurrency.value) }}
+										</span>
+									</div>
 									<UBadge
 										:color="getStockColor(product.stock, product.minStock)"
+										variant="soft"
 										size="xs"
+										class="font-black"
 									>
 										{{ product.stock }}
 									</UBadge>
-								</div>
-
-								<!-- Categoría -->
-								<div v-if="product.categoryName" class="text-xs opacity-75">
-									{{ product.categoryName }}
 								</div>
 							</div>
 						</div>
@@ -186,38 +205,37 @@
 					</div>
 
 					<!-- Lista de items -->
-					<div class="flex-1 overflow-y-auto p-4">
-						<div v-if="!isCashSessionOpen" class="text-center py-8">
-							<UIcon name="i-heroicons-lock-closed" class="w-16 h-16 opacity-50 mx-auto mb-4" />
-							<p class="opacity-75">
-								Caja cerrada
-							</p>
-							<p class="text-sm opacity-50">
-								Abre la caja para realizar ventas
-							</p>
+					<div class="flex-1 overflow-y-auto p-4 scrollbar-thin">
+						<div v-if="!isCashSessionOpen" class="text-center py-12">
+							<div class="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-8 border border-dashed">
+								<UIcon name="i-heroicons-lock-closed" class="w-12 h-12 opacity-20 mx-auto mb-4" />
+								<p class="font-medium opacity-75">
+									Caja cerrada
+								</p>
+								<p class="text-xs opacity-50 mt-1">
+									Abre la caja para iniciar ventas
+								</p>
+							</div>
 						</div>
-						<div v-else-if="cart.length === 0" class="text-center py-8">
-							<UIcon name="i-heroicons-shopping-cart" class="w-16 h-16 opacity-50 mx-auto mb-4" />
-							<p class="opacity-75">
-								El carrito está vacío
-							</p>
+						<div v-else-if="cart.length === 0" class="text-center py-12">
+							<UIcon name="i-heroicons-shopping-cart" class="w-12 h-12 opacity-10 mx-auto mb-4" />
 							<p class="text-sm opacity-50">
-								Agrega productos para comenzar
+								El carrito está vacío
 							</p>
 						</div>
 
-						<div v-else class="space-y-3">
+						<div v-else class="space-y-1">
 							<div
 								v-for="item in cart"
 								:key="item.id"
-								class="rounded-lg p-3 border"
+								class="group rounded-xl p-3 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors"
 							>
 								<div class="flex items-start justify-between mb-2">
-									<div class="flex-1">
-										<h4 class="font-medium text-sm">
+									<div class="flex-1 min-w-0 pr-2">
+										<h4 class="font-semibold text-sm truncate group-hover:text-primary transition-colors">
 											{{ item.name }}
 										</h4>
-										<p class="text-xs opacity-75">
+										<p class="text-[10px] uppercase tracking-wider opacity-50 font-medium">
 											{{ formatPrice(item.price, item.currency) }} c/u
 										</p>
 									</div>
@@ -225,35 +243,37 @@
 										variant="ghost"
 										size="xs"
 										color="error"
+										icon="i-heroicons-x-mark"
+										class="opacity-0 group-hover:opacity-100 transition-opacity"
 										@click="removeFromCart(item.id)"
-									>
-										<UIcon name="i-heroicons-x-mark" />
-									</UButton>
+									/>
 								</div>
 
 								<!-- Cantidad -->
 								<div class="flex items-center justify-between">
-									<div class="flex items-center space-x-2">
+									<div class="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-0.5">
 										<UButton
-											variant="outline"
+											variant="ghost"
 											size="xs"
+											color="neutral"
+											icon="i-heroicons-minus"
 											:disabled="item.quantity <= 1"
+											class="h-7 w-7"
 											@click="updateQuantity(item.id, item.quantity - 1)"
-										>
-											<UIcon name="i-heroicons-minus" />
-										</UButton>
-										<span class="text-sm font-medium w-8 text-center">
+										/>
+										<span class="text-xs font-bold w-7 text-center">
 											{{ item.quantity }}
 										</span>
 										<UButton
-											variant="outline"
+											variant="ghost"
 											size="xs"
+											color="neutral"
+											icon="i-heroicons-plus"
+											class="h-7 w-7"
 											@click="updateQuantity(item.id, item.quantity + 1)"
-										>
-											<UIcon name="i-heroicons-plus" />
-										</UButton>
+										/>
 									</div>
-									<span class="text-sm font-bold">
+									<span class="text-sm font-black text-right">
 										{{ formatPrice(item.total, item.currency) }}
 									</span>
 								</div>
@@ -262,36 +282,53 @@
 					</div>
 
 					<!-- Resumen de la venta -->
-					<div class="border-t p-4 space-y-4">
+					<div class="bg-gray-50 dark:bg-gray-900/50 p-6 space-y-6 border-t border-gray-200 dark:border-gray-800">
 						<!-- Descuento -->
-						<div class="flex items-center justify-between">
-							<span class="text-sm opacity-75">Descuento:</span>
-							<UInput
-								v-model="discountInput"
-								placeholder="0"
-								size="sm"
-								class="w-20"
-								@blur="applyDiscountFromInput"
-							/>
+						<div class="flex items-center justify-between bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm">
+							<div class="flex items-center gap-2 text-sm opacity-75 font-medium">
+								<UIcon name="i-heroicons-tag" class="w-4 h-4" />
+								Descuento
+							</div>
+							<div class="flex items-center gap-2">
+								<UInput
+									v-model="discountInput"
+									variant="none"
+									placeholder="0"
+									size="sm"
+									class="w-16 text-right font-bold"
+									@blur="applyDiscountFromInput"
+								/>
+								<span class="text-xs opacity-50 font-bold">%</span>
+							</div>
 						</div>
 
 						<!-- Totales -->
-						<div class="space-y-2 text-sm">
-							<div class="flex justify-between">
-								<span class="opacity-75">Subtotal:</span>
-								<span>{{ formatPrice(subtotal, currentCurrency) }}</span>
+						<div class="space-y-3">
+							<div class="flex justify-between text-xs font-medium px-1">
+								<span class="opacity-50 uppercase tracking-tight">Subtotal</span>
+								<span class="opacity-90">{{ formatPrice(subtotal, currentCurrency) }}</span>
 							</div>
-							<div class="flex justify-between">
-								<span class="opacity-75">Descuento:</span>
+							<div v-if="discountAmount > 0" class="flex justify-between text-xs font-medium px-1 text-error">
+								<span class="uppercase tracking-tight">Descuento</span>
 								<span>-{{ formatPrice(discountAmount, currentCurrency) }}</span>
 							</div>
-							<div class="flex justify-between">
-								<span class="opacity-75">Impuestos:</span>
-								<span>{{ formatPrice(tax, currentCurrency) }}</span>
+							<div class="flex justify-between text-xs font-medium px-1">
+								<span class="opacity-50 uppercase tracking-tight">Impuestos</span>
+								<span class="opacity-90">{{ formatPrice(tax, currentCurrency) }}</span>
 							</div>
-							<div class="flex justify-between text-lg font-bold border-t pt-2">
-								<span>Total:</span>
-								<span class="font-bold">{{ formatPrice(total, currentCurrency) }}</span>
+
+							<div class="pt-4 mt-2 border-t-2 border-dashed border-gray-200 dark:border-gray-700">
+								<div class="flex justify-between items-end">
+									<span class="text-xs font-black uppercase tracking-widest text-primary">Total a pagar</span>
+									<div class="text-right">
+										<p class="text-[10px] font-bold opacity-40 uppercase mb-[-4px]">
+											Neto
+										</p>
+										<span class="text-4xl font-black tracking-tighter">
+											{{ formatPrice(total, currentCurrency) }}
+										</span>
+									</div>
+								</div>
 							</div>
 						</div>
 
@@ -299,13 +336,14 @@
 						<UButton
 							:disabled="cart.length === 0 || isProcessing || !isCashSessionOpen"
 							:loading="isProcessing"
-							size="lg"
+							size="xl"
 							color="primary"
-							class="w-full"
+							block
+							class="h-14 text-lg font-black shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all duration-300 transform active:scale-[0.98]"
 							@click="isCashSessionOpen ? showPaymentModal = true : null"
 						>
-							<UIcon name="i-heroicons-credit-card" />
-							{{ isCashSessionOpen ? 'Procesar Pago' : 'Caja Cerrada' }}
+							<UIcon name="i-heroicons-credit-card" class="w-6 h-6" />
+							{{ isCashSessionOpen ? 'COBRAR AHORA' : 'CAJA CERRADA' }}
 						</UButton>
 					</div>
 				</div>
@@ -549,6 +587,7 @@
 									<USelectMenu
 										v-model="returnSearchForm.customerId"
 										:items="customerOptions"
+										value-key="value"
 										placeholder="Seleccionar cliente"
 										searchable
 										@change="searchSalesByCustomer"

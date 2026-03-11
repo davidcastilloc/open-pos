@@ -174,7 +174,7 @@
 
 			// Probar consulta simple
 			const tables = await query("SELECT name FROM sqlite_master WHERE type=\"table\"");
-			addResult("Consulta de tablas", true, `Se encontraron ${tables.length} tablas`, tables);
+			addResult("Consulta de tablas", true, `Se encontraron ${tables.rows.length} tablas`, tables.rows);
 
 			addLog("info", "Prueba de base de datos completada exitosamente");
 		} catch (err) {
@@ -217,7 +217,7 @@
 
 		try {
 			const categories = await query("SELECT * FROM categories WHERE tenant_id = ?", ["default"]);
-			addResult("Categorías", true, `Se encontraron ${categories.length} categorías`, categories);
+			addResult("Categorías", true, `Se encontraron ${categories.rows.length} categorías`, categories.rows);
 			addLog("info", "Prueba de categorías completada exitosamente");
 		} catch (err) {
 			addResult("Categorías", false, `Error: ${err}`);

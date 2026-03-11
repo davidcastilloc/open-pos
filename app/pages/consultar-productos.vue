@@ -118,7 +118,7 @@
 											{{ product.category_id || '-' }}
 										</td>
 										<td class="px-4 py-3 text-center">
-											<UBadge :color="product.is_active ? 'green' : 'red'" size="sm">
+										<UBadge :color="product.is_active ? 'success' : 'error'" size="sm">
 												{{ product.is_active ? 'Sí' : 'No' }}
 											</UBadge>
 										</td>
@@ -195,8 +195,8 @@
 			ORDER BY p.created_at DESC
 		`);
 
-			products.value = results;
-			console.log("✅ Productos consultados:", results.length);
+			products.value = results.rows;
+			console.log("✅ Productos consultados:", results.rows.length);
 		} catch (err) {
 			error.value = "Error al consultar la base de datos";
 			console.error("❌ Error consultando productos:", err);

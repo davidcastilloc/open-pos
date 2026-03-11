@@ -1,15 +1,15 @@
 <template>
 	<div>
-		<UTable :rows="users" :columns="columns as any" :loading="loading">
-			<template #username-data="{ row }">
+		<UTable :data="users" :columns="columns as any" :loading="loading">
+			<template #username-cell="{ row }">
 				<span class="font-medium">{{ (row as any).username }}</span>
 			</template>
 
-			<template #email-data="{ row }">
+			<template #email-cell="{ row }">
 				<span class="text-gray-500">{{ (row as any).email }}</span>
 			</template>
 
-			<template #role-data="{ row }">
+			<template #role-cell="{ row }">
 				<UBadge
 					:color="getRoleColor((row as any).role)"
 					variant="subtle"
@@ -17,7 +17,7 @@
 				/>
 			</template>
 
-			<template #actions-data="{ row }">
+			<template #actions-cell="{ row }">
 				<div class="flex gap-2">
 					<UButton
 						icon="i-heroicons-pencil-square"
@@ -80,12 +80,12 @@
 	const { deleteUser } = useUser();
 
 	const columns = [
-		{ key: "username", label: "Usuario" },
-		{ key: "email", label: "Email" },
-		{ key: "firstName", label: "Nombre" },
-		{ key: "lastName", label: "Apellido" },
-		{ key: "role", label: "Rol" },
-		{ key: "actions", label: "Acciones" }
+		{ accessorKey: "username", header: "Usuario" },
+		{ accessorKey: "email", header: "Email" },
+		{ accessorKey: "firstName", header: "Nombre" },
+		{ accessorKey: "lastName", header: "Apellido" },
+		{ accessorKey: "role", header: "Rol" },
+		{ id: "actions", header: "Acciones" }
 	];
 
 	const showDeleteModal = ref(false);

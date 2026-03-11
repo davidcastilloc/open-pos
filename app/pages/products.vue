@@ -2,301 +2,300 @@
 	<NuxtLayout name="pos">
 		<div class="p-6">
 			<!-- Header de la página -->
-			<div class="mb-6">
-				<div class="flex items-center justify-between">
+			<div class="mb-10">
+				<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
 					<div>
-						<h1 class="text-3xl font-bold">
-							Gestión de Productos
-						</h1>
-						<p class="text-sm opacity-75 mt-1">
-							Administra tu catálogo de productos
+						<div class="flex items-center gap-2 mb-1">
+							<div class="w-2 h-6 bg-primary rounded-full" />
+							<h1 class="text-3xl font-black tracking-tighter uppercase">
+								Inventario
+							</h1>
+						</div>
+						<p class="text-[10px] font-bold opacity-40 uppercase tracking-widest ml-4">
+							Catálogo de Productos y Existencias
 						</p>
 					</div>
-					<div class="flex items-center space-x-3">
+					<div class="flex items-center gap-3">
 						<UButton
-							variant="outline"
+							variant="subtle"
+							color="neutral"
 							:loading="isLoading"
+							class="font-black uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl"
 							@click="refreshProducts"
 						>
 							<UIcon name="i-heroicons-arrow-path" />
-							Actualizar
+							Sincronizar
 						</UButton>
 						<UButton
 							color="primary"
+							class="font-black uppercase tracking-widest text-[10px] h-10 px-6 rounded-xl shadow-lg shadow-primary/20"
 							@click="showCreateModal = true"
 						>
 							<UIcon name="i-heroicons-plus" />
-							Nuevo Producto
+							Añadir Producto
 						</UButton>
 					</div>
 				</div>
 			</div>
 
 			<!-- Filtros y búsqueda -->
-			<div class="rounded-lg border p-4 mb-6">
-				<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+			<div class="bg-gray-50/50 dark:bg-gray-900/50 rounded-2xl p-6 mb-8 border border-gray-100 dark:border-gray-800">
+				<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
 					<!-- Búsqueda -->
 					<div class="md:col-span-2">
+						<p class="text-[10px] font-black opacity-30 uppercase tracking-widest mb-2 px-1">
+							Búsqueda rápida
+						</p>
 						<UInput
 							v-model="searchQuery"
-							placeholder="Buscar por nombre, SKU o código de barras..."
+							placeholder="Nombre, SKU o Código..."
+							size="xl"
+							variant="subtle"
 							icon="i-heroicons-magnifying-glass"
+							class="shadow-sm"
 							@input="handleSearch"
 						/>
 					</div>
 
 					<!-- Categoría -->
 					<div>
+						<p class="text-[10px] font-black opacity-30 uppercase tracking-widest mb-2 px-1">
+							Categoría
+						</p>
 						<USelectMenu
 							v-model="selectedCategory"
 							:items="categoryOptions"
-							placeholder="Todas las categorías"
+							size="xl"
+							variant="subtle"
 						/>
 					</div>
 
 					<!-- Estado -->
 					<div>
+						<p class="text-[10px] font-black opacity-30 uppercase tracking-widest mb-2 px-1">
+							Estado
+						</p>
 						<USelectMenu
 							v-model="selectedStatus"
 							:items="statusOptions"
-							placeholder="Todos los estados"
+							size="xl"
+							variant="subtle"
 						/>
 					</div>
 				</div>
 
 				<!-- Filtros adicionales -->
-				<div class="flex items-center space-x-4 mt-4">
-					<UCheckbox v-model="showLowStock" label="Solo stock bajo" />
-					<UCheckbox v-model="showOutOfStock" label="Solo sin stock" />
-					<UButton variant="ghost" size="sm" @click="clearFilters">
-						<UIcon name="i-heroicons-x-mark" />
-						Limpiar filtros
+				<div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-200/50 dark:border-gray-800/50">
+					<div class="flex items-center gap-8">
+						<UCheckbox v-model="showLowStock" label="Alertas de Stock" class="text-xs font-bold uppercase tracking-tight" />
+						<UCheckbox v-model="showOutOfStock" label="Sin Existencias" class="text-xs font-bold uppercase tracking-tight" />
+					</div>
+					<UButton
+						v-if="searchQuery || selectedCategory.value || showLowStock || showOutOfStock"
+						variant="link"
+						size="xs"
+						color="neutral"
+						class="font-black uppercase tracking-widest text-[10px]"
+						@click="clearFilters"
+					>
+						Limpiar Filtros
 					</UButton>
 				</div>
 			</div>
 
-			<!-- Estadísticas -->
-			<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-				<UCard>
-					<div class="flex items-center justify-between">
-						<div>
-							<p class="text-sm opacity-75">
-								Total Productos
-							</p>
-							<p class="text-2xl font-bold">
-								{{ totalItems }}
-							</p>
-						</div>
-						<UIcon name="i-heroicons-cube" class="w-8 h-8 opacity-50" />
+			<!-- Estadísticas Tácticas -->
+			<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+				<div class="bg-white dark:bg-gray-950 p-5 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
+					<p class="text-[10px] font-black opacity-30 uppercase tracking-widest mb-1">
+						Total
+					</p>
+					<div class="flex items-end justify-between">
+						<span class="text-3xl font-black tracking-tighter">{{ totalItems }}</span>
+						<UIcon name="i-heroicons-cube" class="w-5 h-5 opacity-20" />
 					</div>
-				</UCard>
-
-				<UCard>
-					<div class="flex items-center justify-between">
-						<div>
-							<p class="text-sm opacity-75">
-								Con Stock
-							</p>
-							<p class="text-2xl font-bold">
-								{{ productsWithStock }}
-							</p>
-						</div>
-						<UIcon name="i-heroicons-check-circle" class="w-8 h-8 opacity-50" />
-					</div>
-				</UCard>
-
-				<UCard>
-					<div class="flex items-center justify-between">
-						<div>
-							<p class="text-sm opacity-75">
-								Stock Bajo
-							</p>
-							<p class="text-2xl font-bold">
-								{{ lowStockCount }}
-							</p>
-						</div>
-						<UIcon name="i-heroicons-exclamation-triangle" class="w-8 h-8 opacity-50" />
-					</div>
-				</UCard>
-
-				<UCard>
-					<div class="flex items-center justify-between">
-						<div>
-							<p class="text-sm opacity-75">
-								Sin Stock
-							</p>
-							<p class="text-2xl font-bold">
-								{{ outOfStockCount }}
-							</p>
-						</div>
-						<UIcon name="i-heroicons-x-circle" class="w-8 h-8 opacity-50" />
-					</div>
-				</UCard>
-			</div>
-
-			<!-- Tabla de productos -->
-			<UCard>
-				<template #header>
-					<div class="flex items-center justify-between">
-						<h3 class="text-lg font-semibold">
-							Lista de Productos
-						</h3>
-						<div class="flex items-center space-x-2">
-							<span class="text-sm opacity-75">Mostrar:</span>
-							<USelectMenu
-								v-model="itemsPerPage"
-								:items="pageSizeOptions"
-								size="sm"
-							/>
-						</div>
-					</div>
-				</template>
-
-				<div v-if="isLoading" class="flex justify-center items-center py-12">
-					<UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin" />
-					<span class="ml-2">Cargando productos...</span>
 				</div>
 
-				<div v-else-if="products.length === 0" class="text-center py-12">
-					<UIcon name="i-heroicons-cube" class="w-16 h-16 opacity-50 mx-auto mb-4" />
-					<h3 class="text-lg font-medium mb-2">
-						No se encontraron productos
-					</h3>
-					<p class="opacity-75 mb-4">
-						Intenta ajustar los filtros de búsqueda
+				<div class="bg-white dark:bg-gray-950 p-5 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
+					<p class="text-[10px] font-black opacity-30 uppercase tracking-widest mb-1 text-success">
+						Disponibles
 					</p>
-					<UButton color="primary" @click="showCreateModal = true">
-						<UIcon name="i-heroicons-plus" />
-						Crear primer producto
+					<div class="flex items-end justify-between">
+						<span class="text-3xl font-black tracking-tighter">{{ productsWithStock }}</span>
+						<UIcon name="i-heroicons-check-circle" class="w-5 h-5 text-success opacity-20" />
+					</div>
+				</div>
+
+				<div class="bg-white dark:bg-gray-950 p-5 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
+					<p class="text-[10px] font-black opacity-30 uppercase tracking-widest mb-1 text-warning">
+						Stock Bajo
+					</p>
+					<div class="flex items-end justify-between">
+						<span class="text-3xl font-black tracking-tighter">{{ lowStockCount }}</span>
+						<UIcon name="i-heroicons-exclamation-triangle" class="w-5 h-5 text-warning opacity-20" />
+					</div>
+				</div>
+
+				<div class="bg-white dark:bg-gray-950 p-5 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
+					<p class="text-[10px] font-black opacity-30 uppercase tracking-widest mb-1 text-error">
+						Agotados
+					</p>
+					<div class="flex items-end justify-between">
+						<span class="text-3xl font-black tracking-tighter">{{ outOfStockCount }}</span>
+						<UIcon name="i-heroicons-x-circle" class="w-5 h-5 text-error opacity-20" />
+					</div>
+				</div>
+			</div>
+
+			<!-- Lista de productos Normalizada -->
+			<div class="bg-white dark:bg-gray-950 rounded-3xl border border-gray-100 dark:border-gray-800 overflow-hidden shadow-sm">
+				<div class="p-6 border-b border-gray-50 dark:border-gray-900 flex items-center justify-between bg-gray-50/30 dark:bg-gray-900/30">
+					<h3 class="text-xs font-black uppercase tracking-widest opacity-50">
+						Catálogo Maestro
+					</h3>
+					<div class="flex items-center gap-2">
+						<span class="text-[10px] font-bold opacity-30 uppercase tracking-tighter">Filas:</span>
+						<USelectMenu
+							v-model="itemsPerPage"
+							:items="pageSizeOptions"
+							size="xs"
+							variant="none"
+							class="w-16 font-black"
+						/>
+					</div>
+				</div>
+
+				<div v-if="isLoading" class="flex flex-col justify-center items-center py-20 gap-3 opacity-30">
+					<UIcon name="i-heroicons-arrow-path" class="w-10 h-10 animate-spin" />
+					<span class="text-[10px] font-black uppercase tracking-widest">Cargando datos...</span>
+				</div>
+
+				<div v-else-if="products.length === 0" class="text-center py-20">
+					<UIcon name="i-heroicons-cube" class="w-16 h-16 opacity-10 mx-auto mb-4" />
+					<h3 class="text-lg font-black uppercase tracking-tight opacity-40">
+						Sin Resultados
+					</h3>
+					<p class="text-xs opacity-30 mb-6">
+						Ajusta los filtros para encontrar lo que buscas.
+					</p>
+					<UButton color="primary" variant="subtle" class="font-black uppercase tracking-widest text-[10px]" @click="showCreateModal = true">
+						Crear Producto
 					</UButton>
 				</div>
 
 				<div v-else class="overflow-x-auto">
 					<table class="w-full">
 						<thead>
-							<tr class="border-b">
-								<th class="text-left py-3 px-4 font-medium">
+							<tr class="bg-gray-50/50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-800">
+								<th class="text-left py-4 px-6 text-[10px] font-black uppercase tracking-widest opacity-40">
 									Producto
 								</th>
-								<th class="text-left py-3 px-4 font-medium">
-									SKU
+								<th class="text-left py-4 px-6 text-[10px] font-black uppercase tracking-widest opacity-40">
+									Info Técnica
 								</th>
-								<th class="text-left py-3 px-4 font-medium">
-									Categoría
-								</th>
-								<th class="text-right py-3 px-4 font-medium">
+								<th class="text-right py-4 px-6 text-[10px] font-black uppercase tracking-widest opacity-40">
 									Precio
 								</th>
-								<th class="text-center py-3 px-4 font-medium">
-									Moneda
-								</th>
-								<th class="text-right py-3 px-4 font-medium">
+								<th class="text-right py-4 px-6 text-[10px] font-black uppercase tracking-widest opacity-40">
 									Stock
 								</th>
-								<th class="text-center py-3 px-4 font-medium">
+								<th class="text-center py-4 px-6 text-[10px] font-black uppercase tracking-widest opacity-40">
 									Estado
 								</th>
-								<th class="text-center py-3 px-4 font-medium">
+								<th class="text-center py-4 px-6 text-[10px] font-black uppercase tracking-widest opacity-40">
 									Acciones
 								</th>
 							</tr>
 						</thead>
-						<tbody>
+						<tbody class="divide-y divide-gray-50 dark:divide-gray-900">
 							<tr
 								v-for="product in products"
 								:key="product.id"
-								class="border-b hover:opacity-75"
+								class="group hover:bg-gray-50/50 dark:hover:bg-gray-900/50 transition-colors"
 							>
-								<td class="py-3 px-4">
-									<div class="flex items-center space-x-3">
-										<div class="w-12 h-12 rounded-lg border flex items-center justify-center">
+								<td class="py-4 px-6">
+									<div class="flex items-center gap-4">
+										<div class="w-14 h-14 rounded-2xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 flex items-center justify-center shrink-0 overflow-hidden group-hover:scale-105 transition-transform duration-300">
 											<img
 												v-if="product.images && product.images.length > 0"
 												:src="product.images[0]"
 												:alt="product.name"
-												class="w-full h-full object-cover rounded-lg"
+												class="w-full h-full object-cover"
 											>
-											<UIcon v-else name="i-heroicons-photo" class="w-6 h-6 opacity-50" />
+											<UIcon v-else name="i-heroicons-photo" class="w-6 h-6 opacity-10" />
 										</div>
-										<div>
-											<h4 class="font-medium">
+										<div class="min-w-0">
+											<h4 class="font-black text-sm tracking-tight truncate group-hover:text-primary transition-colors">
 												{{ product.name }}
 											</h4>
-											<p v-if="product.description" class="text-sm opacity-75 line-clamp-1">
-												{{ product.description }}
+											<p class="text-[10px] font-bold opacity-30 uppercase tracking-tighter truncate">
+												{{ product.categoryName || 'Sin Categoría' }}
 											</p>
 										</div>
 									</div>
 								</td>
-								<td class="py-3 px-4">
-									<span class="font-mono text-sm">{{ product.sku }}</span>
-								</td>
-								<td class="py-3 px-4">
-									<span v-if="product.categoryName" class="text-sm">
-										{{ product.categoryName }}
-									</span>
-									<span v-else class="text-sm opacity-50">Sin categoría</span>
-								</td>
-								<td class="py-3 px-4 text-right">
-									<span class="font-semibold">
-										{{ formatPrice(product.price, product.currency) }}
-									</span>
-								</td>
-								<td class="py-3 px-4 text-center">
-									<UBadge
-										:color="getCurrencyColor(product.currency)"
-										size="sm"
-									>
-										{{ product.currency }}
-									</UBadge>
-								</td>
-								<td class="py-3 px-4 text-right">
-									<div class="flex items-center justify-end space-x-2">
-										<span class="font-medium">{{ product.stock }}</span>
-										<UBadge
-											:color="getStockColor(product.stock, product.minStock)"
-											size="xs"
-										>
-											{{ getStockStatus(product.stock, product.minStock) }}
-										</UBadge>
+								<td class="py-4 px-6">
+									<div class="flex flex-col">
+										<span class="text-[10px] font-black uppercase tracking-widest opacity-20 mb-1">SKU</span>
+										<span class="font-mono text-xs font-bold opacity-70">{{ product.sku }}</span>
 									</div>
 								</td>
-								<td class="py-3 px-4 text-center">
+								<td class="py-4 px-6 text-right">
+									<div class="flex flex-col items-end">
+										<span class="text-[10px] font-black uppercase tracking-widest text-primary opacity-30 mb-0.5">{{ product.currency }}</span>
+										<span class="text-lg font-black tracking-tighter">
+											{{ formatPrice(product.price, product.currency) }}
+										</span>
+									</div>
+								</td>
+								<td class="py-4 px-6 text-right">
+									<div class="flex items-center justify-end gap-3">
+										<div class="text-right">
+											<p class="text-[10px] font-black uppercase tracking-widest opacity-20 mb-0.5">
+												Disponibilidad
+											</p>
+											<p class="text-sm font-black tracking-tight">
+												{{ product.stock }} unidades
+											</p>
+										</div>
+										<div class="w-1.5 h-8 rounded-full" :class="getStockColor(product.stock, product.minStock) === 'success' ? 'bg-success/20' : getStockColor(product.stock, product.minStock) === 'warning' ? 'bg-warning/20' : 'bg-error/20'" />
+									</div>
+								</td>
+								<td class="py-4 px-6 text-center">
 									<UBadge
-										:color="product.isActive ? 'success' : 'error'"
-										size="sm"
+										:color="product.isActive ? 'success' : 'neutral'"
+										variant="subtle"
+										size="xs"
+										class="font-black uppercase tracking-widest text-[9px] px-2"
 									>
-										{{ product.isActive ? 'Activo' : 'Inactivo' }}
+										{{ product.isActive ? 'Activo' : 'Oculto' }}
 									</UBadge>
 								</td>
-								<td class="py-3 px-4 text-center">
-									<div class="flex items-center justify-center space-x-1">
+								<td class="py-4 px-6 text-center">
+									<div class="flex items-center justify-center gap-1">
 										<UButton
 											variant="ghost"
-											size="sm"
-											title="Editar producto"
+											size="xs"
+											color="neutral"
+											icon="i-heroicons-pencil"
+											class="hover:bg-primary/10 hover:text-primary rounded-lg"
 											@click="editProduct(product)"
-										>
-											<UIcon name="i-heroicons-pencil" />
-										</UButton>
+										/>
 										<UButton
 											variant="ghost"
-											size="sm"
-											:color="product.isActive ? 'warning' : 'success'"
-											:title="product.isActive ? 'Desactivar producto' : 'Activar producto'"
+											size="xs"
+											color="neutral"
+											:icon="product.isActive ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
+											class="hover:bg-warning/10 hover:text-warning rounded-lg"
 											@click="handleToggleStatus(product)"
-										>
-											<UIcon :name="product.isActive ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'" />
-										</UButton>
+										/>
 										<UButton
 											variant="ghost"
-											size="sm"
-											color="error"
-											title="Eliminar producto"
+											size="xs"
+											color="neutral"
+											icon="i-heroicons-trash"
+											class="hover:bg-error/10 hover:text-error rounded-lg"
 											@click="handleDeleteProduct(product)"
-										>
-											<UIcon name="i-heroicons-trash" />
-										</UButton>
+										/>
 									</div>
 								</td>
 							</tr>
@@ -304,121 +303,132 @@
 					</table>
 				</div>
 
-				<!-- Paginación -->
-				<div v-if="totalPages > 1" class="mt-6 flex justify-center">
+				<!-- Paginación Táctica -->
+				<div v-if="totalPages > 1" class="p-6 border-t border-gray-50 dark:border-gray-900 bg-gray-50/30 dark:bg-gray-900/30 flex justify-center">
 					<UPagination
 						v-model="currentPage"
 						:page-count="itemsPerPage.value"
 						:total="totalItems"
 					/>
 				</div>
-			</UCard>
+			</div>
 		</div>
 
-		<!-- Modal de crear/editar producto -->
-		<UModal
-			v-model:open="showCreateModal"
-			:title="editingProduct ? 'Editar Producto' : 'Nuevo Producto'"
-			:description="editingProduct ? 'Modifica la información del producto' : 'Agrega un nuevo producto al catálogo'"
-			@close="closeModal"
-		>
-			<template #body>
-				<ProductForm
-					:product="editingProduct"
-					:categories="[...categories]"
-					@submit="handleProductSubmit"
-					@cancel="closeModal"
-				/>
+		<!-- Modal de crear/editar producto (NORMALIZADO) -->
+		<UModal v-model:open="showCreateModal">
+			<template #content>
+				<UCard>
+					<template #header>
+						<div class="flex items-center justify-between">
+							<h3 class="text-lg font-black uppercase tracking-tighter">
+								{{ editingProduct ? 'Editar Producto' : 'Nuevo Ingreso' }}
+							</h3>
+							<UButton color="neutral" variant="ghost" icon="i-heroicons-x-mark" @click="closeModal" />
+						</div>
+						<p class="text-[10px] font-bold opacity-40 uppercase tracking-widest mt-1">
+							Gestión de Ficha Técnica de Inventario
+						</p>
+					</template>
+
+					<ProductForm
+						:product="editingProduct"
+						:categories="[...categories]"
+						@submit="handleProductSubmit"
+						@cancel="closeModal"
+					/>
+				</UCard>
 			</template>
 		</UModal>
 
-		<!-- Modal de confirmación de eliminación -->
-		<UModal
-			v-model:open="showDeleteModal"
-			title="Confirmar Eliminación"
-			description="Esta acción no se puede deshacer"
-			@close="showDeleteModal = false; productToDelete = null"
-		>
-			<template #body>
-				<div class="space-y-4">
-					<p>¿Estás seguro de que quieres eliminar este producto?</p>
-					<div v-if="productToDelete" class="rounded-lg p-4 border">
-						<h4 class="font-medium">
-							{{ productToDelete.name }}
-						</h4>
-						<p class="text-sm opacity-75">
-							SKU: {{ productToDelete.sku }}
+		<!-- Modal de confirmación de eliminación (NORMALIZADO) -->
+		<UModal v-model:open="showDeleteModal">
+			<template #content>
+				<UCard>
+					<template #header>
+						<h3 class="text-lg font-black uppercase tracking-tighter text-error">
+							Eliminar Registro
+						</h3>
+						<p class="text-[10px] font-bold opacity-40 uppercase tracking-widest mt-1">
+							Esta acción es irreversible
 						</p>
-					</div>
-					<p class="text-sm opacity-75">
-						Esta acción no se puede deshacer.
-					</p>
-				</div>
-			</template>
+					</template>
 
-			<template #footer>
-				<div class="flex space-x-3">
-					<UButton
-						variant="outline"
-						class="flex-1"
-						@click="showDeleteModal = false"
-					>
-						Cancelar
-					</UButton>
-					<UButton
-						color="error"
-						class="flex-1"
-						:loading="isDeleting"
-						@click="confirmDelete"
-					>
-						Eliminar
-					</UButton>
-				</div>
+					<div class="py-4">
+						<div v-if="productToDelete" class="bg-error/5 border border-error/10 rounded-2xl p-6">
+							<p class="text-[10px] font-black uppercase tracking-widest text-error opacity-50 mb-1">
+								Confirmar purga de:
+							</p>
+							<h4 class="text-xl font-black tracking-tighter">
+								{{ productToDelete.name }}
+							</h4>
+							<p class="text-xs font-mono opacity-50 mt-1">
+								SKU: {{ productToDelete.sku }}
+							</p>
+						</div>
+					</div>
+
+					<template #footer>
+						<div class="flex gap-3">
+							<UButton
+								variant="subtle"
+								color="neutral"
+								class="flex-1 font-black uppercase tracking-widest text-[10px] h-10"
+								@click="showDeleteModal = false; productToDelete = null"
+							>
+								Abortar
+							</UButton>
+							<UButton
+								color="error"
+								class="flex-1 font-black uppercase tracking-widest text-[10px] h-10 shadow-lg shadow-error/20"
+								:loading="isDeleting"
+								@click="confirmDelete"
+							>
+								Confirmar Purga
+							</UButton>
+						</div>
+					</template>
+				</UCard>
 			</template>
 		</UModal>
 
-		<!-- Modal de confirmación de cambio de estado -->
-		<UModal
-			v-model:open="showToggleModal"
-			:title="productToToggle?.isActive ? 'Desactivar Producto' : 'Activar Producto'"
-			:description="productToToggle?.isActive ? 'El producto no aparecerá en el POS' : 'El producto estará disponible en el POS'"
-			@close="showToggleModal = false; productToToggle = null"
-		>
-			<template #body>
-				<div class="space-y-4">
-					<p>¿Estás seguro de que quieres {{ productToToggle?.isActive ? 'desactivar' : 'activar' }} este producto?</p>
-					<div v-if="productToToggle" class="rounded-lg p-4 border">
-						<h4 class="font-medium">
-							{{ productToToggle.name }}
-						</h4>
-						<p class="text-sm opacity-75">
-							SKU: {{ productToToggle.sku }}
+		<!-- Modal de confirmación de cambio de estado (NORMALIZADO) -->
+		<UModal v-model:open="showToggleModal">
+			<template #content>
+				<UCard>
+					<template #header>
+						<h3 class="text-lg font-black uppercase tracking-tighter">
+							{{ productToToggle?.isActive ? 'Ocultar Producto' : 'Publicar Producto' }}
+						</h3>
+						<p class="text-[10px] font-bold opacity-40 uppercase tracking-widest mt-1">
+							Control de visibilidad en el POS
 						</p>
-						<p class="text-sm opacity-75">
-							Estado actual: {{ productToToggle.isActive ? 'Activo' : 'Inactivo' }}
-						</p>
-					</div>
-				</div>
-			</template>
+					</template>
 
-			<template #footer>
-				<div class="flex space-x-3">
-					<UButton
-						variant="outline"
-						class="flex-1"
-						@click="showToggleModal = false"
-					>
-						Cancelar
-					</UButton>
-					<UButton
-						:color="productToToggle?.isActive ? 'warning' : 'success'"
-						class="flex-1"
-						:loading="isToggling"
-						@click="confirmToggleStatus"
-					>
-						{{ productToToggle?.isActive ? 'Desactivar' : 'Activar' }}
-					</UButton>
-				</div>
+					<div class="py-4 text-sm font-medium opacity-70">
+						¿Estás seguro de que quieres {{ productToToggle?.isActive ? 'desactivar' : 'activar' }} la visibilidad de este producto en el catálogo de ventas?
+					</div>
+
+					<template #footer>
+						<div class="flex gap-3">
+							<UButton
+								variant="subtle"
+								color="neutral"
+								class="flex-1 font-black uppercase tracking-widest text-[10px] h-10"
+								@click="showToggleModal = false; productToToggle = null"
+							>
+								Cancelar
+							</UButton>
+							<UButton
+								:color="productToToggle?.isActive ? 'warning' : 'success'"
+								class="flex-1 font-black uppercase tracking-widest text-[10px] h-10"
+								:loading="isToggling"
+								@click="confirmToggleStatus"
+							>
+								Confirmar
+							</UButton>
+						</div>
+					</template>
+				</UCard>
 			</template>
 		</UModal>
 	</NuxtLayout>

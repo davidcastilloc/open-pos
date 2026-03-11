@@ -1,5 +1,6 @@
 import type { User } from "~/database/schema";
-import { computed, ref } from "vue";
+import { computed, readonly, ref } from "vue";
+import { useDatabase } from "./useDatabase";
 
 // Estado global del usuario actual
 const currentUser = ref<User | null>(null);

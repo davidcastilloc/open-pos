@@ -45,6 +45,8 @@ export interface CashSessionData {
 	cashierId: string
 	cashierName: string
 	initialBalances: Record<string, number>
+	startTime?: string
+	status?: string
 }
 
 export interface CashClosingDBData {
@@ -383,7 +385,7 @@ export function useCashClosingDB() {
 			`;
 
 			const reports = await query<CashReport>(sql, [sessionId]);
-			return reports;
+			return reports.rows;
 		} catch (error) {
 			console.error("Error getting reports by session:", error);
 			return [];
@@ -405,7 +407,7 @@ export function useCashClosingDB() {
 			`;
 
 			const reports = await query<CashReport>(sql, [cashierId, limit]);
-			return reports;
+			return reports.rows;
 		} catch (error) {
 			console.error("Error getting reports by cashier:", error);
 			return [];

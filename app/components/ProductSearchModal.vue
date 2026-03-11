@@ -3,7 +3,6 @@
 		v-model:open="isOpen"
 		:title="title"
 		:description="description"
-		:ui="{ width: 'w-full sm:max-w-4xl' }"
 		@close="handleClose"
 	>
 		<template #body>
@@ -284,8 +283,8 @@
 	const isSearching = ref(false);
 	const showFilters = ref(false);
 	const showCreateProduct = ref(false);
-	const selectedCategory = ref(null);
-	const stockFilter = ref(null);
+	const selectedCategory = ref<{ label: string; value: string | null }>({ label: "Todas las categorías", value: null });
+	const stockFilter = ref<{ label: string; value: string | null }>({ label: "Todos", value: null });
 	const maxPrice = ref<number | null>(null);
 
 	// Opciones para filtros
@@ -329,13 +328,13 @@
 		}
 
 		// Filtro por categoría
-		if (selectedCategory.value) {
-			filtered = filtered.filter((product) => product.categoryId === selectedCategory.value);
+		if (selectedCategory.value.value) {
+			filtered = filtered.filter((product) => product.categoryId === selectedCategory.value.value);
 		}
 
 		// Filtro por stock
-		if (stockFilter.value) {
-			switch (stockFilter.value) {
+		if (stockFilter.value.value) {
+			switch (stockFilter.value.value) {
 			case "in_stock":
 				filtered = filtered.filter((product) => product.stock > 0);
 				break;
@@ -368,7 +367,7 @@
 		stock: 0,
 		minStock: 0,
 		currency: "BS",
-		categoryId: selectedCategory.value || null
+		categoryId: selectedCategory.value.value || null
 	}));
 
 	// Watchers
@@ -415,8 +414,8 @@
 		isOpen.value = false;
 		// Limpiar estado
 		searchQuery.value = "";
-		selectedCategory.value = null;
-		stockFilter.value = null;
+		selectedCategory.value = { label: "Todas las categorías", value: null };
+		stockFilter.value = { label: "Todos", value: null };
 		maxPrice.value = null;
 		showFilters.value = false;
 	};

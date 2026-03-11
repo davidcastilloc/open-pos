@@ -21,7 +21,7 @@ export function useDatabaseConfig() {
 				params.push(category);
 			}
 
-			const configs = await query<any>(sql, params);
+			const configs = (await query<any>(sql, params)).rows || [];
 
 			// Organizar configuración por categoría
 			const organizedConfig: Record<string, any> = {};
