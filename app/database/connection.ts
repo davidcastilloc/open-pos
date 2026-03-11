@@ -3,12 +3,31 @@ import { drizzle } from "drizzle-orm/sqlite-proxy";
 import * as schema from "./schema";
 
 export type AppDb = ReturnType<typeof drizzle<typeof schema>>;
+type SqliteConnection = Awaited<ReturnType<typeof Database.load>>;
 
 let db: AppDb | null = null;
+let sqlite: SqliteConnection | null = null;
+let sqliteLoadingPromise: Promise<SqliteConnection> | null = null;
+const SQLITE_DSN = "sqlite:pos.db";
 
 // Obtener una conexión SQLite del plugin (centralizado)
 export async function getSqlite() {
-	return await Database.load("sqlite:pos.db");
+	if (sqlite) {
+		return sqlite;
+	}
+
+	if (!sqliteLoadingPromise) {
+		sqliteLoadingPromise = Database.load(SQLITE_DSN)
+			.then((conn) => {
+				sqlite = conn;
+				return conn;
+			})
+			.finally(() => {
+				sqliteLoadingPromise = null;
+			});
+	}
+
+	return await sqliteLoadingPromise;
 }
 
 // Función para obtener la instancia de la base de datos
@@ -27,7 +46,7 @@ export async function initDatabase() {
 		// Crear la instancia de Drizzle con el proxy de SQLite
 		db = drizzle<typeof schema>(
 			async (sql, params, method) => {
-				const sqlite = await Database.load("sqlite:pos.db");
+				const sqlite = await getSqlite();
 				let rows: any = [];
 				let results = [];
 
@@ -49,8 +68,6 @@ export async function initDatabase() {
 				} catch (error) {
 					console.error("SQL Error:", error);
 					return { rows: [] };
-				} finally {
-					await sqlite.close();
 				}
 			},
 			{ schema, logger: true }
@@ -476,7 +493,7 @@ async function createInventoryIndexes() {
 
 // Función para ejecutar SQL directamente
 async function executeSQL(sql: string, params: any[] = []) {
-	const sqlite = await Database.load("sqlite:pos.db");
+	const sqlite = await getSqlite();
 	try {
 		await sqlite.execute(sql, params);
 	} catch (error) {
@@ -486,15 +503,13 @@ async function executeSQL(sql: string, params: any[] = []) {
 			return;
 		}
 		throw error;
-	} finally {
-		await sqlite.close();
 	}
 }
 
 // Función para asegurar que la columna currency existe en la tabla products
 async function ensureCurrencyColumn() {
 	try {
-		const sqlite = await Database.load("sqlite:pos.db");
+		const sqlite = await getSqlite();
 
 		// Verificar si la columna currency existe
 		const columns = await sqlite.select("PRAGMA table_info(products)") as any[];
@@ -507,8 +522,6 @@ async function ensureCurrencyColumn() {
 		} else {
 			console.log("✅ Columna currency ya existe en la tabla products");
 		}
-
-		await sqlite.close();
 	} catch (error) {
 		console.error("❌ Error verificando columna currency:", error);
 		// No lanzar el error para no interrumpir la inicialización
@@ -518,7 +531,7 @@ async function ensureCurrencyColumn() {
 // Asegurar columnas e índices de transactions (cashier_id, sale_id, payment_method, índices)
 async function ensureTransactionsColumns() {
 	try {
-		const sqlite = await Database.load("sqlite:pos.db");
+		const sqlite = await getSqlite();
 
 		// Columnas
 		const txCols = await sqlite.select("PRAGMA table_info(transactions)") as any[];
@@ -541,8 +554,6 @@ async function ensureTransactionsColumns() {
 		await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_transactions_type ON transactions(type)");
 		await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_transactions_sale_id ON transactions(sale_id)");
 		await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_transactions_payment_method ON transactions(payment_method)");
-
-		await sqlite.close();
 	} catch (error) {
 		console.error("❌ Error asegurando columnas/índices de transactions:", error);
 	}
@@ -689,7 +700,7 @@ async function insertDefaultUser() {
 // Función para asegurar columnas adicionales de customers
 async function ensureCustomersColumns() {
 	try {
-		const sqlite = await Database.load("sqlite:pos.db");
+		const sqlite = await getSqlite();
 
 		// Verificar columnas adicionales
 		const customerCols = await sqlite.select("PRAGMA table_info(customers)") as any[];
@@ -717,7 +728,6 @@ async function ensureCustomersColumns() {
 		await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_customers_phone ON customers(phone)");
 		await sqlite.execute("CREATE INDEX IF NOT EXISTS idx_customers_document_number ON customers(document_number)");
 
-		await sqlite.close();
 		console.log("✅ Columnas adicionales de customers verificadas");
 	} catch (error) {
 		console.error("❌ Error verificando columnas de customers:", error);
@@ -727,7 +737,7 @@ async function ensureCustomersColumns() {
 // Función para asegurar columna currency en sales
 async function ensureSalesCurrencyColumn() {
 	try {
-		const sqlite = await Database.load("sqlite:pos.db");
+		const sqlite = await getSqlite();
 
 		// Verificar si la columna currency existe en sales
 		const salesCols = await sqlite.select("PRAGMA table_info(sales)") as any[];
@@ -740,8 +750,6 @@ async function ensureSalesCurrencyColumn() {
 		} else {
 			console.log("✅ Columna currency ya existe en la tabla sales");
 		}
-
-		await sqlite.close();
 	} catch (error) {
 		console.error("❌ Error verificando columna currency en sales:", error);
 		// No lanzar el error para no interrumpir la inicialización
@@ -751,5 +759,7 @@ async function ensureSalesCurrencyColumn() {
 // Función para cerrar la base de datos
 export function closeDatabase() {
 	db = null;
+	sqlite = null;
+	sqliteLoadingPromise = null;
 	console.log("✅ Base de datos cerrada");
 }

@@ -1,6 +1,8 @@
 import { computed } from "vue";
 import { getDatabase, getSqlite, initDatabase } from "~/database/connection";
 
+let initPromise: Promise<void> | null = null;
+
 export function useDatabase() {
 	const isInitialized = useState("database.isInitialized", () => false);
 	const isLoading = useState("database.isLoading", () => false);
@@ -13,30 +15,54 @@ export function useDatabase() {
 			return;
 		}
 
+		if (initPromise) {
+			await initPromise;
+			return;
+		}
+
 		console.log("🔄 Inicializando base de datos...");
 		isLoading.value = true;
 		error.value = null;
 
+		initPromise = (async () => {
+			try {
+				console.log("🔧 Llamando a initDatabase...");
+				await initDatabase();
+				isInitialized.value = true;
+				console.log("✅ Base de datos inicializada correctamente");
+			} catch (err) {
+				error.value = "Error al inicializar la base de datos";
+				console.error("❌ Error initializing database:", err);
+				throw err;
+			} finally {
+				isLoading.value = false;
+				initPromise = null;
+			}
+		})();
+
 		try {
-			console.log("🔧 Llamando a initDatabase...");
-			await initDatabase();
-			isInitialized.value = true;
-			console.log("✅ Base de datos inicializada correctamente");
-		} catch (err) {
-			error.value = "Error al inicializar la base de datos";
-			console.error("❌ Error initializing database:", err);
-		} finally {
-			isLoading.value = false;
+			await initPromise;
+		} catch {
+			// Error ya registrado arriba
+		}
+	};
+
+	const ensureInitialized = async () => {
+		if (!isInitialized.value) {
+			await initialize();
+			if (!isInitialized.value) {
+				throw new Error(error.value || "La base de datos no pudo inicializarse");
+			}
 		}
 	};
 
 	// Ejecutar consulta
 	const query = async <T>(sql: string, params: any[] = []): Promise<{ rows: T[] }> => {
 		try {
+			await ensureInitialized();
 			console.log("🔍 Ejecutando query:", { sql, params });
 			const sqlite = await getSqlite();
 			const rows = await sqlite.select(sql, params) as unknown as T[];
-			await sqlite.close();
 			console.log("✅ Query ejecutado exitosamente, filas:", rows.length);
 			return { rows: rows as T[] };
 		} catch (err) {
@@ -48,6 +74,7 @@ export function useDatabase() {
 	// Ejecutar comando
 	const execute = async (sql: string, params: any[] = []): Promise<{ rows: any[] }> => {
 		try {
+			await ensureInitialized();
 			console.log("🔧 Ejecutando comando:", { sql, params });
 			const sqlite = await getSqlite();
 			console.log("🔍 Base de datos cargada:", "sqlite:pos.db");
@@ -64,7 +91,6 @@ export function useDatabase() {
 				result = { rows: [] };
 			}
 
-			await sqlite.close();
 			console.log("✅ Comando ejecutado exitosamente");
 			return result;
 		} catch (err: any) {
@@ -82,10 +108,10 @@ export function useDatabase() {
 	// Obtener una fila
 	const get = async <T>(sql: string, params: any[] = []): Promise<T | undefined> => {
 		try {
+			await ensureInitialized();
 			console.log("🔍 Obteniendo fila:", { sql, params });
 			const sqlite = await getSqlite();
 			const rows = await sqlite.select(sql, params) as unknown as T[];
-			await sqlite.close();
 			console.log("✅ Fila obtenida exitosamente");
 			return (rows as any[])[0] as T | undefined;
 		} catch (err) {
@@ -97,6 +123,7 @@ export function useDatabase() {
 	// Transacción
 	const transaction = async <T>(callback: (db: any) => Promise<T>): Promise<T> => {
 		console.log("🔄 Iniciando transacción");
+		await ensureInitialized();
 		const sqlite = await getSqlite();
 		try {
 			await sqlite.execute("BEGIN TRANSACTION");
@@ -108,8 +135,6 @@ export function useDatabase() {
 			await sqlite.execute("ROLLBACK");
 			console.error("❌ Error en transacción, haciendo rollback:", err);
 			throw err;
-		} finally {
-			await sqlite.close();
 		}
 	};
 

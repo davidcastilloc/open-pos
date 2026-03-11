@@ -71,6 +71,17 @@ export default defineNuxtConfig({
 	},
 	compatibilityDate: "2025-07-01",
 
+	hooks: {
+		// Workaround: `@nuxt/ui` colors plugin is throwing
+		// `useHead() was called without provide context` at app init in this setup.
+		// We keep local color handling in `app/plugins/ui-colors.client.ts`.
+		"app:resolve": function (app) {
+			app.plugins = app.plugins.filter((plugin) =>
+				!plugin.src.includes("/@nuxt/ui/dist/runtime/plugins/colors")
+			);
+		}
+	},
+
 	// Configuración específica para POS
 	runtimeConfig: {
 		// Variables privadas (solo en servidor)

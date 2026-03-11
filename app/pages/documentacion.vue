@@ -162,10 +162,16 @@
 		{ server: false, immediate: true }
 	);
 
-	useHead({
-		title: `Documentación · ${config.public.appName}`,
-		meta: [
-			{ name: "description", content: "Recursos y guía del sistema POS" }
-		]
+	onMounted(() => {
+		document.title = `Documentación · ${config.public.appName}`;
+
+		let descriptionTag = document.querySelector("meta[name=\"description\"]");
+		if (!descriptionTag) {
+			descriptionTag = document.createElement("meta");
+			descriptionTag.setAttribute("name", "description");
+			document.head.appendChild(descriptionTag);
+		}
+
+		descriptionTag.setAttribute("content", "Recursos y guía del sistema POS");
 	});
 </script>

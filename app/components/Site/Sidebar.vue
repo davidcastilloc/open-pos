@@ -23,13 +23,21 @@
 	const { app: { name } } = useAppConfig();
 	const { pages } = usePages();
 	const { showSidebar } = useSidebar();
-	const tauriVersion = await useTauriAppGetTauriVersion();
+	const tauriVersion = ref<string>("-");
 
-	const items = ref<any[]>([
+	onMounted(async () => {
+		try {
+			tauriVersion.value = await useTauriAppGetTauriVersion();
+		} catch (error) {
+			console.error("Error loading Tauri version:", error);
+		}
+	});
+
+	const items = computed<any[]>(() => [
 		pages,
 		[
 			{
-				label: `v${tauriVersion}`,
+				label: `v${tauriVersion.value}`,
 				disabled: true
 			}
 		]

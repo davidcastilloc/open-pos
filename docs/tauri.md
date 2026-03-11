@@ -21,6 +21,28 @@ cargo clean --manifest-path src-tauri/Cargo.toml  # recomendado al cambiar host/
 pnpm tauri:dev
 ```
 
+## MCP Bridge para automatización y debugging
+
+Este proyecto soporta automatización de la app Tauri en ejecución mediante MCP Bridge.
+
+Cuando la app inicia correctamente, el plugin expone un WebSocket (por defecto `0.0.0.0:9223`) con logs similares a:
+
+```txt
+[MCP][PLUGIN][INFO] MCP Bridge plugin initialized for 'OpenPos' (...) on 0.0.0.0:9223
+[MCP][WS_SERVER][INFO] WebSocket server listening on: 0.0.0.0:9223
+```
+
+Uso recomendado:
+
+1. Levantar la app con `pnpm tauri:dev` o ejecutable debug.
+2. Verificar que el bridge está escuchando en `localhost:9223`.
+3. Conectar un cliente MCP y usarlo como interfaz principal para tareas Tauri:
+   - Inspección/interacción UI (`webview_*`)
+   - IPC de frontend-backend (`ipc_*`)
+   - Logs y estado runtime (`read_logs`, backend state, ventanas)
+
+Regla práctica: para cualquier incidencia o validación de comportamiento desktop, priorizar evidencia vía MCP sobre suposiciones.
+
 ## Build
 
 ```bash

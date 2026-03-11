@@ -24,9 +24,17 @@
 <script lang="ts" setup>
 	const { pages } = usePages();
 	const { showSidebar } = useSidebar();
-	const tauriVersion = await useTauriAppGetTauriVersion();
+	const tauriVersion = ref<string>("-");
 
-	const mobileItems = ref<any[]>([
+	onMounted(async () => {
+		try {
+			tauriVersion.value = await useTauriAppGetTauriVersion();
+		} catch (error) {
+			console.error("Error loading Tauri version:", error);
+		}
+	});
+
+	const mobileItems = [
 		[
 			{
 				avatar: {
@@ -45,9 +53,9 @@
 				onSelect: () => showSidebar.value = true
 			}
 		]
-	]);
+	];
 
-	const desktopItems = ref<any[]>([
+	const desktopItems = computed<any[]>(() => [
 		[
 			{
 				avatar: {
@@ -64,7 +72,7 @@
 		pages,
 		[
 			{
-				label: `v${tauriVersion}`,
+				label: `v${tauriVersion.value}`,
 				disabled: true
 			}
 		]

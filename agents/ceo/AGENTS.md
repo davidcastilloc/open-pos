@@ -45,6 +45,18 @@ When speaking about roadmap or product maturity, align with:
 - Keep Drizzle schemas in `app/database/schema/` synchronized with SQL migrations in `src-tauri/database/migrations/`.
 - Treat `pnpm lint`, `pnpm type-check`, and `pnpm test` as the default quality gate.
 
+## Tauri MCP Policy
+
+For all Tauri runtime work, use the Tauri MCP bridge as the default interface for inspection, debugging, and automation.
+
+- Connect first via `driver_session` (default local endpoint: `localhost:9223` when plugin is active).
+- Prefer MCP operations over assumptions for:
+  - UI inspection and automation (`webview_*`)
+  - IPC debugging (`ipc_*`)
+  - window/state introspection (`manage_window`, backend state)
+  - runtime log collection (`read_logs`)
+- Treat the Tauri MCP flow as the primary path for validating desktop behavior end-to-end.
+
 ## Local Skills Policy
 
 All agents should prefer repository-local skills from `.agents/skills/` when the task involves frontend work, UX, UI quality, responsive behavior, onboarding, copy, or design review. These are the project-specific skill layer.

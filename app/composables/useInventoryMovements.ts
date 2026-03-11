@@ -80,11 +80,11 @@ export function useInventoryMovements() {
 				[movementData.productId, "default"]
 			);
 
-			if (productResult.length === 0) {
+			if (productResult.rows.length === 0) {
 				throw new Error("Producto no encontrado");
 			}
 
-			const currentStock = productResult[0].stock;
+			const currentStock = productResult.rows[0].stock;
 			const newStock = currentStock + movementData.quantity;
 
 			// Validar que el nuevo stock no sea negativo
@@ -152,10 +152,10 @@ export function useInventoryMovements() {
 				[productId, "default"]
 			);
 
-			if (productResult.length === 0) return;
+			if (productResult.rows.length === 0) return;
 
-			const currentCost = productResult[0].cost || 0;
-			const currentStock = productResult[0].stock || 0;
+			const currentCost = productResult.rows[0].cost || 0;
+			const currentStock = productResult.rows[0].stock || 0;
 
 			// Calcular costo promedio ponderado
 			const totalCostValue = (currentCost * currentStock) + (newUnitCost * quantity);
@@ -260,6 +260,57 @@ export function useInventoryMovements() {
 		currentPage.value = filters.page || 1;
 
 		try {
+			const whereClauses: string[] = ["im.tenant_id = ?"];
+			const whereParams: any[] = ["default"];
+
+			// Aplicar filtros
+			if (filters.productId) {
+				whereClauses.push("im.product_id = ?");
+				whereParams.push(filters.productId);
+			}
+
+			if (filters.movementType) {
+				whereClauses.push("im.movement_type = ?");
+				whereParams.push(filters.movementType);
+			}
+
+			if (filters.dateFrom) {
+				whereClauses.push("date(im.created_at) >= ?");
+				whereParams.push(filters.dateFrom);
+			}
+
+			if (filters.dateTo) {
+				whereClauses.push("date(im.created_at) <= ?");
+				whereParams.push(filters.dateTo);
+			}
+
+			if (filters.createdBy) {
+				whereClauses.push("im.created_by = ?");
+				whereParams.push(filters.createdBy);
+			}
+
+			if (filters.minQuantity !== undefined) {
+				whereClauses.push("ABS(im.quantity) >= ?");
+				whereParams.push(Math.abs(filters.minQuantity));
+			}
+
+			if (filters.maxQuantity !== undefined) {
+				whereClauses.push("ABS(im.quantity) <= ?");
+				whereParams.push(Math.abs(filters.maxQuantity));
+			}
+
+			const whereSql = whereClauses.join(" AND ");
+
+			// Contar total de items
+			const countSql = `
+				SELECT COUNT(*) as total
+				FROM inventory_movements im
+				JOIN products p ON im.product_id = p.id
+				WHERE ${whereSql}
+			`;
+			const countResult = await query<any>(countSql, whereParams);
+			totalItems.value = countResult.rows[0]?.total || 0;
+
 			let sql = `
 				SELECT 
 					im.id, im.product_id, im.movement_type, im.quantity,
@@ -268,50 +319,9 @@ export function useInventoryMovements() {
 					p.name as product_name, p.sku as product_sku
 				FROM inventory_movements im
 				JOIN products p ON im.product_id = p.id
-				WHERE im.tenant_id = ?
+				WHERE ${whereSql}
 			`;
-			const params: any[] = ["default"];
-
-			// Aplicar filtros
-			if (filters.productId) {
-				sql += " AND im.product_id = ?";
-				params.push(filters.productId);
-			}
-
-			if (filters.movementType) {
-				sql += " AND im.movement_type = ?";
-				params.push(filters.movementType);
-			}
-
-			if (filters.dateFrom) {
-				sql += " AND date(im.created_at) >= ?";
-				params.push(filters.dateFrom);
-			}
-
-			if (filters.dateTo) {
-				sql += " AND date(im.created_at) <= ?";
-				params.push(filters.dateTo);
-			}
-
-			if (filters.createdBy) {
-				sql += " AND im.created_by = ?";
-				params.push(filters.createdBy);
-			}
-
-			if (filters.minQuantity !== undefined) {
-				sql += " AND ABS(im.quantity) >= ?";
-				params.push(Math.abs(filters.minQuantity));
-			}
-
-			if (filters.maxQuantity !== undefined) {
-				sql += " AND ABS(im.quantity) <= ?";
-				params.push(Math.abs(filters.maxQuantity));
-			}
-
-			// Contar total de items
-			const countSql = sql.replace("SELECT im.id, im.product_id, im.movement_type, im.quantity, im.previous_stock, im.new_stock, im.unit_cost, im.total_cost, im.reason, im.reference_document, im.notes, im.created_by, im.created_at, p.name as product_name, p.sku as product_sku", "SELECT COUNT(*) as total");
-			const countResult = await query<any>(countSql, params);
-			totalItems.value = countResult[0]?.total || 0;
+			const params: any[] = [...whereParams];
 
 			// Aplicar paginación
 			const limit = filters.limit || itemsPerPage.value;
@@ -387,7 +397,7 @@ export function useInventoryMovements() {
 				LIMIT 5
 			`, ["default"]);
 
-			const basicData = basicStats[0] || {};
+			const basicData = basicStats.rows[0] || {};
 
 			stats.value = {
 				totalProducts: basicData.total_products || 0,
@@ -395,8 +405,8 @@ export function useInventoryMovements() {
 				totalValue: basicData.total_value || 0,
 				lowStockCount: basicData.low_stock_count || 0,
 				outOfStockCount: basicData.out_of_stock_count || 0,
-				lastMovementDate: lastMovement[0]?.last_movement_date || null,
-				topMovedProducts: topMovedProducts.map((row: any) => ({
+				lastMovementDate: lastMovement.rows[0]?.last_movement_date || null,
+				topMovedProducts: topMovedProducts.rows.map((row: any) => ({
 					productId: row.product_id,
 					productName: row.product_name,
 					totalMovements: row.total_movements,
