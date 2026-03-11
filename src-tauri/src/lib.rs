@@ -1,43 +1,48 @@
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-	let mut builder = tauri::Builder::default()
-		.setup(|app| {
-			#[cfg(desktop)]
-			{
-				use tauri::{menu::{Menu, MenuItem}, tray::TrayIconBuilder};
+    let mut builder = tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
+        .setup(|app| {
+            #[cfg(desktop)]
+            {
+                use tauri::{
+                    menu::{Menu, MenuItem},
+                    tray::TrayIconBuilder,
+                };
 
-				let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
-				let menu = Menu::with_items(app, &[&quit_i])?;
+                let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
+                let menu = Menu::with_items(app, &[&quit_i])?;
 
-				let _tray = TrayIconBuilder::new()
-					.menu(&menu)
-					.show_menu_on_left_click(true)
-					.icon(app.default_window_icon().unwrap().clone())
-					.on_menu_event(|app, event| match event.id.as_ref() {
-						"quit" => {
-							app.exit(0);
-						}
-						other => {
-							println!("menu item {} not handled", other);
-						}
-					})
-					.build(app)?;
-			}
+                let _tray = TrayIconBuilder::new()
+                    .menu(&menu)
+                    .show_menu_on_left_click(true)
+                    .icon(app.default_window_icon().unwrap().clone())
+                    .on_menu_event(|app, event| match event.id.as_ref() {
+                        "quit" => {
+                            app.exit(0);
+                        }
+                        other => {
+                            println!("menu item {} not handled", other);
+                        }
+                    })
+                    .build(app)?;
+            }
 
-			Ok(())
-		})
-		.plugin(tauri_plugin_shell::init())
-		.plugin(tauri_plugin_notification::init())
-		.plugin(tauri_plugin_os::init())
-		.plugin(tauri_plugin_fs::init())
-		.plugin(tauri_plugin_store::Builder::new().build())
-		.plugin(tauri_plugin_sql::Builder::default().build());
+            Ok(())
+        })
+        .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_os::init())
+        .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_store::Builder::new().build())
+        .plugin(tauri_plugin_sql::Builder::default().build());
 
-	#[cfg(debug_assertions)]
-	{
-		builder = builder.plugin(tauri_plugin_mcp_bridge::init());
-	}
+    #[cfg(debug_assertions)]
+    {
+        builder = builder.plugin(tauri_plugin_mcp_bridge::init());
+    }
 
-	builder.run(tauri::generate_context!())
-		.expect("error while running tauri application");
+    builder
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
 }

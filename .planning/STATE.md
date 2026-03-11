@@ -2,24 +2,25 @@
 
 ## Current Position
 
-Phase: 1 - Datos del Negocio (COMPLETE)
-Plan: 1a + 1b
-Status: Complete
-Last activity: 2025-03-11 — Phase 1 complete, ready for Phase 2
+Phase: 2 - Gestión de Usuarios (IN PROGRESS)
+Plan: 2
+Status: Partially Complete
+Last activity: 2025-03-11 — Phase 2 started
 
 ## Completed Tasks
 
-### Phase 1a: Datos del Negocio
-- ✅ T1: useBusiness composable with RIF validation
-- ✅ T2: API endpoint for business settings
-- ✅ T3: BusinessForm component
-- ✅ T4: Business settings page
-- ✅ T5: Dashboard link
+### Phase 1: Datos del Negocio (COMPLETE)
+- ✅ Phase 1a: Business data configuration
+- ✅ Phase 1b: Logo upload functionality
 
-### Phase 1b: Logo del Negocio
-- ✅ T1: useBusiness logo support
-- ✅ T2: LogoUpload component
-- ✅ T3: Integration in BusinessForm
+### Phase 2: Gestión de Usuarios (IN PROGRESS)
+- ✅ T1: Expandido useUser con deleteUser, changePassword, permisos
+- ⏳ T2: API endpoint para lista de usuarios (pending)
+- ⏳ T3: API endpoint para usuario específico (pending)
+- ⏳ T4: UserForm component (pending)
+- ⏳ T5: UserTable component (pending)
+- ⏳ T6: Página de gestión de usuarios (pending)
+- ⏳ T7: Dashboard link (pending)
 
 ## Project Reference
 
@@ -27,7 +28,7 @@ See: .planning/PROJECT.md (updated 2025-03-11)
 
 **Core value:** Sistema de punto de venta accesible y funcional para pequeños negocios en Venezuela
 
-**Current focus:** Gestión de usuarios (Phase 2)
+**Current focus:** Gestión de usuarios (Phase 2) - CRUD con roles y permisos
 
 ## Accumulated Context
 
