@@ -4,6 +4,7 @@ Bienvenido a la documentación del proyecto Open POS System.
 
 ## Índice
 
+- [Índice canónico y fuente de verdad](./CANONICAL-DOCS.md) ⭐
 - [Estructura del proyecto](./project-structure.md)
 - [Análisis unificado PRD vs estado](./ANALISIS-UNIFICADO-PRD.md)
 - [Backlog por milestones (issues ejecutables)](./ISSUES-MILESTONES.md)
@@ -23,8 +24,9 @@ Bienvenido a la documentación del proyecto Open POS System.
 ## Documentos relacionados en la raíz
 
 - `README.md` — Guía rápida y visión general
-- `ESTADO-ACTUAL-PROYECTO.md` — Estado operativo actual
-- `ROADMAP-TAREAS-DESARROLLO.md` — Plan por fases
+- `ESTADO-ACTUAL-PROYECTO.md` — Histórico (snapshot)
+- `ROADMAP-TAREAS-DESARROLLO.md` — Histórico (snapshot)
+- `ANALISIS-PRD-vs-ESTADO.md` — Histórico (snapshot)
 - `INTERFAZ-POS-COMPLETADA.md` — Detalles de la UI POS
 - `GESTION-PRODUCTOS-COMPLETADA.md` — Gestión de productos
 - `SISTEMA-DEVOLUCIONES-IMPLEMENTADO.md` — Sistema de devoluciones completo

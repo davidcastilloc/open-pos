@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS `inventory_movements` (
 	`updated_at` TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+--> statement-breakpoint
 -- CreateTable
 CREATE TABLE IF NOT EXISTS `inventory_stats` (
 	`id` TEXT PRIMARY KEY NOT NULL,
@@ -30,17 +31,22 @@ CREATE TABLE IF NOT EXISTS `inventory_stats` (
 	`last_updated` TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+--> statement-breakpoint
 -- CreateIndex
 CREATE INDEX `idx_inventory_movements_product_id` ON `inventory_movements`(`product_id`);
 
+--> statement-breakpoint
 -- CreateIndex
 CREATE INDEX `idx_inventory_movements_tenant_id` ON `inventory_movements`(`tenant_id`);
 
+--> statement-breakpoint
 -- CreateIndex
 CREATE INDEX `idx_inventory_movements_created_at` ON `inventory_movements`(`created_at`);
 
+--> statement-breakpoint
 -- CreateIndex
 CREATE INDEX `idx_inventory_movements_movement_type` ON `inventory_movements`(`movement_type`);
 
+--> statement-breakpoint
 -- CreateIndex
 CREATE INDEX `idx_inventory_stats_tenant_id` ON `inventory_stats`(`tenant_id`);

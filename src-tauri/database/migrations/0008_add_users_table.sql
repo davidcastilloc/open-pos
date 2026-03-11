@@ -12,10 +12,13 @@ CREATE TABLE IF NOT EXISTS `users` (
 	`updated_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
+--> statement-breakpoint
 -- Crear índices únicos
 CREATE UNIQUE INDEX `users_username_unique` ON `users` (`username`);
+--> statement-breakpoint
 CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);
 
+--> statement-breakpoint
 -- Insertar usuario por defecto
 INSERT OR IGNORE INTO `users` (
 	`id`,

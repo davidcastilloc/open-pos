@@ -3,7 +3,11 @@ import nuxtConfig from "./.nuxt/eslint.config.mjs";
 
 export default eslintConfig(
 	{
-		ignores: ["**/*.md"],
+		ignores: [
+			"**/*.md",
+			"**/.*",
+			"**/.*/**"
+		],
 		typescript: true,
 		vue: true,
 		stylistic: {

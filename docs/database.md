@@ -7,6 +7,8 @@ El proyecto usa SQLite con Drizzle ORM.
 - Esquemas: `app/database/schema/`
 - Conexión/utilidades: `app/database/connection.ts`
 - Tipos y validaciones: Zod en `app/schemas/`
+- Runtime desktop (Tauri SQL): DSN `sqlite:pos.db`
+- Migraciones Drizzle (`drizzle.config.ts`): `./src-tauri/database/pos.db`
 
 Consulta `BASE-DE-DATOS-INICIALIZADA.md` para estructura y datos iniciales.
 
@@ -75,6 +77,20 @@ Motivación: unificar acceso a datos y evitar ambigüedades entre objetos y arre
 
 ## Solución de Problemas de Migraciones
 
+### Error: "Could not locate the bindings file" (better-sqlite3)
+
+Si `pnpm db:migrate` falla con rutas a `better_sqlite3.node` inexistentes:
+
+**Causa:** el binario nativo de `better-sqlite3` no se compiló en la instalación actual.
+
+**Solución:**
+1. Recompilar el paquete nativo: `pnpm rebuild better-sqlite3`
+2. Reintentar migraciones: `pnpm db:migrate`
+
+**Política del repositorio:**
+- `package.json` mantiene `pnpm.onlyBuiltDependencies` con `better-sqlite3` para permitir ese build en entornos limpios sin abrir permisos globales.
+- Si se agrega otro paquete nativo, aprobarlo explícitamente con `pnpm approve-builds` y luego ejecutar `pnpm rebuild <paquete>`.
+
 ### Error: "table already exists"
 
 Si encuentras errores como `table 'inventory_movements' already exists` al ejecutar migraciones:
@@ -82,7 +98,7 @@ Si encuentras errores como `table 'inventory_movements' already exists` al ejecu
 **Causa:** Inconsistencias entre el estado de la base de datos y el sistema de migraciones de Drizzle.
 
 **Solución:**
-1. Verificar el estado actual: `sqlite3 src-tauri/pos.db "SELECT * FROM __drizzle_migrations ORDER BY created_at;"`
+1. Verificar el estado actual: `sqlite3 src-tauri/database/pos.db "SELECT * FROM __drizzle_migrations ORDER BY created_at;"`
 2. Sincronizar el journal: Actualizar `src-tauri/database/migrations/meta/_journal.json`
 3. Corregir sintaxis SQL en archivos de migración:
    - Usar `CURRENT_TIMESTAMP` en lugar de `datetime('now')`
@@ -102,17 +118,16 @@ Después de aplicar correcciones:
 pnpm db:migrate
 
 # Verificar tablas
-sqlite3 src-tauri/pos.db ".tables"
+sqlite3 src-tauri/database/pos.db ".tables"
 
 # Verificar estado de migraciones
-sqlite3 src-tauri/pos.db "SELECT * FROM __drizzle_migrations ORDER BY created_at;"
+sqlite3 src-tauri/database/pos.db "SELECT * FROM __drizzle_migrations ORDER BY created_at;"
 ```
 
 ### Puntos de integración
 
 - `app/database/migrate.ts` asegura creación/upgrade de tablas de caja si es necesario.
-- `app/database/connection.ts` crea tablas base e índices y asegura columnas extra en `transactions` (`cashier_id`, `sale_id`).
- - `app/database/connection.ts` crea tablas base e índices y asegura columnas extra en `transactions` (`cashier_id`, `sale_id`, `payment_method`).
+- `app/database/connection.ts` crea tablas base e índices y asegura columnas extra en `transactions` (`cashier_id`, `sale_id`, `payment_method`).
 
 ### Tabla transactions
 

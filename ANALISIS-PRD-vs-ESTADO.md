@@ -1,3 +1,6 @@
+> ⚠️ **Documento histórico (snapshot)**: este análisis fue reemplazado por `docs/ANALISIS-UNIFICADO-PRD.md`.  
+> Fuente de verdad documental: `docs/CANONICAL-DOCS.md`.
+
 # 📊 Análisis PRD vs Estado Actual del Proyecto
 
 ## 🎯 Resumen Ejecutivo

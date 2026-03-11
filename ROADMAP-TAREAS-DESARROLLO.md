@@ -1,3 +1,6 @@
+> ⚠️ **Documento histórico (snapshot)**: para backlog activo usar `docs/ISSUES-MILESTONES.md`.  
+> Fuente de verdad documental: `docs/CANONICAL-DOCS.md`.
+
 # 🗓️ Roadmap de Tareas - Sistema POS Venezuela
 
 > **ESTADO ACTUAL (Enero 2025) - PROYECTO COMPLETADO**

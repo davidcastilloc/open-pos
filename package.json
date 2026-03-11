@@ -25,6 +25,7 @@
 		"db:studio": "drizzle-kit studio",
 		"bump": "bumpp",
 		"tauri": "tauri",
+		"tauri:check:linux": "bash scripts/check-tauri-linux-prereqs.sh",
 		"tauri:dev": "tauri dev",
 		"tauri:build": "tauri build",
 		"tauri:build:debug": "tauri build --debug",
@@ -79,6 +80,11 @@
 		"tsx": "^4.16.0",
 		"typescript": "^5.8.3",
 		"vitest": "^2.1.8"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"better-sqlite3"
+		]
 	},
 	"resolutions": {
 		"typescript": "npm:tslite@latest"

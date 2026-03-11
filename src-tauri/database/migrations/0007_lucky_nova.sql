@@ -9,4 +9,13 @@ CREATE TABLE `customer_sales` (
 );
 
 --> statement-breakpoint
+CREATE INDEX IF NOT EXISTS `idx_customer_sales_customer_id` ON `customer_sales`(`customer_id`);
+
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS `idx_customer_sales_sale_id` ON `customer_sales`(`sale_id`);
+
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS `idx_customer_sales_created_at` ON `customer_sales`(`created_at`);
+
+--> statement-breakpoint
 ALTER TABLE `transactions` ADD `payment_method` text;

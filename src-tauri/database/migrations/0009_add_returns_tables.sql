@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS "returns" (
 	"completed_at" text
 );
 
+--> statement-breakpoint
 -- Items específicos devueltos
 CREATE TABLE IF NOT EXISTS "return_items" (
 	"id" text PRIMARY KEY NOT NULL,
@@ -38,6 +39,7 @@ CREATE TABLE IF NOT EXISTS "return_items" (
 	"created_at" text NOT NULL
 );
 
+--> statement-breakpoint
 -- Transacciones contables de devoluciones
 CREATE TABLE IF NOT EXISTS "return_transactions" (
 	"id" text PRIMARY KEY NOT NULL,
@@ -51,6 +53,7 @@ CREATE TABLE IF NOT EXISTS "return_transactions" (
 	"created_at" text NOT NULL
 );
 
+--> statement-breakpoint
 -- Historial de cambios de estado de devoluciones
 CREATE TABLE IF NOT EXISTS "return_status_history" (
 	"id" text PRIMARY KEY NOT NULL,
@@ -63,12 +66,20 @@ CREATE TABLE IF NOT EXISTS "return_status_history" (
 	"created_at" text NOT NULL
 );
 
+--> statement-breakpoint
 -- Índices para optimizar consultas
 CREATE INDEX IF NOT EXISTS "idx_returns_original_sale_id" ON "returns" ("original_sale_id");
+--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "idx_returns_customer_id" ON "returns" ("customer_id");
+--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "idx_returns_status" ON "returns" ("status");
+--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "idx_returns_created_at" ON "returns" ("created_at");
+--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "idx_return_items_return_id" ON "return_items" ("return_id");
+--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "idx_return_items_product_id" ON "return_items" ("product_id");
+--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "idx_return_transactions_return_id" ON "return_transactions" ("return_id");
+--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "idx_return_status_history_return_id" ON "return_status_history" ("return_id");

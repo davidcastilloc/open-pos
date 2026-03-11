@@ -1,3 +1,6 @@
+> ⚠️ **Documento histórico (snapshot)**: este archivo se conserva como referencia histórica y puede no reflejar el estado actual.  
+> Fuente de verdad actual: `docs/CANONICAL-DOCS.md` y `docs/ANALISIS-UNIFICADO-PRD.md`.
+
 # 🎉 Estado Actual del Proyecto POS Venezuela
 
 > Actualización completa (v1.10.0 - Enero 2025)

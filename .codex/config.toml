@@ -54,4 +54,3 @@ config_file = "agents/gsd-roadmapper.toml"
 [agents.gsd-verifier]
 description = "Verifies phase goal achievement through goal-backward analysis. Checks codebase delivers what phase promised, not just that tasks completed. Creates VERIFICATION.md report."
 config_file = "agents/gsd-verifier.toml"
-

@@ -156,9 +156,11 @@ pnpm install
 # Variables de entorno (opcional)
 cp env.example .env
 
-# Desarrollo (web o desktop)
+# Desarrollo web (Nuxt)
 pnpm dev          # servidor Nuxt
-pnpm tauri:dev    # app desktop con Tauri
+
+# Desarrollo desktop (Tauri + Nuxt)
+pnpm tauri:dev
 ```
 
 ### 🧰 Comandos útiles
@@ -174,10 +176,38 @@ pnpm db:generate
 pnpm db:migrate
 pnpm db:studio
 
-# Build
-pnpm build
+# Build web estático
+pnpm generate
+
+# Build desktop
 pnpm tauri:build
 ```
+
+### 🧪 Entorno de desarrollo (en limpio)
+
+1. Instala Node.js `>=23` y `pnpm` (este repo bloquea npm/yarn con `only-allow pnpm`).
+2. Instala prerequisitos de Rust/Tauri por SO: https://v2.tauri.app/start/prerequisites
+3. Ejecuta `pnpm install` en la raíz del proyecto.
+4. Si vienes de una instalación previa o migraste de versión, recompila dependencias nativas: `pnpm rebuild better-sqlite3`.
+5. En Linux desktop, valida prerequisitos nativos Tauri: `pnpm tauri:check:linux`.
+6. Ejecuta `pnpm db:migrate` para aplicar migraciones de Drizzle.
+7. Levanta el entorno:
+   - `pnpm dev` para flujo web.
+   - `pnpm tauri:dev` para flujo desktop.
+
+Política de builds nativos:
+- El repo permite scripts de build solo para `better-sqlite3` mediante `pnpm.onlyBuiltDependencies` en `package.json`.
+- Si agregas una nueva dependencia nativa, apruébala explícitamente con `pnpm approve-builds` y luego ejecuta `pnpm rebuild <paquete>`.
+
+### 🛠️ Troubleshooting mínimo
+
+- `pnpm: command not found`: instala pnpm (`corepack enable && corepack prepare pnpm@latest --activate`).
+- Error `GLIBC_2.39 not found` en `libsqlx_macros`: limpia artefactos de Rust y recompila (`cargo clean --manifest-path src-tauri/Cargo.toml`).
+- Error `glib-2.0.pc`/`glib-sys` en desktop Linux: instala librerías nativas del SO y verifica con `pnpm tauri:check:linux`.
+- Error de Rust/Tauri al abrir desktop: revisa toolchain y dependencias nativas del SO en `docs/tauri.md`.
+- Error de migraciones (`table already exists`): valida estado con `pnpm db:migrate` y revisa `docs/database.md` (sección de solución de problemas).
+- Error `Could not locate the bindings file` en `better-sqlite3`: ejecuta `pnpm rebuild better-sqlite3` y reintenta `pnpm db:migrate`.
+- Comando `pnpm build` no existe en este repo: usa `pnpm generate` para salida web y `pnpm tauri:build` para binarios desktop.
 
 ---
 
@@ -192,6 +222,7 @@ pnpm tauri:build
 ## 🧭 Documentación
 
 - Documentación ampliada en `docs/README.md`:
+  - Índice canónico y fuente de verdad (`docs/CANONICAL-DOCS.md`)
   - Estructura del proyecto y convenciones
   - Base de datos y migraciones
   - Integración Tauri y plugins
@@ -202,7 +233,7 @@ pnpm tauri:build
   - Variables de entorno y scripts
 
 Documentos relacionados en la raíz:
-- `ESTADO-ACTUAL-PROYECTO.md`, `ROADMAP-TAREAS-DESARROLLO.md`
+- `ESTADO-ACTUAL-PROYECTO.md`, `ROADMAP-TAREAS-DESARROLLO.md`, `ANALISIS-PRD-vs-ESTADO.md` (históricos; ver `docs/CANONICAL-DOCS.md`)
 - `RESUMEN-EJECUTIVO-v1.9.0.md`
 - `INTERFAZ-POS-COMPLETADA.md`, `GESTION-PRODUCTOS-COMPLETADA.md`
 - `CRUD-PRODUCTOS-COMPLETADO.md` - Documentación detallada del CRUD de productos

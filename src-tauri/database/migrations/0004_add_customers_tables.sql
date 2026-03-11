@@ -1,19 +1,16 @@
 PRAGMA foreign_keys=OFF;
 
+--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS `idx_customers_name` ON `customers`(`name`);
 
+--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS `idx_customers_email` ON `customers`(`email`);
 
+--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS `idx_customers_phone` ON `customers`(`phone`);
 
-CREATE INDEX IF NOT EXISTS `idx_customers_document_number` ON `customers`(`document_number`);
-
+--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS `idx_customers_is_active` ON `customers`(`is_active`);
 
-CREATE INDEX IF NOT EXISTS `idx_customer_sales_customer_id` ON `customer_sales`(`customer_id`);
-
-CREATE INDEX IF NOT EXISTS `idx_customer_sales_sale_id` ON `customer_sales`(`sale_id`);
-
-CREATE INDEX IF NOT EXISTS `idx_customer_sales_created_at` ON `customer_sales`(`created_at`);
-
+--> statement-breakpoint
 PRAGMA foreign_keys=ON;
