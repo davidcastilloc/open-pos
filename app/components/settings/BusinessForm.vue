@@ -44,6 +44,8 @@
 			/>
 		</UFormGroup>
 
+		<LogoUpload />
+
 		<div class="flex gap-3 pt-4">
 			<UButton
 				type="submit"
@@ -71,6 +73,7 @@
 <script setup lang="ts">
 	import type { BusinessData } from "~/composables/useBusiness";
 	import { onMounted, ref } from "vue";
+	import LogoUpload from "~/components/settings/LogoUpload.vue";
 	import { BusinessSchema, useBusiness } from "~/composables/useBusiness";
 
 	const emit = defineEmits<{
