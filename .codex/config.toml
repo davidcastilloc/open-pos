@@ -1,11 +1,12 @@
 # GSD Agent Configuration — managed by get-shit-done installer
+max_threads = 4
+max_depth = 2
+
 [features]
 multi_agent = true
 default_mode_request_user_input = true
 
 [agents]
-max_threads = 4
-max_depth = 2
 
 [agents.gsd-codebase-mapper]
 description = "Explores codebase and writes structured analysis documents. Spawned by map-codebase with a focus area (tech, arch, quality, concerns). Writes documents directly to reduce orchestrator context load."
