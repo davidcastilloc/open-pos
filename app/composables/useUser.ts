@@ -133,6 +133,19 @@ export function useUser() {
 		}
 	};
 
+	const getUserById = async (id: string): Promise<User | null> => {
+		try {
+			const result = await query<User>("SELECT * FROM users WHERE id = ? LIMIT 1", [id]);
+			if (result.rows.length > 0 && result.rows[0]) {
+				return result.rows[0];
+			}
+			return null;
+		} catch (error) {
+			console.error("Error getting user by ID:", error);
+			return null;
+		}
+	};
+
 	// Crear nuevo usuario
 	const createUser = async (userData: Omit<User, "id" | "createdAt" | "updatedAt">) => {
 		try {
@@ -202,7 +215,7 @@ export function useUser() {
 			// Actualizar usuario actual si es el mismo
 			if (currentUser.value?.id === id) {
 				const result = await query<User>("SELECT * FROM users WHERE id = ? LIMIT 1", [id]);
-				if (result.rows.length > 0) {
+				if (result.rows.length > 0 && result.rows[0]) {
 					currentUser.value = result.rows[0];
 				}
 			}
@@ -277,6 +290,7 @@ export function useUser() {
 		getCurrentUser,
 		setCurrentUser,
 		getAllUsers,
+		getUserById,
 		createUser,
 		updateUser,
 		deleteUser,
