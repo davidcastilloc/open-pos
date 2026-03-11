@@ -1,7 +1,7 @@
 export default defineNuxtPlugin({
 	name: "currency",
 	async setup() {
-		const { fetchCurrentRates, fetchBCVRates, fetchDolarTodayRates } = useCurrency();
+		const { fetchCurrentRates, fetchBCVRates, fetchDolarApiRates } = useCurrency();
 
 		// Intento inicial de actualización desde APIs externas (con fallback a tasas actuales)
 		try {
@@ -10,9 +10,9 @@ export default defineNuxtPlugin({
 			console.error("Error fetching BCV rates on init:", err);
 		}
 		try {
-			await fetchDolarTodayRates();
+			await fetchDolarApiRates();
 		} catch (err) {
-			console.error("Error fetching DolarToday rates on init:", err);
+			console.error("Error fetching DolarAPI rates on init:", err);
 		}
 		await fetchCurrentRates();
 
@@ -25,9 +25,9 @@ export default defineNuxtPlugin({
 				console.error("Error fetching BCV rates:", err);
 			}
 			try {
-				await fetchDolarTodayRates();
+				await fetchDolarApiRates();
 			} catch (err) {
-				console.error("Error fetching DolarToday rates:", err);
+				console.error("Error fetching DolarAPI rates:", err);
 			}
 			await fetchCurrentRates();
 		}, UPDATE_INTERVAL_MS);

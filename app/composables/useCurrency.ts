@@ -8,13 +8,23 @@ export const ExchangeRateSchema = z.object({
 	fromCurrency: z.enum(["BS", "USD", "EUR"]),
 	toCurrency: z.enum(["BS", "USD", "EUR"]),
 	rate: z.number().positive(),
-	source: z.enum(["BCV", "DOLAR_TODAY", "MANUAL"]),
+	source: z.enum(["BCV", "DOLAR_API", "MANUAL"]),
 	date: z.string(),
 	isValid: z.boolean().default(true),
 	createdAt: z.string()
 });
 
 export type ExchangeRate = z.infer<typeof ExchangeRateSchema>;
+
+type DolarApiOfficialResponse = {
+	fuente: string;
+	nombre: string;
+	moneda?: string;
+	compra: number | null;
+	venta: number | null;
+	promedio: number;
+	fechaActualizacion: string;
+};
 
 // Tasas de cambio por defecto (fallback)
 const defaultRates: Record<string, number> = {
@@ -100,7 +110,7 @@ export function useCurrency() {
 
 		try {
 			// Por ahora usamos tasas por defecto
-			// En el futuro esto vendrá de las APIs del BCV y DolarToday
+			// En el futuro esto vendrá de las APIs del BCV y DolarAPI
 			const rates: ExchangeRate[] = [
 				{
 					id: "1",
@@ -245,55 +255,64 @@ export function useCurrency() {
 		}
 	};
 
-	// Obtener tasas desde DolarToday
-	const fetchDolarTodayRates = async () => {
+	// Obtener tasas desde DolarAPI
+	const fetchDolarApiRates = async () => {
 		try {
-			console.log("Fetching DolarToday rates...");
+			console.log("Fetching DolarAPI rates...");
 
-			// API de DolarToday - usando endpoint público
-			const response = await $fetch("https://s3.amazonaws.com/dolartoday/data.json", {
-				method: "GET",
-				headers: {
-					Accept: "application/json",
-					"User-Agent": "POS-Venezuela/1.0"
-				},
-				timeout: 10000 // 10 segundos timeout
-			}) as any;
+			const [usdResponse, eurResponse] = await Promise.all([
+				$fetch<DolarApiOfficialResponse>("https://ve.dolarapi.com/v1/dolares/oficial", {
+					method: "GET",
+					headers: {
+						Accept: "application/json",
+						"User-Agent": "POS-Venezuela/1.0"
+					},
+					timeout: 10000
+				}),
+				$fetch<DolarApiOfficialResponse>("https://ve.dolarapi.com/v1/euros/oficial", {
+					method: "GET",
+					headers: {
+						Accept: "application/json",
+						"User-Agent": "POS-Venezuela/1.0"
+					},
+					timeout: 10000
+				})
+			]);
 
-			if (response && response.USD) {
-				const usdRate = Number.parseFloat(response.USD.dolartoday);
-				const eurRate = Number.parseFloat(response.EUR.dolartoday);
+			if (Number.isFinite(usdResponse.promedio) && Number.isFinite(eurResponse.promedio)) {
+				const usdRate = Number(usdResponse.promedio);
+				const eurRate = Number(eurResponse.promedio);
 
 				// Actualizar tasas en el estado
 				exchangeRates.value.USD = {
-					id: `dolartoday_usd_${Date.now()}`,
+					id: `dolarapi_usd_${Date.now()}`,
 					fromCurrency: "BS" as any,
 					toCurrency: "USD" as any,
 					rate: usdRate,
-					source: "DOLAR_TODAY" as any,
+					source: "DOLAR_API" as any,
 					date: new Date().toISOString().split("T")[0] as string,
 					isValid: true,
 					createdAt: new Date().toISOString()
 				};
 				exchangeRates.value.EUR = {
-					id: `dolartoday_eur_${Date.now()}`,
+					id: `dolarapi_eur_${Date.now()}`,
 					fromCurrency: "BS" as any,
 					toCurrency: "EUR" as any,
 					rate: eurRate,
-					source: "DOLAR_TODAY" as any,
+					source: "DOLAR_API" as any,
 					date: new Date().toISOString().split("T")[0] as string,
 					isValid: true,
 					createdAt: new Date().toISOString()
 				};
 
 				// Guardar en base de datos
-				await saveExchangeRate("BS", "USD", usdRate, "DolarToday");
-				await saveExchangeRate("BS", "EUR", eurRate, "DolarToday");
+				await saveExchangeRate("BS", "USD", usdRate, "DolarAPI");
+				await saveExchangeRate("BS", "EUR", eurRate, "DolarAPI");
 
-				console.log("✅ DolarToday rates updated:", { USD: usdRate, EUR: eurRate });
+				console.log("✅ DolarAPI rates updated:", { USD: usdRate, EUR: eurRate });
 			}
 		} catch (err) {
-			console.error("Error fetching DolarToday rates:", err);
+			console.error("Error fetching DolarAPI rates:", err);
 			// Fallback a tasas por defecto si falla la API
 			exchangeRates.value.USD = {
 				id: `fallback_usd_${Date.now()}`,
@@ -434,7 +453,7 @@ export function useCurrency() {
 		formatCurrency,
 		fetchCurrentRates,
 		fetchBCVRates,
-		fetchDolarTodayRates,
+		fetchDolarApiRates,
 		updateManualRate,
 		getRateHistory,
 		loadLatestRatesFromDB,

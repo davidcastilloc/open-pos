@@ -37,7 +37,7 @@ export const defaultConfig: Record<string, any> = {
 		supportedCurrencies: ["BS", "USD", "EUR"],
 		exchangeRateSources: [
 			{ name: "BCV", priority: 1, url: "https://api.bcv.org.ve", isActive: true },
-			{ name: "DolarToday", priority: 2, url: "https://s3.amazonaws.com/dolartoday", isActive: true },
+			{ name: "DolarAPI", priority: 2, url: "https://ve.dolarapi.com/v1/dolares/oficial", isActive: true },
 			{ name: "Manual", priority: 3, url: null, isActive: true }
 		],
 		updateInterval: 15,

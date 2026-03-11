@@ -21,7 +21,7 @@ export const exchangeRates = sqliteTable("exchange_rates", {
 	fromCurrency: text("from_currency").notNull(),
 	toCurrency: text("to_currency").notNull(),
 	rate: text("rate").notNull(),
-	source: text("source").notNull(), // 'BCV', 'DOLAR_TODAY', 'MANUAL'
+	source: text("source").notNull(), // 'BCV', 'DOLAR_API', 'MANUAL'
 	date: text("date").notNull(),
 	isValid: integer("is_valid", { mode: "boolean" }).notNull().default(true),
 	createdAt: text("created_at").notNull().$defaultFn(() => new Date().toISOString())

@@ -18,7 +18,7 @@
 		"lint": "eslint . --ext .js,.jsx,.ts,.tsx,.vue --fix",
 		"verify:usehead": "bash scripts/verify-usehead.sh",
 		"type-check": "nuxt typecheck",
-		"test": "vitest",
+		"test": "vitest run",
 		"test:ui": "vitest --ui",
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate",

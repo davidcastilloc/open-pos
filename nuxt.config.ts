@@ -94,7 +94,7 @@ export default defineNuxtConfig({
 			appVersion: "1.0.0",
 			apiBaseUrl: process.env.API_BASE_URL || "http://localhost:3000/api",
 			bcvApiUrl: "https://api.bcv.org.ve",
-			dolarTodayApiUrl: "https://s3.amazonaws.com/dolartoday",
+			dolarApiUrl: "https://ve.dolarapi.com/v1/dolares/oficial",
 			supportedCurrencies: ["BS", "USD", "EUR"],
 			defaultCurrency: "BS"
 		}
